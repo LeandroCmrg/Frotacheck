@@ -102,7 +102,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
 .pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
 .enhance-card[hidden]{display:none!important}
-/* FrotaCheck 5.7.1: etapas automaticas visiveis; tratamento continua invisivel */
+/* FrotaCheck 5.7.2: etapas automaticas visiveis; tratamento continua invisivel */
 .stage-area{border-top:1px solid var(--line);padding:17px 22px 4px}
 .stage-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
 .stage-heading strong{font-size:13px}.stage-heading span{font-size:11px;font-weight:750;color:var(--muted)}
@@ -122,7 +122,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7.1</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7.2</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura por etapas</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck melhora a imagem, lê os dados e verifica o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
@@ -701,7 +701,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.7.1',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.7.2',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -833,7 +833,7 @@ self.onmessage=e=>{
   }
   function docCheck(t,map={}){return documentEvidence(t,map).level==='identified';}
   function scoreMap(m){return ['placa','exercicio','uf','especie','modelo','pbt','eixos'].reduce((acc,k)=>acc+(m[k]?.score||0),0);}
-  // FrotaCheck 5.7.1.1: a rotina havia sido removida por engano na versão 5.7.
+  // FrotaCheck 5.7.2.1: a rotina havia sido removida por engano na versão 5.7.
   // O mapa armazena objetos {value, score, origin}; não basta existir a chave.
   function missingImportant(map){
     return ['placa','exercicio','uf','especie'].some(k=>!map?.[k]?.value);
@@ -873,7 +873,7 @@ self.onmessage=e=>{
     return window.pdfjsLib;
   }
   // Reutiliza um único worker Tesseract: evita carregar o idioma para cada CRLV.
-  async function ocr(input,psm=null){
+  async function ocr(input,psm=null,options={}){
     if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
     if(!window.Tesseract)throw Error('Motor OCR indisponível. Conecte-se à internet e recarregue.');
     if(!ocrWorkerPromise){
@@ -882,8 +882,12 @@ self.onmessage=e=>{
       }).catch(err=>{ocrWorkerPromise=null;throw err;});
     }
     const worker=await ocrWorkerPromise;
-    // PSM 11 = texto esparso, útil para CRLV em várias colunas.
-    await worker.setParameters({tessedit_pageseg_mode:psm===7?'7':psm===6?'6':psm===11?'11':'3'});
+    // O campo Exercício recebe leitura numérica isolada. A restrição de
+    // caracteres é removida na próxima chamada para não afetar outros campos.
+    await worker.setParameters({
+      tessedit_pageseg_mode:psm===7?'7':psm===6?'6':psm===11?'11':'3',
+      tessedit_char_whitelist:options.digitsOnly?'0123456789':''
+    });
     const r=await worker.recognize(input);
     return r?.data?.text||'';
   }
@@ -1015,6 +1019,45 @@ self.onmessage=e=>{
       if(m)register(map,'uf',m[1],2,'Órgão emissor');
     }
   }
+  // Fallback 5.7.2: recuperar o EXERCÍCIO quando o OCR textual não conseguiu.
+  // Não é uma suposição baseada na data atual ou no calendário de 2026:
+  // lê somente o retângulo do valor localizado abaixo de EXERCÍCIO no CRLV-e.
+  function yearFromFocusedOCR(raw){
+    const value=String(raw||'').toUpperCase().replace(/[OQ]/g,'0').replace(/[IL|]/g,'1');
+    // Em recortes muito estreitos o OCR pode espaçar os quatro algarismos.
+    const compact=value.replace(/[\s.·_:;-]+/g,'').replace(/[^0-9]/g,'');
+    if(/^20[12][0-9]$/.test(compact))return compact;
+    const matches=[...new Set(value.match(/\b20[12][0-9]\b/g)||[])];
+    return matches.length===1?matches[0]:null;
+  }
+  async function recoverExercise(scanned,original,map,parts){
+    if(map.exercicio?.value)return;
+    const portrait=c=>c&&c.width>420&&c.height>550&&c.height/c.width>1.12&&c.height/c.width<2.25;
+    const sources=[
+      {canvas:original,label:'PDF/foto original'},
+      {canvas:scanned,label:'cópia digitalizada'}
+    ].filter(x=>portrait(x.canvas));
+    const zones=[
+      // Apenas a linha dos quatro dígitos. Não inclui fabricação/modelo (2018/2019).
+      {box:[.196,.181,.076,.017],psm:7},
+      {box:[.192,.179,.082,.021],psm:7},
+      {box:[.185,.171,.107,.028],psm:6},
+      {box:[.180,.165,.125,.038],psm:6}
+    ];
+    for(const src of sources){
+      for(const z of zones){
+        let raw='';
+        try{raw=await ocr(fieldCrop(src.canvas,z.box),z.psm,{digitsOnly:true});}
+        catch(_){continue;}
+        const value=yearFromFocusedOCR(raw);
+        if(!value)continue;
+        register(map,'exercicio',value,4,'Exercício isolado · '+src.label);
+        parts.push('--- EXERCÍCIO EM RECORTE NUMÉRICO ('+src.label+') ---\n'+raw.trim());
+        return;
+      }
+    }
+    parts.push('--- EXERCÍCIO: leitura dirigida não conclusiva; conferir campo na cópia ---');
+  }
   function canvasRegion(source,x,y,w,h,maxSide=2200){
     const sx=Math.round(source.width*x),sy=Math.round(source.height*y);
     const sw=Math.max(1,Math.round(source.width*w)),sh=Math.max(1,Math.round(source.height*h));
@@ -1046,6 +1089,9 @@ self.onmessage=e=>{
     // Leitura precisa dos valores, antes de repetir OCR em metades da folha.
     // A copia tratada e lida primeiro; a original preserva caracteres pequenos.
     await readCrlvFieldZones(c,originalSource||source,map,parts);
+    // Tesseract às vezes perde os 4 dígitos em um layout de duas colunas.
+    // A recuperação usa recortes ainda menores e reconhece somente números.
+    if(!map.exercicio?.value)await recoverExercise(c,originalSource||source,map,parts);
     // Reconhecimento por regiões evita que campos pequenos se percam na página inteira.
     if(missingImportant(map)||!map.pbt||!map.eixos||!map.modelo){
       // Colunas superiores do CRLV, onde ficam placa, exercício, espécie e PBT.
