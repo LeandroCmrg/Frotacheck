@@ -102,7 +102,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
 .pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
 .enhance-card[hidden]{display:none!important}
-/* FrotaCheck 5.7: etapas automaticas visiveis; tratamento continua invisivel */
+/* FrotaCheck 5.7.1: etapas automaticas visiveis; tratamento continua invisivel */
 .stage-area{border-top:1px solid var(--line);padding:17px 22px 4px}
 .stage-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
 .stage-heading strong{font-size:13px}.stage-heading span{font-size:11px;font-weight:750;color:var(--muted)}
@@ -122,7 +122,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7.1</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura por etapas</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck melhora a imagem, lê os dados e verifica o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
@@ -701,7 +701,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.7',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.7.1',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -833,6 +833,11 @@ self.onmessage=e=>{
   }
   function docCheck(t,map={}){return documentEvidence(t,map).level==='identified';}
   function scoreMap(m){return ['placa','exercicio','uf','especie','modelo','pbt','eixos'].reduce((acc,k)=>acc+(m[k]?.score||0),0);}
+  // FrotaCheck 5.7.1.1: a rotina havia sido removida por engano na versão 5.7.
+  // O mapa armazena objetos {value, score, origin}; não basta existir a chave.
+  function missingImportant(map){
+    return ['placa','exercicio','uf','especie'].some(k=>!map?.[k]?.value);
+  }
   function setExtracted(map,mode,text,identified=null){
     fields.filter(k=>k!=='override').forEach(k=>$(k).value='');$('override').value='';
     for(const [key,val] of Object.entries(map)){if($(key))$(key).value=val.value;}
