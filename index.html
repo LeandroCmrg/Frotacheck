@@ -10,39 +10,242 @@
 *{box-sizing:border-box}body{margin:0}.stripe{height:7px;background:linear-gradient(90deg,#ffcc00 72%,#d40511 72%)}
 header{background:#ffcc00;border-bottom:1px solid #e9bd00;padding:18px 24px}header .wrap{max-width:1040px;margin:auto;display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;display:grid;place-items:center;font-size:25px;font-weight:900;color:white;background:#d40511;border-radius:12px}h1{font-size:22px;margin:0}header small{font-weight:650;font-size:11px;letter-spacing:.12em;color:#7f4200}main{max-width:1040px;margin:24px auto;padding:0 18px 32px}
 h2{font-size:24px;margin:0 0 8px}.sub{color:#555;line-height:1.55;margin:0 0 17px;font-size:14px}.panel{background:white;border:1px solid #e6e2da;border-radius:18px;padding:22px;box-shadow:0 7px 30px #2221}.upload{border:2px dashed #dec36b;background:#fffdf5;border-radius:15px;min-height:145px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;text-align:center;cursor:pointer}.upload:focus-visible{outline:3px solid #d40511}.upload strong{font-size:17px}.upload small{color:#675f50}.button{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:12px 18px;border:0;background:#d40511;color:white;font-weight:750;border-radius:10px;cursor:pointer;font-size:14px;text-decoration:none}.button:disabled{background:#bbb;cursor:not-allowed}.button.secondary{background:#252525}.tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px}.notice{margin:16px 0 0;background:#fff9e8;border:1px solid #ead99e;padding:11px 15px;border-radius:10px;font-size:13px;color:#755217;line-height:1.55}.notice.ok{background:#effaf1;color:#246337;border-color:#bde2c3}.notice.warn{background:#fff2ec;color:#a43c21;border-color:#f8cebd}.results{display:none;margin-top:20px}.results.show{display:block}.columns{display:grid;grid-template-columns:1fr 1fr;gap:16px}.image-card{border:1px solid #e9e3d8;border-radius:13px;padding:13px;min-width:0;background:#fff}.image-card h3{font-size:15px;margin:0 0 10px}.viewer{min-height:200px;background:#f2f0eb;display:flex;justify-content:center;align-items:center;border-radius:8px;overflow:hidden}.viewer canvas{display:block;max-width:100%;height:auto;max-height:530px;object-fit:contain}.small{font-size:12px;color:#666;line-height:1.5}.footer{margin:18px 0;font-size:12px;color:#74716a}.hidden{display:none!important}.progress{height:7px;background:#eee;border-radius:99px;overflow:hidden;margin-top:10px}.progress>div{height:100%;width:0;background:#d40511;transition:width .3s}#file{display:none}@media(max-width:620px){.columns{grid-template-columns:1fr}main{margin:16px auto}.panel{padding:16px}h2{font-size:21px}.tools .button{width:100%}}
+
+#status{min-height:44px} .button:focus-visible,.upload:focus-visible{outline:3px solid #ac080f;outline-offset:2px}
 </style>
 </head>
 <body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>LABORATÓRIO DE SCANNER · TESTE</small></div></div></header>
-<main><section class="panel"><h2>Vamos testar a digitalização inteligente</h2><p class="sub">Esta página experimental testa o <strong>jscanify + OpenCV.js</strong>. Ela procura as bordas da folha, corrige a perspectiva e melhora a leitura, sem API paga. <strong>Seu FrotaCheck principal não é alterado.</strong></p>
-<label for="file" class="upload" id="dropzone" tabindex="0" role="button"><span style="font-size:34px">📄</span><strong>Selecionar foto ou PDF de teste</strong><small>JPG, PNG ou PDF · até 15 MB · processamento no navegador</small><span class="button" aria-hidden="true">Escolher documento</span></label><input type="file" id="file" accept="application/pdf,image/jpeg,image/png,image/webp,.pdf,.jpg,.jpeg,.png,.webp" />
+<main><section class="panel"><h2>Vamos testar a digitalização inteligente</h2><p class="sub">Esta versão utiliza um <strong>scanner leve em processamento separado</strong>, para recortar, endireitar e limpar fotografias de documentos sem travar a página. Não requer API paga nem OpenCV. <strong>Seu FrotaCheck principal não é alterado.</strong></p>
+<label for="file" class="upload" id="dropzone" tabindex="0" role="button"><span style="font-size:34px">📄</span><strong>Selecionar foto ou PDF de teste</strong><small>JPG, PNG ou PDF · até 15 MB · processamento local e separado da tela</small><span class="button" aria-hidden="true">Escolher documento</span></label><input type="file" id="file" accept="application/pdf,image/jpeg,image/png,image/webp,.pdf,.jpg,.jpeg,.png,.webp" />
 <div class="tools"><button class="button secondary" id="process" disabled>↻ Processar novamente</button><button class="button" id="download" disabled>↓ Baixar PDF melhorado</button></div>
-<div class="notice" role="status" id="status">Pronto para receber um documento. O processamento é local e bibliotecas são carregadas pela internet.</div><div class="progress hidden" id="progress"><div id="progressbar"></div></div>
+<div class="notice" role="status" id="status">Pronto para digitalizar. Fotos funcionam sem bibliotecas externas; PDF depende do leitor PDF.js.</div><div class="progress hidden" id="progress"><div id="progressbar"></div></div>
 <section id="results" class="results"><div class="columns"><div class="image-card"><h3>Foto original</h3><div class="viewer" id="original"></div></div><div class="image-card"><h3>Após digitalização</h3><div class="viewer" id="processed"></div></div></div><p id="notes" class="small"></p></section>
 <p class="footer"><strong>Importante:</strong> a cópia tratada não substitui o CRLV oficial, não valida sua autenticidade e não deve apagar rasuras ou informação existente. Se o scanner não detectar bordas com confiança, será preservada a página inteira. Não use documentos com dados pessoais sem autorização.</p>
 </section></main>
+
+<script id="worker-code" type="text/plain">
+(() => {
+"use strict";
+const clamp=x=>x<0?0:x>255?255:x;
+function median(a){a.sort((x,y)=>x-y);return a[Math.floor(a.length/2)];}
+function findDocument(rgba,W,H){
+  // Análise só em miniatura; evita cálculo pesado no arquivo inteiro.
+  const sampleW=Math.min(340,W), sampleH=Math.round(H*sampleW/W);
+  const n=sampleW*sampleH, small=new Uint8Array(n*3), sx=W/sampleW, sy=H/sampleH;
+  for(let y=0;y<sampleH;y++)for(let x=0;x<sampleW;x++){
+    const k=(Math.min(H-1,Math.floor(y*sy))*W+Math.min(W-1,Math.floor(x*sx)))*4,i=(y*sampleW+x)*3;
+    small[i]=rgba[k];small[i+1]=rgba[k+1];small[i+2]=rgba[k+2];
+  }
+  const rr=[],gg=[],bb=[],edge=Math.max(2,Math.floor(Math.min(sampleW,sampleH)*.025));
+  for(let y=0;y<sampleH;y+=Math.max(2,Math.floor(sampleH/25)))for(let x=0;x<sampleW;x+=Math.max(2,Math.floor(sampleW/25))){
+    if(!(x<edge*2||y<edge*2||x>sampleW-edge*2||y>sampleH-edge*2))continue;
+    const i=(y*sampleW+x)*3;rr.push(small[i]);gg.push(small[i+1]);bb.push(small[i+2]);
+  }
+  if(rr.length<4)return null;
+  const bg=[median(rr),median(gg),median(bb)],bgl=(bg[0]+bg[1]+bg[2])/3;
+  const center=[];
+  for(const fy of [.4,.5,.6])for(const fx of [.35,.5,.65]){
+    const i=(Math.floor(fy*sampleH)*sampleW+Math.floor(fx*sampleW))*3;
+    center.push([small[i],small[i+1],small[i+2]]);
+  }
+  const paper=center.map(v=>(v[0]+v[1]+v[2])/3).sort((a,b)=>a-b)[Math.floor(center.length/2)];
+  // Papel sem contraste com fundo: não arriscar recortar partes do CRLV.
+  if(Math.abs(paper-bgl)<24)return null;
+  const brighter=paper>bgl,mask=new Uint8Array(n),limit=Math.max(15,Math.min(48,Math.abs(paper-bgl)*.27));
+  for(let i=0;i<n;i++){
+    const j=i*3,r=small[j],g=small[j+1],b=small[j+2],lum=(r+g+b)/3;
+    const diff=Math.sqrt(((r-bg[0])**2+(g-bg[1])**2+(b-bg[2])**2)/3);
+    mask[i]=(diff>limit && (brighter?lum>bgl+11:lum<bgl-11))?1:0;
+  }
+  // Ligação de pequenos vazios do documento e agrupamento da maior região.
+  const seen=new Uint8Array(n),queue=new Int32Array(n);let best=null;
+  for(let i=0;i<n;i++){
+    if(!mask[i]||seen[i])continue;
+    let head=0,tail=1;queue[0]=i;seen[i]=1;
+    let area=0,minX=sampleW,maxX=0,minY=sampleH,maxY=0;
+    let TL=[1e10,null],TR=[-1e10,null],BR=[-1e10,null],BL=[1e10,null];
+    while(head<tail){
+      const p=queue[head++],x=p%sampleW,y=Math.floor(p/sampleW);area++;
+      if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
+      if(x+y<TL[0])TL=[x+y,[x,y]];
+      if(x-y>TR[0])TR=[x-y,[x,y]];
+      if(x+y>BR[0])BR=[x+y,[x,y]];
+      if(x-y<BL[0])BL=[x-y,[x,y]];
+      const ns=[x>0?p-1:-1,x+1<sampleW?p+1:-1,y>0?p-sampleW:-1,y+1<sampleH?p+sampleW:-1];
+      for(const v of ns)if(v>=0&&mask[v]&&!seen[v]){seen[v]=1;queue[tail++]=v;}
+    }
+    if(!best||area>best.area)best={area,minX,maxX,minY,maxY,points:[TL[1],TR[1],BR[1],BL[1]]};
+  }
+  if(!best)return null;
+  let frac=best.area/n,bw=(best.maxX-best.minX)/sampleW,bh=(best.maxY-best.minY)/sampleH;
+  if(frac<.15||frac>.93||bw<.38||bh<.38)return null;
+  // Conversão dos cantos amostrados para coordenadas da imagem real.
+  const pts=best.points.map(([x,y])=>({x:Math.min(W-1,x*sx),y:Math.min(H-1,y*sy)}));
+  const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  const width=(d(pts[0],pts[1])+d(pts[3],pts[2]))/2;
+  const height=(d(pts[0],pts[3])+d(pts[1],pts[2]))/2;
+  if(width<.25*W||height<.25*H||width*height<.15*W*H)return null;
+  return {points:pts,width,height,confidence:Math.min(.95,frac*1.45),area:frac};
+}
+function warp(rgba,W,H,doc){
+  const pts=doc.points;
+  // Contrato do quadrilátero: TL,TR,BR,BL.
+  const [P0,P1,P2,P3]=pts;
+  const dx1=P1.x-P2.x,dx2=P3.x-P2.x,dx3=P0.x-P1.x+P2.x-P3.x;
+  const dy1=P1.y-P2.y,dy2=P3.y-P2.y,dy3=P0.y-P1.y+P2.y-P3.y;
+  let g=0,h=0;
+  const det=dx1*dy2-dx2*dy1;
+  if(Math.abs(det)>1e-6){g=(dx3*dy2-dx2*dy3)/det;h=(dx1*dy3-dx3*dy1)/det;}
+  const a=P1.x-P0.x+g*P1.x,b=P3.x-P0.x+h*P3.x,c=P0.x;
+  const d=P1.y-P0.y+g*P1.y,e=P3.y-P0.y+h*P3.y,f=P0.y;
+  const sc=Math.min(1.25,1600/Math.max(doc.width,doc.height));
+  const w=Math.max(1,Math.round(doc.width*sc)),hh=Math.max(1,Math.round(doc.height*sc));
+  const out=new Uint8ClampedArray(w*hh*4);
+  for(let y=0;y<hh;y++){
+    const v=y/Math.max(1,hh-1);
+    for(let x=0;x<w;x++){
+      const u=x/Math.max(1,w-1),z=g*u+h*v+1;
+      const px=(a*u+b*v+c)/z,py=(d*u+e*v+f)/z;
+      const X=Math.max(0,Math.min(W-1,Math.round(px))),Y=Math.max(0,Math.min(H-1,Math.round(py)));
+      const i=(Y*W+X)*4,k=(y*w+x)*4;
+      out[k]=rgba[i];out[k+1]=rgba[i+1];out[k+2]=rgba[i+2];out[k+3]=255;
+    }
+  }
+  return {pixels:out,width:w,height:hh};
+}
+function enhance(img){
+  const {width:W,height:H,pixels:src}=img,n=W*H;
+  const gray=new Uint8Array(n);
+  for(let i=0;i<n;i++){let k=i*4;gray[i]=Math.round(src[k]*.299+src[k+1]*.587+src[k+2]*.114);}
+  // Iluminação local por imagem integral: compensa sombras sem eliminar marcas do documento.
+  const stride=W+1,integral=new Float64Array(stride*(H+1));
+  for(let y=1;y<=H;y++){
+    let sum=0;
+    for(let x=1;x<=W;x++){sum+=gray[(y-1)*W+x-1];integral[y*stride+x]=integral[(y-1)*stride+x]+sum;}
+  }
+  const R=Math.max(14,Math.round(Math.min(W,H)/22));
+  const out=new Uint8ClampedArray(n*4);
+  for(let y=0;y<H;y++){
+    const y0=Math.max(0,y-R),y1=Math.min(H-1,y+R);
+    for(let x=0;x<W;x++){
+      const x0=Math.max(0,x-R),x1=Math.min(W-1,x+R);
+      const avg=(integral[(y1+1)*stride+x1+1]-integral[y0*stride+x1+1]-integral[(y1+1)*stride+x0]+integral[y0*stride+x0])/((x1-x0+1)*(y1-y0+1));
+      const raw=gray[y*W+x];
+      // Balanço: papel mais branco, tinta escura permanece.
+      const corrected=(raw-(avg-234)*.76-128)*1.1+128;
+      const v=clamp(Math.round(corrected)),k=(y*W+x)*4;
+      out[k]=out[k+1]=out[k+2]=v;out[k+3]=255;
+    }
+  }
+  return {pixels:out,width:W,height:H};
+}
+self.onmessage=e=>{
+  const {id,pixels,width,height}=e.data;
+  try{
+    const rgba=new Uint8ClampedArray(pixels);
+    const detected=findDocument(rgba,width,height);
+    const input=detected?warp(rgba,width,height,detected):{pixels:rgba,width,height};
+    const output=enhance(input);
+    self.postMessage({id,ok:true,width:output.width,height:output.height,pixels:output.pixels.buffer,cropped:!!detected,confidence:detected?.confidence||0},[output.pixels.buffer]);
+  }catch(err){self.postMessage({id,ok:false,error:String(err?.message||err).slice(0,160)});}
+};
+})();
+</script>
 <script>
+(() => {
 'use strict';
-const $ = id=>document.getElementById(id);
-const input=$('file'), statusEl=$('status');
-let prepared=[], busy=false, lastName='documento', dependencies={};
-const urls={pdfjs:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',pdfLib:'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',opencv:'https://docs.opencv.org/4.7.0/opencv.js',jscanify:'https://cdn.jsdelivr.net/npm/jscanify@1.4.3/src/jscanify.min.js'};
-function status(message,kind=''){statusEl.textContent=message;statusEl.className='notice '+kind}
-function showProgress(value){$('progress').classList.remove('hidden');$('progressbar').style.width=(value||0)+'%'}
-function finishProgress(){$('progress').classList.add('hidden')}
-function loadScript(name){if(dependencies[name])return dependencies[name];dependencies[name]=new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src=urls[name];sc.async=true;sc.onload=resolve;sc.onerror=()=>reject(Error('Não foi possível carregar '+name));document.head.append(sc)});return dependencies[name];}
-async function loadCV(){await loadScript('opencv');let c=window.cv;if(c && typeof c.then==='function') c=await c;const start=Date.now();while(!(c&&c.Mat)){if(Date.now()-start>30000)throw Error('OpenCV demorou para iniciar');await new Promise(r=>setTimeout(r,100));c=window.cv;}return c}
-function makeCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
-function imageFromBlob(blob){return new Promise((resolve,reject)=>{let url=URL.createObjectURL(blob);const im=new Image();im.onload=()=>{URL.revokeObjectURL(url);resolve(im)};im.onerror=()=>{URL.revokeObjectURL(url);reject(Error('Imagem inválida'))};im.src=url})}
-function rasterImage(img){const scale=Math.min(1,2800/Math.max(img.naturalWidth,img.naturalHeight));const c=makeCanvas(Math.max(1,Math.round(img.naturalWidth*scale)),Math.max(1,Math.round(img.naturalHeight*scale)));c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c}
-async function pagesFromFile(file){if(file.type==='application/pdf'||/\.pdf$/i.test(file.name)){await loadScript('pdfjs');const pdfjs=window.pdfjsLib;if(!pdfjs)throw Error('PDF.js não carregou.');pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;const pages=[];for(let i=1;i<=Math.min(pdf.numPages,6);i++){const page=await pdf.getPage(i),v=page.getViewport({scale:2}),scale=Math.min(1,2600/Math.max(v.width,v.height)),vp=page.getViewport({scale:2*scale});const canvas=makeCanvas(Math.round(vp.width),Math.round(vp.height));await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;pages.push({original:canvas,fromPDF:true})}return pages}
- const img=await imageFromBlob(file);return [{original:rasterImage(img),fromPDF:false}];}
-function contrast(canvas,cv){const src=cv.imread(canvas);let gray=new cv.Mat(),smooth=new cv.Mat(),background=new cv.Mat(),normalized=new cv.Mat();try{cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY);cv.GaussianBlur(gray,smooth,new cv.Size(3,3),0);let k=Math.min(81,Math.floor(Math.min(canvas.width,canvas.height)/14)|1);k=Math.max(9,k%2?k:k+1);cv.GaussianBlur(smooth,background,new cv.Size(k,k),0);cv.divide(smooth,background,normalized,225);cv.normalize(normalized,normalized,0,255,cv.NORM_MINMAX);const out=makeCanvas(canvas.width,canvas.height);cv.imshow(out,normalized);return out;}finally{src.delete();gray.delete();smooth.delete();background.delete();normalized.delete()}}
-function fallbackContrast(canvas){const c=makeCanvas(canvas.width,canvas.height);const ctx=c.getContext('2d');ctx.filter='grayscale(1) contrast(1.2) brightness(1.03)';ctx.drawImage(canvas,0,0);ctx.filter='none';return c}
-function variance(canvas){const w=Math.min(canvas.width,120),h=Math.min(canvas.height,120),c=makeCanvas(w,h);c.getContext('2d').drawImage(canvas,0,0,w,h);const d=c.getContext('2d').getImageData(0,0,w,h).data;let n=0,mean=0,v=0,light=0;for(let i=0;i<d.length;i+=4){const x=(d[i]+d[i+1]+d[i+2])/3;n++;mean+=x;v+=x*x;if(x>245)light++}mean/=n;return {var:v/n-mean*mean,white:light/n,mean}}
-function scanPaper(canvas,scanner){const landscape=canvas.width>canvas.height;const w=landscape?1754:1240,h=landscape?1240:1754;const extracted=scanner.extractPaper(canvas,w,h);if(!extracted||!extracted.width||!extracted.height)throw Error('O recorte não foi gerado.');const stat=variance(extracted),org=variance(canvas);if(stat.var<15||stat.mean<18||stat.white>.985)throw Error('Resultado do recorte suspeito');return {canvas:extracted,description:'Bordas detectadas e perspectiva corrigida (jscanify)'};}
-function present(first){$('original').replaceChildren(first.original.cloneNode());const copy=makeCanvas(first.original.width,first.original.height);copy.getContext('2d').drawImage(first.original,0,0);$('original').replaceChildren(copy);const after=makeCanvas(first.result.width,first.result.height);after.getContext('2d').drawImage(first.result,0,0);$('processed').replaceChildren(after);$('notes').textContent=first.description+' · A imagem original foi preservada.';$('results').classList.add('show');}
-async function processFile(file){if(!file)return;if(file.size>15*1024*1024){status('Arquivo acima de 15 MB.','warn');return;}busy=true;$('process').disabled=true;$('download').disabled=true;lastName=file.name.replace(/\.[^.]+$/,'');try{status('Carregando bibliotecas do scanner...');showProgress(12);const cv=await loadCV();await loadScript('jscanify');if(typeof window.jscanify!=='function')throw Error('jscanify não iniciou');const scanner=new window.jscanify();status('Abrindo documento...');const pages=await pagesFromFile(file);showProgress(35);const output=[];for(let i=0;i<pages.length;i++){const page=pages[i];let clipped=page.original,desc='Página preservada';if(!page.fromPDF){try{const ext=scanPaper(page.original,scanner);clipped=ext.canvas;desc=ext.description}catch(e){desc='Bordas não confirmadas: mantive a imagem inteira'}}else{desc='PDF: página original preservada (sem recorte agressivo)'}let improved;try{improved=contrast(clipped,cv)}catch{improved=fallbackContrast(clipped);desc+=' · contraste alternativo'}output.push({original:page.original,result:improved,description:desc});showProgress(35+Math.round(60*(i+1)/pages.length))}prepared=output;present(output[0]);$('download').disabled=false;$('process').disabled=false;status(`${output.length} página(s) processada(s). Compare o antes e depois e baixe a cópia, se estiver legível.`,'ok');}catch(e){status('Não foi possível concluir o teste: '+(e.message||'Erro inesperado')+'. Confirme que está online e tente de novo.','warn');prepared=[];}finally{finishProgress();busy=false;$('process').disabled=false}}
-input.addEventListener('change',()=>processFile(input.files?.[0]));$('process').addEventListener('click',()=>!busy&&processFile(input.files?.[0]));$('dropzone').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}});$('dropzone').addEventListener('dragover',e=>e.preventDefault());$('dropzone').addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files?.length){input.files=e.dataTransfer.files;processFile(input.files[0])}});
-$('download').addEventListener('click',async()=>{if(!prepared.length||busy)return;try{$('download').disabled=true;status('Gerando PDF...');await loadScript('pdfLib');const PDFLib=window.PDFLib;if(!PDFLib)throw Error('pdf-lib indisponível');const pdf=await PDFLib.PDFDocument.create();pdf.setTitle('Cópia digitalizada para leitura - FrotaCheck');for(const p of prepared){const data=p.result.toDataURL('image/png');const png=await pdf.embedPng(data);const width=595,height=842;let w=width,h=width*(png.height/png.width);if(h>height){h=height;w=height*(png.width/png.height)}const pg=pdf.addPage([width,height]);pg.drawImage(png,{x:(width-w)/2,y:(height-h)/2,width:w,height:h})}const bytes=await pdf.save();const blob=new Blob([bytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=lastName+'-copia-melhorada.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);status('PDF de leitura gerado. O arquivo original não foi alterado.','ok')}catch(e){status('Erro ao gerar PDF: '+e.message,'warn')}finally{$('download').disabled=false}});
+const $=id=>document.getElementById(id);
+const input=$('file');let file=null,busy=false,prepared=[],job=0,worker=null;let workerJobs=new Map();
+const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+let pdfReady=null;
+function status(t,kind=''){const e=$('status');e.textContent=t;e.className='notice '+kind;}
+function progress(value){$('progress').classList.remove('hidden');$('progressbar').style.width=value+'%';}
+function hideProgress(){$('progress').classList.add('hidden');}
+const pause=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));
+function canvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+function drawResized(source,w,h){let c=canvas(w,h);let ctx=c.getContext('2d',{willReadFrequently:true});ctx.imageSmoothingQuality='high';ctx.drawImage(source,0,0,w,h);return c;}
+function fit(w,h,max=1450){const s=Math.min(1,max/Math.max(w,h));return [Math.max(1,Math.round(w*s)),Math.max(1,Math.round(h*s))];}
+function loadPDF(){if(pdfReady)return pdfReady;pdfReady=new Promise((resolve,reject)=>{let done=false;const tag=document.createElement('script');const timer=setTimeout(()=>{if(done)return;done=true;reject(Error('PDF.js não respondeu. Para testar sem essa biblioteca, use JPG ou PNG.'));},14000);tag.src=PDFJS;tag.async=true;tag.onload=()=>{if(done)return;done=true;clearTimeout(timer);window.pdfjsLib?resolve(window.pdfjsLib):reject(Error('PDF.js não iniciou.'));};tag.onerror=()=>{if(done)return;done=true;clearTimeout(timer);reject(Error('Sem acesso ao leitor PDF.js. Tente uma foto.'));};document.head.appendChild(tag);});return pdfReady;}
+async function decodeImage(file){
+ let b=null,im=null;
+ try{if('createImageBitmap' in window)b=await createImageBitmap(file);}catch{}
+ if(!b){im=await new Promise((res,rej)=>{const u=URL.createObjectURL(file),x=new Image();x.onload=()=>{URL.revokeObjectURL(u);res(x);};x.onerror=()=>{URL.revokeObjectURL(u);rej(Error('Imagem inválida.'));};x.src=u;});}
+ const src=b||im;let [w,h]=fit(src.width||src.naturalWidth,src.height||src.naturalHeight,1450);const c=drawResized(src,w,h);b?.close?.();return [{original:c}];
+}
+async function decodePDF(file){
+ const pdfjs=await loadPDF();pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ const pdf=await pdfjs.getDocument({data:await file.arrayBuffer()}).promise;
+ let limit=Math.min(pdf.numPages,3);let result=[];
+ for(let pageNum=1;pageNum<=limit;pageNum++){
+   status(`Abrindo PDF: página ${pageNum} de ${limit}…`);await pause();
+   let page=await pdf.getPage(pageNum);const vp0=page.getViewport({scale:1});let s=Math.min(1.6,1450/Math.max(vp0.width,vp0.height));const vp=page.getViewport({scale:s});const c=canvas(Math.round(vp.width),Math.round(vp.height));
+   await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;result.push({original:c});page.cleanup();
+ }
+ pdf.destroy();return result;
+}
+function initWorker(){if(worker)return;
+ const source=$('worker-code').textContent;
+ worker=new Worker(URL.createObjectURL(new Blob([source],{type:'application/javascript'})));
+ worker.onmessage=e=>{const d=e.data,p=workerJobs.get(d.id);if(!p)return;workerJobs.delete(d.id);clearTimeout(p.timer);d.ok?p.resolve(d):p.reject(Error(d.error));};
+ worker.onerror=()=>{for(const p of workerJobs.values()){clearTimeout(p.timer);p.reject(Error('O processamento foi interrompido.'));}workerJobs.clear();worker?.terminate();worker=null;};
+}
+function runWorker(c){return new Promise((resolve,reject)=>{
+ initWorker();const id=++job,ctx=c.getContext('2d',{willReadFrequently:true});const image=ctx.getImageData(0,0,c.width,c.height);const timer=setTimeout(()=>{const p=workerJobs.get(id);if(p){workerJobs.delete(id);worker?.terminate();worker=null;reject(Error('O scanner demorou demais. Tente uma imagem menor.'));}},20000);
+ workerJobs.set(id,{resolve,reject,timer});worker.postMessage({id,pixels:image.data.buffer,width:c.width,height:c.height},[image.data.buffer]);
+});}
+function preview(container,c){const clone=drawResized(c,c.width,c.height);container.replaceChildren(clone);}
+function outputFromWorker(d){const c=canvas(d.width,d.height),ctx=c.getContext('2d');ctx.putImageData(new ImageData(new Uint8ClampedArray(d.pixels),d.width,d.height),0,0);return c;}
+async function analyze(fileObj){if(busy)return;if(!fileObj)return;if(fileObj.size>15*1024*1024)return status('Arquivo acima de 15 MB.','warn');
+ file=fileObj;busy=true;prepared=[];$('process').disabled=true;$('download').disabled=true;$('results').classList.remove('show');
+ try{status('Abrindo o documento…');progress(5);await pause();const pages=(/\.pdf$/i.test(file.name)||file.type==='application/pdf')?await decodePDF(file):await decodeImage(file);progress(30);await pause();
+   for(let i=0;i<pages.length;i++){
+     status(`Melhorando página ${i+1} de ${pages.length}. O navegador continua disponível.`);await pause();
+     let scanned;try{const d=await runWorker(pages[i].original);scanned={original:pages[i].original,result:outputFromWorker(d),description:d.cropped?'Folha recortada, endireitada e clareada.':'Bordas não identificadas com confiança: imagem preservada e clareada.'};}
+     catch(err){const c=drawResized(pages[i].original,pages[i].original.width,pages[i].original.height);const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.filter='grayscale(1) contrast(1.15) brightness(1.05)';ctx.drawImage(pages[i].original,0,0);ctx.filter='none';scanned={original:pages[i].original,result:c,description:'Tratamento leve alternativo. '+err.message};}
+     prepared.push(scanned);progress(30+Math.round(65*(i+1)/pages.length));await pause();
+   }
+   preview($('original'),prepared[0].original);preview($('processed'),prepared[0].result);$('notes').textContent=prepared[0].description+' O documento original não foi alterado.';$('results').classList.add('show');
+   $('download').disabled=false;status(`${prepared.length} página(s) preparada(s). Confira a prévia e baixe a cópia se estiver legível.`,'ok');
+ }catch(e){status('Não foi possível abrir o documento: '+e.message,'warn');}
+ finally{busy=false;$('process').disabled=false;hideProgress();}
+}
+input.addEventListener('change',()=>analyze(input.files[0]));
+$('process').addEventListener('click',()=>analyze(file));
+$('dropzone').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+$('dropzone').addEventListener('dragover',e=>e.preventDefault());
+$('dropzone').addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files?.length)analyze(e.dataTransfer.files[0]);});
+function enc(str){return new TextEncoder().encode(str);}
+function buildPDF(images){
+  // PDF simples auto-contido com JPEG, sem biblioteca externa.
+  const chunks=[],offsets=[0];let total=0;const push=arr=>{chunks.push(arr);total+=arr.length;};
+  const str=s=>push(enc(s));
+  function obj(n,parts){offsets[n]=total;str(`${n} 0 obj\n`);for(const p of parts){if(typeof p==='string')str(p);else push(p);}str('\nendobj\n');}
+  str('%PDF-1.4\n');
+  const N=images.length,refs=[];
+  obj(1,[`<< /Type /Catalog /Pages 2 0 R >>`]);
+  for(let i=0;i<N;i++)refs.push(`${3+i*3} 0 R`);
+  obj(2,[`<< /Type /Pages /Kids [${refs.join(' ')}] /Count ${N} >>`]);
+  for(let i=0;i<N;i++){
+    const img=images[i],pageId=3+i*3,contId=pageId+1,imageId=pageId+2;
+    let w=595,h=842,drawW=w,drawH=w*img.height/img.width;
+    if(drawH>h){drawH=h;drawW=h*img.width/img.height;}
+    obj(pageId,[`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${w} ${h}] /Resources << /XObject << /I0 ${imageId} 0 R >> >> /Contents ${contId} 0 R >>`]);
+    const cmd=`q\n${drawW.toFixed(3)} 0 0 ${drawH.toFixed(3)} ${((w-drawW)/2).toFixed(3)} ${((h-drawH)/2).toFixed(3)} cm\n/I0 Do\nQ`;
+    obj(contId,[`<< /Length ${enc(cmd).length} >>\nstream\n${cmd}\nendstream`]);
+    obj(imageId,[`<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.bytes.length} >>\nstream\n`,img.bytes,'\nendstream']);
+  }
+  const xref=total;str(`xref\n0 ${3+3*N}\n0000000000 65535 f \n`);
+  for(let n=1;n<3+3*N;n++)str(`${String(offsets[n]).padStart(10,'0')} 00000 n \n`);
+  str(`trailer\n<< /Size ${3+3*N} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  return new Blob(chunks,{type:'application/pdf'});
+}
+async function toJpeg(c){const blob=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(Error('Falha ao codificar página.')),'image/jpeg',.84));return {bytes:new Uint8Array(await blob.arrayBuffer()),width:c.width,height:c.height};}
+$('download').addEventListener('click',async()=>{
+ if(!prepared.length||busy)return;$('download').disabled=true;
+ try{status('Preparando cópia PDF…');await pause();const images=[];for(const p of prepared){images.push(await toJpeg(p.result));await pause();}const pdf=buildPDF(images);const url=URL.createObjectURL(pdf);const a=document.createElement('a');a.href=url;a.download=(file?.name||'documento').replace(/\.[^.]+$/,'')+'-melhorado.pdf';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);status('PDF gerado. Confira o conteúdo antes de usar; não substitui o CRLV oficial.','ok');}
+ catch(e){status('Erro ao montar o PDF: '+e.message,'warn');}
+ finally{$('download').disabled=false;}
+});
+})();
 </script>
 </body></html>
