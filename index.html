@@ -2,134 +2,86 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FrotaCheck | Scanner 4.6 — teste</title>
+<title>FrotaCheck | Scanner 4.7 — teste</title>
 <style>
 :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f7f5;color:#252525}*{box-sizing:border-box}body{margin:0}.stripe{height:7px;background:linear-gradient(90deg,#ffcc00 76%,#d40511 76%)}header{background:#ffcc00;border-bottom:1px solid #e9bd00;padding:17px 22px}.wrap{max-width:970px;margin:auto;display:flex;align-items:center;gap:12px}.logo{background:#d40511;color:#fff;font-weight:900;font-size:22px;border-radius:10px;width:43px;height:43px;display:grid;place-items:center}h1{font-size:22px;margin:0}small{color:#705100;font-size:11px;font-weight:700;letter-spacing:.06em}main{max-width:970px;margin:24px auto;padding:0 18px}.panel{padding:22px;border:1px solid #e6e3da;border-radius:16px;background:#fff;box-shadow:0 7px 28px #00000008}h2{font-size:24px;margin:0 0 7px}.sub{font-size:14px;line-height:1.5;color:#565656;margin:0 0 16px}.drop{border:2px dashed #d9c071;background:#fffdf4;min-height:135px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:20px;text-align:center;border-radius:13px;cursor:pointer}.drop strong{font-size:17px}.drop span{color:#5f5a4c;font-size:13px}.btn{background:#d40511;color:#fff;border:0;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:750;cursor:pointer}.btn.dark{background:#282828}.btn.light{background:#f1ece2;color:#272727}.btn:disabled{background:#b4b4b4;color:#fff;cursor:not-allowed}.drop:focus-visible,.btn:focus-visible{outline:3px solid #bd7b00;outline-offset:3px}#file{display:none}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.msg{background:#fff7e5;border:1px solid #f0dca4;border-radius:10px;padding:12px 15px;color:#77511b;font-size:13px;line-height:1.5}.msg.good{background:#eef9f0;border-color:#b7dec0;color:#235e37}.msg.bad{background:#fff0ed;border-color:#ebc4bd;color:#972d24}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}.card{border:1px solid #e8e4dd;border-radius:12px;padding:13px;min-width:0}.card h3{font-size:15px;margin:0 0 12px}.viewport{min-height:155px;display:grid;place-items:center;background:#edeae6;border-radius:8px;overflow:hidden}.viewport canvas{max-width:100%;max-height:600px;width:auto;height:auto;object-fit:contain;display:block}.caption{font-size:12px;line-height:1.5;color:#606060}.hidden{display:none!important}.progress{height:6px;background:#ececec;overflow:hidden;border-radius:30px;margin:12px 0}.progress>div{height:100%;background:#d40511;width:0;transition:width .1s}details#results{margin:18px 0;padding:13px;border-radius:11px;border:1px solid #e9e2d6}details#results>summary{font-weight:750;cursor:pointer;padding:6px}details#results>summary:focus-visible{outline:2px solid #bd7b00}.warning{margin-top:18px;font-size:12px;color:#666;line-height:1.5}@media(max-width:620px){main{margin:14px auto}.panel{padding:16px}.grid{grid-template-columns:1fr}.actions .btn{flex:1}h2{font-size:21px}}
 </style>
 </head>
-<body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>SCANNER 4.6 • TESTE DE QUALIDADE</small></div></div></header>
-<main><div class="panel"><h2>Digitalização automática do documento</h2><p class="sub">Envie uma foto ou PDF. O scanner corrige a orientação, reduz sombras e melhora o contraste sem apagar conteúdo. O original permanece intacto. Esta é uma versão de teste, separada do FrotaCheck principal.</p>
+<body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>SCANNER 4.7 • DIGITALIZAÇÃO PRETO E BRANCO</small></div></div></header>
+<main><div class="panel"><h2>Digitalização automática do documento</h2><p class="sub">Envie uma foto ou PDF. Agora buscamos o padrão de documento digitalizado: fundo branco, texto preto, recorte seguro e formato do CRLV aberto. O original permanece intacto. Esta é uma versão de teste, separada do FrotaCheck principal.</p>
 <label class="drop" id="drop" for="file" role="button" tabindex="0"><span style="font-size:32px">📄</span><strong>Selecionar foto ou PDF</strong><span>JPG, PNG, WebP ou PDF de até 15 MB</span></label><input id="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf">
 <div class="actions"><button class="btn" id="download" disabled>↓ Baixar PDF melhorado</button></div>
-<div class="msg" id="status" role="status" aria-live="polite">Pronto para testar. A melhoria é feita no seu navegador.</div><div id="progress" class="progress hidden"><div id="bar"></div></div>
-<details id="results" class="hidden"><summary>Comparar original e cópia digitalizada (teste)</summary><div class="grid"><section class="card"><h3>Original</h3><div class="viewport" id="before"></div></section><section class="card"><h3>Digitalizado</h3><div class="viewport" id="after"></div></section></div><p class="caption" id="notes"></p></details>
+<div class="msg" id="status" role="status" aria-live="polite">Pronto para testar. A digitalização é feita no seu navegador, sem API externa.</div><div id="progress" class="progress hidden"><div id="bar"></div></div>
+<details id="results" class="hidden"><summary>Conferir antes e depois (teste)</summary><div class="grid"><section class="card"><h3>Original</h3><div class="viewport" id="before"></div></section><section class="card"><h3>Digitalizado</h3><div class="viewport" id="after"></div></section></div><p class="caption" id="notes"></p></details>
 <p class="warning"><strong>Importante:</strong> a cópia tratada não substitui o CRLV oficial. Rasuras, informações existentes, QR Code e bordas do documento não devem ser apagados. Documento muito desfocado ou cortado na fotografia não pode ser recuperado com garantia.</p>
 </div></main>
 <script id="worker-source" type="text/plain">
-'use strict';
+ 'use strict';
+// FrotaCheck Scanner 4.7: recorte seguro + preto e branco adaptativo.
 function rotate(src,w,h,turn){if(turn===0)return {pixels:src,width:w,height:h};const out=new Uint8ClampedArray(src.length),W=h,H=w;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const s=(y*w+x)*4;let X,Y;if(turn===1){X=h-1-y;Y=x;}else{X=y;Y=w-1-x;}const d=(Y*W+X)*4;out[d]=src[s];out[d+1]=src[s+1];out[d+2]=src[s+2];out[d+3]=255;}return {pixels:out,width:W,height:H};}
-function brightnessBorder(data,W,H){const outer=17, thickness=Math.max(1,Math.round(Math.min(W,H)*.02));let a=0,b=0,na=0,nb=0;for(let j=0;j<H;j+=3){for(let x=0;x<W;x+=3){if(x>thickness&&x<W-thickness&&j>thickness&&j<H-thickness)continue;let k=(j*W+x)*4,v=(data[k]+data[k+1]+data[k+2])/3;if(x<thickness){a+=255-v;na++;}if(x>W-thickness){b+=255-v;nb++;}}}return [(na?a/na:0),(nb?b/nb:0)];}
-function estimateCrop(src,W,H){
-// Conservador: somente quando existe fundo claramente contrastante.
-const S=240,sw=Math.min(S,W),sh=Math.max(1,Math.round(H*sw/W)),n=sw*sh,lum=new Uint8Array(n),stepx=W/sw,stepy=H/sh;
-for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){const i=(Math.floor(y*stepy)*W+Math.floor(x*stepx))*4;lum[y*sw+x]=Math.round(src[i]*.299+src[i+1]*.587+src[i+2]*.114);}
-const border=[];for(let y=0;y<sh;y+=3)for(let x=0;x<sw;x+=3){if(x<sw*.035||x>sw*.965||y<sh*.035||y>sh*.965)border.push(lum[y*sw+x]);}
-border.sort((a,b)=>a-b);let bg=border[Math.floor(border.length*.5)]||130;const center=[];for(let y=Math.floor(sh*.24);y<sh*.76;y+=Math.max(1,Math.floor(sh*.09)))for(let x=Math.floor(sw*.24);x<sw*.76;x+=Math.max(1,Math.floor(sw*.09)))center.push(lum[y*sw+x]);center.sort((a,b)=>a-b);const paper=center[Math.floor(center.length*.55)];
-if(Math.abs(paper-bg)<45)return null;const bright=paper>bg;
-const col=new Float32Array(sw),row=new Float32Array(sh);for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){const v=lum[y*sw+x],f=bright?v>bg+30:v<bg-30;if(f){col[x]++;row[y]++;}}
-const cols=Array.from(col).map(v=>v/sh),rows=Array.from(row).map(v=>v/sw);const left=cols.findIndex(v=>v>.44),right=cols.findLastIndex(v=>v>.44),top=rows.findIndex(v=>v>.44),bottom=rows.findLastIndex(v=>v>.44);
-if(left<0||right<0||top<0||bottom<0)return null;const fx=(right-left+1)/sw,fy=(bottom-top+1)/sh;
-// Não aplique recorte em parte interna, papel estreito ou muito recortado.
-if(fx<.66||fy<.67||(fx>.99&&fy>.99))return null;
-if(left>sw*.18||top>sh*.18||(sw-1-right)>sw*.18||(sh-1-bottom)>sh*.18)return null;
-const padX=Math.round(sw*.012),padY=Math.round(sh*.012);let x0=Math.max(0,Math.floor((left-padX)*W/sw)),x1=Math.min(W,Math.ceil((right+padX+1)*W/sw)),y0=Math.max(0,Math.floor((top-padY)*H/sh)),y1=Math.min(H,Math.ceil((bottom+padY+1)*H/sh));
-if(x1-x0<W*.64||y1-y0<H*.64)return null;
-// Evita distorção: recorte retangular sem perspectiva quando houver dúvida.
-return {x:x0,y:y0,w:x1-x0,h:y1-y0};
+function cut(src,w,h,b){const out=new Uint8ClampedArray(b.w*b.h*4);for(let y=0;y<b.h;y++)for(let x=0;x<b.w;x++){const si=((y+b.y)*w+b.x+x)*4,di=(y*b.w+x)*4;out[di]=src[si];out[di+1]=src[si+1];out[di+2]=src[si+2];out[di+3]=255;}return {pixels:out,width:b.w,height:b.h};}
+function percentile(arr,p){const s=arr.slice().sort((a,b)=>a-b);return s[Math.max(0,Math.min(s.length-1,Math.floor(p*(s.length-1))))]||0;}
+function detectMargins(src,W,H){
+  // Detecta somente margens laterais com fundo muito diferente do papel.
+  // Não corrige perspectiva: preserva selos, campos, QR Code e os 4 cantos.
+  if(W<280||H<280)return null;
+  const col=new Float32Array(W),start=Math.floor(H*.21),end=Math.floor(H*.93),dy=Math.max(2,Math.floor(H/280));
+  for(let x=0;x<W;x++){
+    let total=0,n=0;
+    for(let y=start;y<end;y+=dy){let i=(y*W+x)*4;total+=src[i]*.299+src[i+1]*.587+src[i+2]*.114;n++;}
+    col[x]=total/Math.max(1,n);
+  }
+  const r=Math.max(3,Math.round(W*.015)),smooth=new Float32Array(W);let run=0;
+  for(let x=0;x<W+r;x++){if(x<W)run+=col[x];if(x-r>=0)run-=col[x-r];if(x>=r-1)smooth[x-(r>>1)]=run/r;}
+  for(let x=0;x<W;x++)if(!smooth[x]){let a=Math.max(0,x-r),b=Math.min(W-1,x+r),s=0;for(let q=a;q<=b;q++)s+=col[q];smooth[x]=s/(b-a+1);}
+  const med=(a,b)=>percentile(Array.from(smooth.slice(Math.floor(W*a),Math.max(Math.floor(W*a)+1,Math.floor(W*b)))),.5);
+  const outerL=med(.005,.025),innerL=med(.11,.23),outerR=med(.967,.996),innerR=med(.78,.9);
+  let left=0,right=W;
+  if(outerL>75 && outerL<205 && innerL-outerL>17){const threshold=outerL+(innerL-outerL)*.59;for(let x=Math.round(W*.014);x<Math.round(W*.20);x++){if(smooth[x]>threshold&&smooth[Math.min(W-1,x+r)]>threshold){left=Math.min(W*.12,Math.max(0,x+Math.round(W*.006)));break;}}}
+  if(outerR<210 && innerR-outerR>17){const threshold=outerR+(innerR-outerR)*.57;for(let x=Math.round(W*.987);x>Math.round(W*.79);x--){if(smooth[x]>threshold&&smooth[Math.max(0,x-r)]>threshold){right=Math.max(W*.88,Math.min(W,x-Math.round(W*.003)));break;}}}
+  left=Math.round(left);right=Math.round(right);
+  if(right-left<W*.76||(left<6&&W-right<6))return null;
+  // Não recortar caso haja indício de tinta escura exatamente na margem detectada.
+  return {x:left,y:0,w:right-left,h:H};
 }
-function crop(src,w,h,box){let data=new Uint8ClampedArray(box.w*box.h*4);for(let y=0;y<box.h;y++)for(let x=0;x<box.w;x++){const s=((box.y+y)*w+box.x+x)*4,d=(y*box.w+x)*4;data[d]=src[s];data[d+1]=src[s+1];data[d+2]=src[s+2];data[d+3]=255;}return {pixels:data,width:box.w,height:box.h};}
-function enhanceSoft(src,W,H){
-  // O mesmo tratamento moderado da v4.5, como rota segura de fallback.
-  const out=new Uint8ClampedArray(src.length),hist=new Uint32Array(256);
-  for(let i=0;i<src.length;i+=4){const v=Math.round(src[i]*.299+src[i+1]*.587+src[i+2]*.114);hist[v]++;}
-  const n=W*H;let sum=0,lo=0,hi=255;
-  for(let i=0;i<256;i++){sum+=hist[i];if(sum>=n*.025){lo=i;break;}}
-  sum=0;for(let i=255;i>=0;i--){sum+=hist[i];if(sum>=n*.025){hi=i;break;}}
-  const span=Math.max(70,hi-lo);
-  for(let i=0;i<src.length;i+=4){const g=src[i]*.299+src[i+1]*.587+src[i+2]*.114;const auto=Math.min(255,Math.max(0,(g-lo)*255/span));const v=Math.round(g*.55+auto*.45);out[i]=out[i+1]=out[i+2]=v;out[i+3]=255;}
+function adaptiveBW(src,W,H){
+  const N=W*H,gray=new Uint8Array(N),integral=new Float64Array((W+1)*(H+1));
+  for(let y=0;y<H;y++){
+    let sum=0;const row=(y+1)*(W+1),above=y*(W+1);
+    for(let x=0;x<W;x++){
+      const k=y*W+x,p=k*4;const g=Math.round(.299*src[p]+.587*src[p+1]+.114*src[p+2]);gray[k]=g;
+      sum+=g;integral[row+x+1]=integral[above+x+1]+sum;
+    }
+  }
+  let radius=Math.max(17,Math.min(68,Math.round(Math.min(W,H)*.034)));const C=13;
+  const out=new Uint8ClampedArray(N*4);
+  for(let y=0;y<H;y++){
+    const y0=Math.max(0,y-radius),y1=Math.min(H-1,y+radius);
+    const upper=y0*(W+1),lower=(y1+1)*(W+1);
+    for(let x=0;x<W;x++){
+      const x0=Math.max(0,x-radius),x1=Math.min(W-1,x+radius),k=y*W+x;
+      const sum=integral[lower+x1+1]-integral[upper+x1+1]-integral[lower+x0]+integral[upper+x0];
+      const mean=sum/((x1-x0+1)*(y1-y0+1));
+      const v=gray[k] <= mean-C || gray[k]<37 ? 0:255;
+      const p=k*4;out[p]=out[p+1]=out[p+2]=v;out[p+3]=255;
+    }
+  }
   return out;
 }
-function adaptiveScan(src,W,H,hasSafeCrop){
-  // Estima o branco do papel localmente e corrige a sombra sem binarizar.
-  const N=W*H,g=new Uint8Array(N),tile=72;
-  for(let k=0,i=0;k<N;k++,i+=4)g[k]=Math.round(.299*src[i]+.587*src[i+1]+.114*src[i+2]);
-  const gw=Math.ceil(W/tile),gh=Math.ceil(H/tile),bg=new Float32Array(gw*gh),smooth=new Float32Array(bg.length);
-  let globalBg=0;
-  for(let ty=0;ty<gh;ty++)for(let tx=0;tx<gw;tx++){
-    const hist=new Uint16Array(256),x0=tx*tile,y0=ty*tile,x1=Math.min(W,x0+tile),y1=Math.min(H,y0+tile);
-    let count=0;
-    for(let y=y0;y<y1;y+=2)for(let x=x0;x<x1;x+=2){hist[g[y*W+x]]++;count++;}
-    let tally=0,q=244;for(let v=0;v<256;v++){tally+=hist[v];if(tally>=count*.85){q=v;break;}}
-    bg[ty*gw+tx]=q;globalBg+=q;
-  }
-  globalBg/=Math.max(1,bg.length);
-  // Suavizacao da luz, independente das pequenas letras.
-  for(let ty=0;ty<gh;ty++)for(let tx=0;tx<gw;tx++){
-    let weight=0,sum=0;
-    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-      const yy=Math.max(0,Math.min(gh-1,ty+dy)),xx=Math.max(0,Math.min(gw-1,tx+dx));
-      const wt=dx===0&&dy===0?4:dx===0||dy===0?2:1;
-      sum+=bg[yy*gw+xx]*wt;weight+=wt;
-    }
-    smooth[ty*gw+tx]=sum/weight;
-  }
-  const base=enhanceSoft(src,W,H);
-  const normalized=new Uint8Array(N);
-  const strength=hasSafeCrop?.82:.53;
-  const target=Math.max(204,Math.min(245,globalBg+20));
-  // Convertendo com interpolacao bilinear para evitar blocos de iluminacao.
-  for(let y=0;y<H;y++){
-    const fy=Math.max(0,Math.min(gh-1,(y+.5)/tile-.5)),y0=Math.floor(fy),y1=Math.min(gh-1,y0+1),wy=fy-y0;
-    for(let x=0;x<W;x++){
-      const fx=Math.max(0,Math.min(gw-1,(x+.5)/tile-.5)),x0=Math.floor(fx),x1=Math.min(gw-1,x0+1),wx=fx-x0;
-      const a=smooth[y0*gw+x0]*(1-wx)+smooth[y0*gw+x1]*wx;
-      const b=smooth[y1*gw+x0]*(1-wx)+smooth[y1*gw+x1]*wx;
-      const paper=Math.max(85,a*(1-wy)+b*wy);
-      const k=y*W+x,gray=g[k],scaled=Math.max(0,Math.min(255,gray*target/paper));
-      const soft=base[k*4],mixed=soft*(1-strength)+scaled*strength;
-      normalized[k]=Math.round(Math.max(0,Math.min(255,mixed)));
-    }
-  }
-  // Nitro de baixa intensidade: realca contornos sem eliminar pontos e acentos.
-  const horizontal=new Uint8Array(N),out=new Uint8ClampedArray(N*4);
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-    const p=y*W+x;
-    horizontal[p]=(normalized[y*W+Math.max(0,x-1)]+2*normalized[p]+normalized[y*W+Math.min(W-1,x+1)]+2)>>2;
-  }
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-    const p=y*W+x,blur=(horizontal[Math.max(0,y-1)*W+x]+2*horizontal[p]+horizontal[Math.min(H-1,y+1)*W+x]+2)>>2;
-    const difference=normalized[p]-blur;
-    const sharp=Math.abs(difference)>3?difference*.32:0;
-    const v=Math.max(0,Math.min(255,Math.round(normalized[p]+sharp)));
-    const d=p*4;out[d]=out[d+1]=out[d+2]=v;out[d+3]=255;
-  }
-  // Se o tratamento deixar a tinta globalmente mais clara, preserva o fallback 4.5.
-  let darkOld=0,darkNew=0;
-  for(let i=0;i<N;i+=37){if(base[i*4]<120)darkOld++;if(out[i*4]<135)darkNew++;}
-  if(darkOld>60 && darkNew<darkOld*.45)return {data:base,usedAdaptive:false};
-  return {data:out,usedAdaptive:true};
-}
-self.onmessage=e=>{const {id,buffer,w,h,full,extra}=e.data;try{let pixels=new Uint8ClampedArray(buffer),W=w,H=h;let note=[];
-if(!full&&W>H*1.16){
-  // Gira somente se houver mais bordas verticais que horizontais,
-  // sugerindo texto/paginas realmente fotografados de lado.
-  let horizontalEnergy=0,verticalEnergy=0;
-  const gAt=(x,y)=>{const k=(y*W+x)*4;return(pixels[k]*.299+pixels[k+1]*.587+pixels[k+2]*.114);};
-  const step=Math.max(3,Math.floor(W/450));
-  for(let y=Math.floor(H*.19);y<H*.81;y+=step)for(let x=Math.floor(W*.19);x<W*.81;x+=step){
-    horizontalEnergy+=Math.abs(gAt(Math.min(W-1,x+3),y)-gAt(Math.max(0,x-3),y));
-    verticalEnergy+=Math.abs(gAt(x,Math.min(H-1,y+3))-gAt(x,Math.max(0,y-3)));
-  }
-  if(horizontalEnergy>verticalEnergy*1.26){
-    const [left,right]=brightnessBorder(pixels,W,H);
-    const direction=left>right*1.12?1:right>left*1.12?3:1;
-    const rotated=rotate(pixels,W,H,direction);pixels=rotated.pixels;W=rotated.width;H=rotated.height;
-    note.push('Documento identificado de lado: orientacao ajustada.');
-  }else note.push('Orientacao horizontal preservada para nao girar texto legivel.');
-}
-if(extra){for(let k=0;k<extra;k++){const rotated=rotate(pixels,W,H,1);pixels=rotated.pixels;W=rotated.width;H=rotated.height;}note.push('Orientação ajustada para conferência.');}
-let cropApplied=false;if(!full){const box=estimateCrop(pixels,W,H);if(box){cropApplied=true;const result=crop(pixels,W,H,box);pixels=result.pixels;W=result.width;H=result.height;note.push('Somente margens externas removidas.');}else note.push('Recorte automático ignorado para preservar o documento inteiro.');}else note.push('Documento completo preservado, sem recorte.');
-const result=adaptiveScan(pixels,W,H,!!cropApplied);const output=result.data;note.push(result.usedAdaptive?'Sombras compensadas localmente, com nitidez moderada.':'Tratamento suave preservado para proteger o texto.');self.postMessage({id,ok:true,buffer:output.buffer,w:W,h:H,notes:note.join(' ')},[output.buffer]);}catch(err){self.postMessage({id,ok:false,error:String(err.message||err).slice(0,160)});}};
+self.onmessage=e=>{const {id,buffer,w,h,full,extra}=e.data;
+  try{
+    let pix=new Uint8ClampedArray(buffer),W=w,H=h;let notes=[];
+    if(!full){const box=detectMargins(pix,W,H);if(box){const r=cut(pix,W,H,box);pix=r.pixels;W=r.width;H=r.height;notes.push('Fundo lateral removido com margem de segurança.');}else notes.push('Sem recorte inseguro: documento preservado.');}
+    // O CRLV desdobrado da referência é horizontal com os campos girados 90°.
+    // Giramos somente uma imagem moderadamente retrato, típica desse formato;
+    // páginas A4 estreitas continuam em pé. A correção manual existe apenas no teste.
+    if(!full && W/H>.72 && W/H<.99){let r=rotate(pix,W,H,3);pix=r.pixels;W=r.width;H=r.height;notes.push('CRLV orientado em paisagem, como a referência.');}
+    for(let k=0;k<(extra||0);k++){let r=rotate(pix,W,H,1);pix=r.pixels;W=r.width;H=r.height;}
+    const result=adaptiveBW(pix,W,H);
+    notes.push('Digitalização alto contraste: fundo branco e texto preto.');
+    self.postMessage({id,ok:true,buffer:result.buffer,w:W,h:H,notes:notes.join(' ')},[result.buffer]);
+  }catch(err){self.postMessage({id,ok:false,error:String(err?.message||err).slice(0,200)});}
+};
 </script>
 <script>
 (()=>{'use strict';const $=id=>document.getElementById(id);const input=$('file');let file=null,prepared=[],busy=false,worker=null,seq=0,pending=new Map();const pdfLib='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';let pdfReady=null;const pause=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));function status(t,k=''){$('status').className='msg '+k;$('status').textContent=t;}function progress(n){$('progress').classList.remove('hidden');$('bar').style.width=n+'%';}function canvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}function scale(w,h,max=1950){const s=Math.min(1,max/Math.max(w,h));return [Math.max(1,Math.round(w*s)),Math.max(1,Math.round(h*s))];}function resized(src,w,h){const c=canvas(w,h);const ctx=c.getContext('2d',{willReadFrequently:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(src,0,0,w,h);return c;}
