@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FrotaCheck | Scanner 5.0 — teste</title>
+<title>FrotaCheck | Scanner 5.1 — orientação corrigida</title>
 <style>
 :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f7f5;color:#252525}*{box-sizing:border-box}body{margin:0}.stripe{height:7px;background:linear-gradient(90deg,#ffcc00 76%,#d40511 76%)}header{background:#ffcc00;border-bottom:1px solid #e9bd00;padding:17px 22px}.wrap{max-width:970px;margin:auto;display:flex;align-items:center;gap:12px}.logo{background:#d40511;color:#fff;font-weight:900;font-size:22px;border-radius:10px;width:43px;height:43px;display:grid;place-items:center}h1{font-size:22px;margin:0}small{color:#705100;font-size:11px;font-weight:700;letter-spacing:.06em}main{max-width:970px;margin:24px auto;padding:0 18px}.panel{padding:22px;border:1px solid #e6e3da;border-radius:16px;background:#fff;box-shadow:0 7px 28px #00000008}h2{font-size:24px;margin:0 0 7px}.sub{font-size:14px;line-height:1.5;color:#565656;margin:0 0 16px}.drop{border:2px dashed #d9c071;background:#fffdf4;min-height:135px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:20px;text-align:center;border-radius:13px;cursor:pointer}.drop strong{font-size:17px}.drop span{color:#5f5a4c;font-size:13px}.btn{background:#d40511;color:#fff;border:0;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:750;cursor:pointer}.btn.dark{background:#282828}.btn.light{background:#f1ece2;color:#272727}.btn:disabled{background:#b4b4b4;color:#fff;cursor:not-allowed}.drop:focus-visible,.btn:focus-visible{outline:3px solid #bd7b00;outline-offset:3px}#file{display:none}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.msg{background:#fff7e5;border:1px solid #f0dca4;border-radius:10px;padding:12px 15px;color:#77511b;font-size:13px;line-height:1.5}.msg.good{background:#eef9f0;border-color:#b7dec0;color:#235e37}.msg.bad{background:#fff0ed;border-color:#ebc4bd;color:#972d24}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}.card{border:1px solid #e8e4dd;border-radius:12px;padding:13px;min-width:0}.card h3{font-size:15px;margin:0 0 12px}.viewport{min-height:155px;display:grid;place-items:center;background:#edeae6;border-radius:8px;overflow:hidden}.viewport canvas{max-width:100%;max-height:600px;width:auto;height:auto;object-fit:contain;display:block}.caption{font-size:12px;line-height:1.5;color:#606060}.hidden{display:none!important}.progress{height:6px;background:#ececec;overflow:hidden;border-radius:30px;margin:12px 0}.progress>div{height:100%;background:#d40511;width:0;transition:width .1s}details#results{margin:18px 0;padding:13px;border-radius:11px;border:1px solid #e9e2d6}details#results>summary{font-weight:750;cursor:pointer;padding:6px}details#results>summary:focus-visible{outline:2px solid #bd7b00}.warning{margin-top:18px;font-size:12px;color:#666;line-height:1.5}@media(max-width:620px){main{margin:14px auto}.panel{padding:16px}.grid{grid-template-columns:1fr}.actions .btn{flex:1}h2{font-size:21px}}
 </style>
 </head>
-<body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>SCANNER 5.0 • ORIENTAÇÃO E RECORTE</small></div></div></header>
+<body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>SCANNER 5.1 • ORIENTAÇÃO CORRIGIDA</small></div></div></header>
 <main><div class="panel"><h2>Digitalização automática do documento</h2><p class="sub">Envie uma foto ou PDF. Recorte pelas bordas do papel, correção automática da orientação e clareamento suave de dobras e sombras. O PDF é A4 retrato e o scanner tenta colocar também o texto na posição correta. O original permanece intacto. Esta é uma versão de teste, separada do FrotaCheck principal.</p>
 <label class="drop" id="drop" for="file" role="button" tabindex="0"><span style="font-size:32px">📄</span><strong>Selecionar foto ou PDF</strong><span>JPG, PNG, WebP ou PDF de até 15 MB</span></label><input id="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf">
-<div class="actions"><button class="btn" id="download" disabled>↓ Baixar PDF melhorado (texto em pé)</button></div>
+<div class="actions"><button class="btn" id="download" disabled>↓ Baixar PDF melhorado</button><button class="btn light hidden" id="rotate180" type="button" disabled title="Use apenas se o documento estiver de cabeça para baixo">↻ Corrigir documento invertido (180°)</button></div>
 <div class="msg" id="status" role="status" aria-live="polite">Pronto para testar. A digitalização é feita no seu navegador, sem API externa.</div><div id="progress" class="progress hidden"><div id="bar"></div></div>
 <details id="results" class="hidden"><summary>Conferir antes e depois (teste)</summary><div class="grid"><section class="card"><h3>Original</h3><div class="viewport" id="before"></div></section><section class="card"><h3>Digitalizado</h3><div class="viewport" id="after"></div></section></div><p class="caption" id="notes"></p></details>
 <p class="warning"><strong>Importante:</strong> a cópia tratada não substitui o CRLV oficial. Informações existentes, anotações oficiais, QR Codes e bordas não podem ser apagados. Dobras profundas podem continuar visíveis. Documento muito desfocado ou cortado na fotografia não pode ser recuperado com garantia.</p>
@@ -21,45 +21,73 @@
    Nao recria texto, nao apaga dados e nao envia documentos. */
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function luminance(p){const n=p.length/4,g=new Uint8Array(n);for(let i=0,k=0;i<n;i++,k+=4)g[i]=Math.round(.299*p[k]+.587*p[k+1]+.114*p[k+2]);return g;}
-function edgeScores(g,W,H){
- const d={},stepX=Math.max(1,Math.floor(W/150)),stepY=Math.max(1,Math.floor(H/150));
- for(const side of ['top','bottom','left','right']){
-  let best=0;
-  if(side==='top'||side==='bottom'){
-   for(let a=Math.floor(H*.01);a<Math.floor(H*.105);a+=Math.max(1,Math.floor(H/120))){
-    const y=side==='top'?a:H-1-a;let dark=0,n=0;
-    for(let x=Math.floor(W*.12);x<W*.88;x+=stepX){if(g[y*W+x]<72)dark++;n++;}
-    if(n)best=Math.max(best,dark/n);
+ function headerEvidence(g,W,H){
+   /* Localiza uma faixa horizontal escura CONTINUA e ESPESSA nas bordas.
+      Uma linha fina de tabela ou dois QR Codes nao devem ser confundidos
+      com a faixa de cabecalho do CRLV. */
+   const results={};
+   for(const side of ['top','bottom','left','right']){
+     const horizontal=side==='top'||side==='bottom';
+     const depth=horizontal?H:W;
+     const length=horizontal?W:H;
+     let bestRun=0, bestCoverage=0, qualifying=0;
+     const first=Math.max(1,Math.floor(depth*.012));
+     const last=Math.max(first+1,Math.floor(depth*.11));
+     const depthStep=Math.max(1,Math.floor(depth/245));
+     const alongStep=Math.max(1,Math.floor(length/420));
+     for(let d=first;d<last;d+=depthStep){
+       let dark=0,n=0,current=0,longest=0;
+       for(let t=Math.floor(length*.055);t<Math.floor(length*.945);t+=alongStep){
+         const index=horizontal
+           ? (side==='top'?d:H-1-d)*W+t
+           : t*W+(side==='left'?d:W-1-d);
+         if(g[index]<97){dark++;current++;if(current>longest)longest=current;}
+         else current=0;
+         n++;
+       }
+       if(!n)continue;
+       const run=longest/n,coverage=dark/n;
+       if(run>.30&&coverage>.47){
+         qualifying++;
+         bestRun=Math.max(bestRun,run);
+         bestCoverage=Math.max(bestCoverage,coverage);
+       }
+     }
+     /* A faixa larga permanece escura por varias linhas adjacentes.
+        Evita escolher a borda errada por conta de linha de tabela. */
+     const thickness=Math.min(1,qualifying/Math.max(3,Math.ceil(depth*.009/depthStep)));
+     results[side]=(bestRun*.70+bestCoverage*.30)*thickness;
    }
-  }else{
-   for(let a=Math.floor(W*.01);a<Math.floor(W*.105);a+=Math.max(1,Math.floor(W/120))){
-    const x=side==='left'?a:W-1-a;let dark=0,n=0;
-    for(let y=Math.floor(H*.12);y<H*.88;y+=stepY){if(g[y*W+x]<72)dark++;n++;}
-    if(n)best=Math.max(best,dark/n);
+   return results;
+ }
+ function rotatePixels(p,W,H,turn){
+   if(!turn)return {p,W,H};
+   const nw=turn===180?W:H,nh=turn===180?H:W,output=new Uint8ClampedArray(nw*nh*4);
+   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+     let nx,ny;
+     if(turn===90){nx=H-1-y;ny=x;}
+     else if(turn===270){nx=y;ny=W-1-x;}
+     else{nx=W-1-x;ny=H-1-y;}
+     const a=(y*W+x)*4,b=(ny*nw+nx)*4;
+     output[b]=p[a];output[b+1]=p[a+1];output[b+2]=p[a+2];output[b+3]=255;
    }
-  }
-  d[side]=best;
+   return {p:output,W:nw,H:nh};
  }
- return d;
-}
-function orient(p,W,H,notes){
- const s=edgeScores(luminance(p),W,H);const rank=Object.entries(s).sort((a,b)=>b[1]-a[1]);
- let turn=0;const confident=rank[0][1]>.47&&rank[0][1]-rank[1][1]>.17;
- if(confident){if(rank[0][0]==='bottom')turn=180;else if(rank[0][0]==='left')turn=90;else if(rank[0][0]==='right')turn=270;}
- else if(W>H*1.07){turn=s.left>s.right?90:270;notes.push('Orientação estimada; confira se o texto ficou em pé.');}
- if(!turn)return {p,W,H};
- let nw=turn===180?W:H,nh=turn===180?H:W,output=new Uint8ClampedArray(nw*nh*4);
- for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-  let nx,ny;
-  if(turn===90){nx=H-1-y;ny=x;}
-  else if(turn===270){nx=y;ny=W-1-x;}
-  else {nx=W-1-x;ny=H-1-y;}
-  let a=(y*W+x)*4,b=(ny*nw+nx)*4;
-  output[b]=p[a];output[b+1]=p[a+1];output[b+2]=p[a+2];output[b+3]=255;
+ function orient(p,W,H,notes){
+   const scores=headerEvidence(luminance(p),W,H);
+   const ranking=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+   const confidence=ranking[0][1]>.40 && (ranking[0][1]-ranking[1][1]>.16);
+   let turn=0;
+   if(confidence){
+     if(ranking[0][0]==='bottom')turn=180;
+     else if(ranking[0][0]==='left')turn=90;
+     else if(ranking[0][0]==='right')turn=270;
+     notes.push(turn?'Orientacao corrigida pela faixa do cabecalho.':'Cabecalho identificado na parte superior.');
+   }else{
+     notes.push('Orientacao nao confirmada com seguranca; mantida a foto original. Se estiver invertido, use o botao de correcao.');
+   }
+   return rotatePixels(p,W,H,turn);
  }
- notes.push('Documento orientado pelo cabeçalho, com texto na posição vertical.');
- return {p:output,W:nw,H:nh};
-}
 function percentile(data,q){if(!data.length)return 0;data.sort((a,b)=>a-b);return data[clamp(Math.floor((data.length-1)*q),0,data.length-1)];}
 function median(data,a,b){const sl=Array.from(data.slice(Math.max(0,Math.floor(a)),Math.min(data.length,Math.ceil(b))));return percentile(sl,.5);}
 function borders(g,W,H){
@@ -169,9 +197,23 @@ async function pdfPages(f){const pdfjs=await loadPdf();pdfjs.GlobalWorkerOptions
 function initWorker(){if(worker)return;const blob=new Blob([$('worker-source').textContent],{type:'text/javascript'}),url=URL.createObjectURL(blob);worker=new Worker(url);URL.revokeObjectURL(url);worker.onmessage=e=>{const r=e.data,p=pending.get(r.id);if(!p)return;pending.delete(r.id);clearTimeout(p.t);r.ok?p.ok(r):p.bad(Error(r.error));};worker.onerror=()=>{for(const p of pending.values()){clearTimeout(p.t);p.bad(Error('Processamento interrompido'))}pending.clear();worker.terminate();worker=null;};}
 function run(c){return new Promise((ok,bad)=>{initWorker();const id=++seq,ctx=c.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,c.width,c.height).data;const t=setTimeout(()=>{if(pending.has(id)){pending.delete(id);worker?.terminate();worker=null;bad(Error('Tempo excedido; a imagem foi preservada.'));}},20000);pending.set(id,{ok,bad,t});worker.postMessage({id,buffer:data.buffer,w:c.width,h:c.height},[data.buffer]);});}
 function makeCanvas(d){const c=canvas(d.w,d.h);c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(d.buffer),d.w,d.h),0,0);return c;}function preview(el,c){el.replaceChildren(resized(c,c.width,c.height));}
-async function process(f){if(!f||busy)return;if(f.size>15*1024*1024){status('Arquivo acima de 15 MB.','bad');return;}file=f;busy=true;prepared=[];$('download').disabled=true;$('results').classList.add('hidden');try{progress(5);status('Abrindo arquivo…');await pause();const pages=f.type==='application/pdf'||/\.pdf$/i.test(f.name)?await pdfPages(f):await imgPages(f);progress(28);for(let i=0;i<pages.length;i++){status(`Processando página ${i+1} de ${pages.length}…`);await pause();let r;try{const d=await run(pages[i]);r={original:pages[i],processed:makeCanvas(d),notes:d.notes};}catch(err){r={original:pages[i],processed:resized(pages[i],pages[i].width,pages[i].height),notes:'Falha no tratamento; página original preservada: '+err.message,failed:true};}prepared.push(r);progress(28+Math.round((i+1)/pages.length*70));}preview($('before'),prepared[0].original);preview($('after'),prepared[0].processed);$('notes').textContent=prepared[0].notes+' O PDF deve ser conferido visualmente antes de ser utilizado.';$('results').classList.remove('hidden');const treated=prepared.filter(p=>!p.failed).length;$('download').disabled=treated===0;status(treated===0?'Não foi possível melhorar o documento. A cópia original foi preservada; tente outro arquivo.':treated===prepared.length?'PDF melhorado pronto para baixar. Confira o resultado antes de utilizar.':'PDF parcialmente melhorado. Algumas páginas foram preservadas sem alterações; confira o resultado.',treated===0?'bad':treated===prepared.length?'good':'');}catch(e){status('Falha na leitura: '+(e?.message||'arquivo inválido'),'bad');}finally{busy=false;$('progress').classList.add('hidden');}}
+async function process(f){if(!f||busy)return;if(f.size>15*1024*1024){status('Arquivo acima de 15 MB.','bad');return;}file=f;busy=true;prepared=[];$('download').disabled=true;$('rotate180').disabled=true;$('rotate180').classList.add('hidden');$('results').classList.add('hidden');try{progress(5);status('Abrindo arquivo…');await pause();const pages=f.type==='application/pdf'||/\.pdf$/i.test(f.name)?await pdfPages(f):await imgPages(f);progress(28);for(let i=0;i<pages.length;i++){status(`Processando página ${i+1} de ${pages.length}…`);await pause();let r;try{const d=await run(pages[i]);r={original:pages[i],processed:makeCanvas(d),notes:d.notes};}catch(err){r={original:pages[i],processed:resized(pages[i],pages[i].width,pages[i].height),notes:'Falha no tratamento; página original preservada: '+err.message,failed:true};}prepared.push(r);progress(28+Math.round((i+1)/pages.length*70));}preview($('before'),prepared[0].original);preview($('after'),prepared[0].processed);$('notes').textContent=prepared[0].notes+' O PDF deve ser conferido visualmente antes de ser utilizado.';$('results').classList.remove('hidden');$('rotate180').classList.remove('hidden');$('rotate180').disabled=false;const treated=prepared.filter(p=>!p.failed).length;$('download').disabled=treated===0;status(treated===0?'Não foi possível melhorar o documento. A cópia original foi preservada; tente outro arquivo.':treated===prepared.length?'PDF melhorado pronto para baixar. Confira o resultado antes de utilizar.':'PDF parcialmente melhorado. Algumas páginas foram preservadas sem alterações; confira o resultado.',treated===0?'bad':treated===prepared.length?'good':'');}catch(e){status('Falha na leitura: '+(e?.message||'arquivo inválido'),'bad');}finally{busy=false;$('progress').classList.add('hidden');}}
 input.addEventListener('change',()=>{if(input.files?.length)process(input.files[0]);});$('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}});$('drop').addEventListener('dragover',e=>e.preventDefault());$('drop').addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files?.length){process(e.dataTransfer.files[0])}});
 const enc=s=>new TextEncoder().encode(s);function makePDF(images){const parts=[],offsets=[0];let size=0;const push=b=>{parts.push(b);size+=b.length},str=s=>push(enc(s));const obj=(i,contents)=>{offsets[i]=size;str(`${i} 0 obj\n`);for(const v of contents)typeof v==='string'?str(v):push(v);str('\nendobj\n');};str('%PDF-1.4\n');const n=images.length;obj(1,['<< /Type /Catalog /Pages 2 0 R >>']);obj(2,[`<< /Type /Pages /Kids [${images.map((_,i)=>`${3+i*3} 0 R`).join(' ')}] /Count ${n} >>`]);for(let i=0;i<n;i++){const im=images[i],p=3+i*3,c=p+1,x=p+2;let w=595,h=842,dw=w-20,dh=dw*im.h/im.w;if(dh>h-20){dh=h-20;dw=dh*im.w/im.h;}obj(p,[`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${w} ${h}] /Resources << /XObject << /I0 ${x} 0 R >> >> /Contents ${c} 0 R >>`]);const cmd=`q\n${dw.toFixed(3)} 0 0 ${dh.toFixed(3)} ${((w-dw)/2).toFixed(3)} ${((h-dh)/2).toFixed(3)} cm\n/I0 Do\nQ`;obj(c,[`<< /Length ${enc(cmd).length} >>\nstream\n${cmd}\nendstream`]);obj(x,[`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.data.length} >>\nstream\n`,im.data,'\nendstream']);}const xref=size;str(`xref\n0 ${3+n*3}\n0000000000 65535 f \n`);for(let i=1;i<3+n*3;i++)str(`${String(offsets[i]).padStart(10,'0')} 00000 n \n`);str(`trailer\n<< /Size ${3+n*3} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);return new Blob(parts,{type:'application/pdf'});}
+$('rotate180').onclick=()=>{
+ if(busy||!prepared.length)return;
+ for(const item of prepared){
+   const original=item.processed;const corrected=canvas(original.width,original.height);
+   const ctx=corrected.getContext('2d');
+   ctx.translate(corrected.width,corrected.height);
+   ctx.rotate(Math.PI);
+   ctx.drawImage(original,0,0);
+   item.processed=corrected;
+ }
+ preview($('after'),prepared[0].processed);
+ $('notes').textContent='Orientacao invertida em 180 graus para correcao manual. Confira os dados e QR Codes antes de utilizar o PDF.';
+ status('Orientacao atualizada. O PDF sera gerado na mesma posicao mostrada na previa.','good');
+};
 $('download').onclick=async()=>{if(busy||!prepared.length)return;$('download').disabled=true;try{status('Gerando PDF…');const imgs=[];for(const p of prepared){const b=await new Promise((ok,bad)=>p.processed.toBlob(b=>b?ok(b):bad(Error('Falha ao gerar imagem')),'image/jpeg',.92));imgs.push({data:new Uint8Array(await b.arrayBuffer()),w:p.processed.width,h:p.processed.height});await pause();}const u=URL.createObjectURL(makePDF(imgs)),a=document.createElement('a');a.href=u;a.download=(file?.name||'documento').replace(/\.[^.]+$/,'')+'-copia-legivel.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(u),60000);status('PDF melhorado gerado. Verifique a legibilidade e se todas as informações permanecem presentes.','good');}catch(e){status('Erro ao exportar PDF: '+e.message,'bad');}finally{$('download').disabled=false;}};
 })();
 </script></body></html>
