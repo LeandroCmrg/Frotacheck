@@ -102,7 +102,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
 .pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
 .enhance-card[hidden]{display:none!important}
-/* FrotaCheck 5.6: etapas automaticas visiveis; tratamento continua invisivel */
+/* FrotaCheck 5.7: etapas automaticas visiveis; tratamento continua invisivel */
 .stage-area{border-top:1px solid var(--line);padding:17px 22px 4px}
 .stage-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
 .stage-heading strong{font-size:13px}.stage-heading span{font-size:11px;font-weight:750;color:var(--muted)}
@@ -122,7 +122,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.6</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura por etapas</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck melhora a imagem, lê os dados e verifica o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
@@ -701,7 +701,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.6',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.7',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -886,59 +886,74 @@ self.onmessage=e=>{
   // independente. Evita misturar PLACA com RENAVAM ou EXERCICIO com ano-modelo.
   // Coordenadas percentuais do documento A4 digitalizado; a imagem tratada
   // e a imagem anterior ao filtro sao consultadas como fontes independentes.
+  // CRLV-e em A4 retrato: regiões dos VALORES, não dos rótulos.
+  // O layout varia conforme a emissão; por isso há duas leituras complementares
+  // (PDF original e cópia tratada). Nunca preencher campos sem texto reconhecido.
+  // Bug da versão 5.6: as regiões incluíam linhas e rótulos que confundiam o PSM 7.
   const CRLV_FIELD_ZONES=[
-    {key:'placa',    box:[.045,.178,.159,.027], psm:7, label:'Placa'},
-    {key:'exercicio',box:[.171,.178,.124,.027], psm:7, label:'Exercício'},
-    {key:'modelo',   box:[.047,.335,.428,.039], psm:7, label:'Marca/modelo'},
-    {key:'especie',  box:[.047,.377,.433,.036], psm:7, label:'Espécie/tipo'},
-    {key:'uf',       box:[.047,.410,.270,.033], psm:7, label:'Placa/UF'},
-    {key:'pbt',      box:[.801,.161,.126,.036], psm:7, label:'PBT'},
-    {key:'eixos',    box:[.794,.189,.060,.038], psm:7, label:'Eixos'}
+    {key:'placa',    box:[.087,.180,.095,.017], psm:7, label:'Placa principal'},
+    {key:'placaUf',  box:[.085,.418,.110,.014], psm:7, label:'Placa anterior / UF'},
+    {key:'exercicio',box:[.196,.181,.076,.017], psm:7, label:'Exercício'},
+    {key:'modelo',   box:[.087,.342,.260,.018], psm:7, label:'Marca/modelo'},
+    {key:'especie',  box:[.088,.378,.240,.019], psm:7, label:'Espécie/tipo'},
+    {key:'pbt',      box:[.823,.169,.055,.014], psm:7, label:'Peso bruto total'},
+    {key:'eixos',    box:[.812,.192,.032,.015], psm:7, label:'Eixos'}
+  ];
+  // Uma região de conferência ajuda a recuperar campos quando o PDF está com
+  // margens diferentes. Só usa valores explícitos e nunca inventa a UF.
+  const CRLV_ALTERNATE_ZONES=[
+    {key:'placaUf',box:[.080,.411,.145,.025],psm:6,label:'Placa/UF ampla'},
+    {key:'exercicio',box:[.185,.171,.107,.028],psm:6,label:'Exercício amplo'},
+    {key:'modelo',box:[.076,.331,.320,.031],psm:6,label:'Modelo amplo'},
+    {key:'especie',box:[.076,.370,.320,.028],psm:6,label:'Espécie ampla'},
+    {key:'pbt',box:[.808,.161,.095,.032],psm:6,label:'PBT amplo'},
+    {key:'eixos',box:[.795,.184,.060,.028],psm:6,label:'Eixos amplo'}
   ];
   function fieldZoneValue(key,raw){
     const n=norm(String(raw||'')).replace(/[|]/g,' ').trim();
     if(!n)return null;
+    if(key==='placaUf'){
+      // O CRLV repete a placa com /UF: fonte especialmente boa para resolver
+      // o I/1 e O/0 da placa, além de informar a UF no mesmo campo.
+      const compact=n.replace(/\s+/g,'');
+      const match=compact.match(/([A-Z0-9]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2})\/([A-Z]{2})/);
+      if(!match)return null;
+      const placa=repairPlate(match[1]);
+      const uf=parseValue('uf',match[2],true);
+      return placa&&uf?{placa,uf}:null;
+    }
     if(key==='placa'){
-      // Exige formato de placa e nunca usa uma sequencia numerica do Renavam.
       const exact=n.match(/(?:^|[^A-Z0-9])([A-Z]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2})(?=$|[^A-Z0-9])/);
       if(exact)return repairPlate(exact[1]);
-      // OCR pode adicionar espacos entre caracteres, mas so recuperamos
-      // isso em uma linha curta para nao transformar o titulo em placa.
-      const withoutLabel=n.replace(/^PLACA\s*[:\-]?\s*/,'').replace(/[^A-Z0-9]/g,'');
-      return withoutLabel.length===7?repairPlate(withoutLabel):null;
+      const compact=n.replace(/^PLACA\s*[:\-]?\s*/,'').replace(/[^A-Z0-9]/g,'');
+      return compact.length===7?repairPlate(compact):null;
     }
-    if(key==='uf'){
-      const m=n.match(/\b(?:[A-Z]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2})\s*\/\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
-      return m?m[1]:null;
+    if(key==='exercicio'){
+      const yrs=[...new Set(n.match(/\b20[12][0-9]\b/g)||[])];
+      return yrs.length===1?yrs[0]:null;
     }
     if(key==='modelo'){
       const lines=n.split(/[\r\n]+/).map(t=>t.trim()).filter(Boolean);
-      const candidates=[];
       for(const line of lines){
-        const cleaned=line.replace(/^(?:MARCA\s*\/\s*MODELO(?:\s*\/\s*VERSAO)?|MODELO)\s*[:\-]?\s*/, '').split(/\b(?:ESPECIE|PLACA|CHASSI|EXERCICIO|PESO\s+BRUTO|RENAVAM)\b/)[0].trim();
-        if(cleaned.length>=6&&cleaned.length<=65&&/[A-Z]{2}/.test(cleaned)&&/\d|\//.test(cleaned)&& !/\b(?:ANTERIOR|BRASIL|DETRAN|SENATRAN|VEICULO|LICENCIAMENTO)\b/.test(cleaned)){
-          candidates.push(cleaned);
-        }
+        const cleaned=line.replace(/^(?:MARCA\s*\/\s*MODELO(?:\s*\/\s*VERSAO)?|MODELO)\s*[:\-]?\s*/, '')
+          .split(/\b(?:ESPECIE|PLACA|CHASSI|EXERCICIO|PESO\s+BRUTO|RENAVAM)\b/)[0]
+          .replace(/[|_]+$/,'').trim();
+        if(cleaned.length>=6&&cleaned.length<=65&&/[A-Z]{2}/.test(cleaned)&&/\d|\//.test(cleaned)&&
+          !/\b(?:ANTERIOR|BRASIL|DETRAN|SENATRAN|VEICULO|LICENCIAMENTO)\b/.test(cleaned))return cleaned;
       }
-      return candidates.length===1?candidates[0]:null;
-    }
-    if(key==='especie'){
-      const match=n.match(species);return match?match[0]:null;
-    }
-    if(key==='exercicio'){
-      const yrs=n.match(/\b20[12][0-9]\b/g)||[];
-      // Nunca usar ano de fabricacao/modelo: so a faixa EXERCICIO.
-      return yrs.length===1?yrs[0]:null;
-    }
-    if(key==='pbt'){
-      const cleaned=n.replace(/\s/g,'').replace(/O/g,'0');
-      const decimals=cleaned.match(/\d{1,2}[.,]\d{1,2}/g)||[];
-      if(decimals.length===1){const v=parseValue('pbt',decimals[0],true);return v;}
       return null;
     }
+    if(key==='especie'){
+      const m=n.match(species);return m?m[0]:null;
+    }
+    if(key==='pbt'){
+      // Valor numérico do PBT isolado no CRLV; remove apenas ruído de OCR.
+      const m=n.replace(/O/g,'0').match(/(?:^|\s)(\d{1,3}[.,]\d{1,2})(?=\s|$)/);
+      return m?parseValue('pbt',m[1],true):null;
+    }
     if(key==='eixos'){
-      const sansLabel=n.replace(/(?:E[I1]X[O0]S|N[UO]MERO\s+DE\s+E[I1]X[O0]S)/g,' ');
-      const matches=sansLabel.match(/\b(?:[1-9]|1[0-2])\b/g)||[];
+      const cleaned=n.replace(/(?:E[I1]X[O0]S|N[UO]MERO\s+DE\s+E[I1]X[O0]S)/g,' ').trim();
+      const matches=[...new Set(cleaned.match(/\b(?:[1-9]|1[0-2])\b/g)||[])];
       return matches.length===1?parseValue('eixos',matches[0],true):null;
     }
     return null;
@@ -948,7 +963,7 @@ self.onmessage=e=>{
     const sx=Math.max(0,Math.round(source.width*x)),sy=Math.max(0,Math.round(source.height*y));
     const sw=Math.max(2,Math.min(source.width-sx,Math.round(source.width*w)));
     const sh=Math.max(2,Math.min(source.height-sy,Math.round(source.height*h)));
-    const factor=Math.max(1,Math.min(3.8,1100/Math.max(sw,sh)));
+    const factor=Math.max(1,Math.min(4.2,1150/Math.max(sw,sh)));
     const c=document.createElement('canvas');c.width=Math.round(sw*factor);c.height=Math.round(sh*factor);
     const ctx=c.getContext('2d',{willReadFrequently:true});
     ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
@@ -958,31 +973,43 @@ self.onmessage=e=>{
   }
   async function readCrlvFieldZones(scanned,original,map,parts){
     const goodPortrait=c=>c?.width>400&&c?.height>550&&c.height/c.width>1.12&&c.height/c.width<2.25;
-    const sources=[{canvas:original,name:'original (conferência de dígitos)'},{canvas:scanned,name:'digitalizado'}].filter(x=>goodPortrait(x.canvas));
+    const sources=[{canvas:original,name:'original (dígitos preservados)'},{canvas:scanned,name:'digitalizado'}]
+      .filter(x=>goodPortrait(x.canvas));
     if(!sources.length)return;
-    for(const zone of CRLV_FIELD_ZONES){
-      if(map[zone.key]?.score>=4)continue;
-      for(const entry of sources){
-        const crop=fieldCrop(entry.canvas,zone.box);
-        let found='';
-        try{found=await ocr(crop,zone.psm);}catch(e){continue;}
-        const value=fieldZoneValue(zone.key,found);
-        if(value){
-          register(map,zone.key,value,4,'Campo localizado · '+entry.name);
-          parts.push('--- CAMPO '+zone.label.toUpperCase()+' ('+entry.name+') ---\n'+found);
-          break;
+    const complete=()=>!!(map.placa&&map.uf&&map.exercicio&&map.modelo&&map.especie&&map.pbt&&map.eixos);
+    const already=z=>z.key==='placaUf'?!!(map.placa?.score>=4&&map.uf?.score>=4):!!(map[z.key]?.score>=4);
+    async function tryZones(zones){
+      for(const zone of zones){
+        if(already(zone))continue;
+        for(const entry of sources){
+          const crop=fieldCrop(entry.canvas,zone.box);
+          let found='';
+          try{found=await ocr(crop,zone.psm);}catch(_){continue;}
+          const value=fieldZoneValue(zone.key,found);
+          if(value){
+            if(zone.key==='placaUf'){
+              if(!map.placa?.value) register(map,'placa',value.placa,3,'Placa anterior/UF · '+entry.name);
+              else if(map.placa.value!==value.placa){
+                // A quinta posição da placa pode ser I ou 1. Não escolher
+                // silenciosamente quando duas leituras divergem.
+                const warning='Placa: confira '+map.placa.value+' × '+value.placa+' (OCR ambíguo)';
+                if(!conflicts.includes(warning))conflicts.push(warning);
+              }
+              register(map,'uf',value.uf,4,'Placa/UF · '+entry.name);
+            }else register(map,zone.key,value,4,'Campo localizado · '+entry.name);
+            parts.push('--- CAMPO '+zone.label.toUpperCase()+' ('+entry.name+') ---\n'+found);
+            break;
+          }
         }
       }
     }
-    // Placa/UF acima e placa/UF na segunda linha servem para validar uma
-    // unica UF; nunca transformar texto avulso de cidade em estado de registro.
+    await tryZones(CRLV_FIELD_ZONES);
+    if(!complete())await tryZones(CRLV_ALTERNATE_ZONES);
     if(!map.uf){
-      const text=parts.join('\n');
-      const m=norm(text).match(/\bDETRAN\s*[-/]?\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
+      const m=norm(parts.join('\n')).match(/\bDETRAN\s*[-/]?\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
       if(m)register(map,'uf',m[1],2,'Órgão emissor');
     }
   }
-  function missingImportant(map){return !map.placa||!map.exercicio||!map.uf||!map.especie;}
   function canvasRegion(source,x,y,w,h,maxSide=2200){
     const sx=Math.round(source.width*x),sy=Math.round(source.height*y);
     const sw=Math.max(1,Math.round(source.width*w)),sh=Math.max(1,Math.round(source.height*h));
@@ -1577,7 +1604,10 @@ self.onmessage=e=>{
       }
       const ev=documentEvidence(text,map);
       if(!map.placa||!map.uf||!map.exercicio){
-        notice('O leitor concluiu a análise, mas não conseguiu confirmar todos os campos essenciais. Confira os campos destacados; nenhum dado ausente será inventado.','warning');
+        const missing=['placa','uf','exercicio'].filter(k=>!map[k]).map(k=>names[k]);
+        notice('Leitura parcial: faltou confirmar '+missing.join(', ')+'. O PDF melhorado está disponível; confira os campos destacados ou tente outra leitura.','warning');
+      }else if(conflicts.length){
+        notice('Leitura concluída, mas há caracteres divergentes entre as áreas do documento. Confira a placa antes de utilizar o resultado.','warning');
       }else if(ev.level!=='identified'){
         notice('Leitura parcial concluída. Tipo e prazo são sugestões baseadas nos campos encontrados; confira no documento original.','warning');
       }else{
