@@ -102,7 +102,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
 .pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
 .enhance-card[hidden]{display:none!important}
-/* FrotaCheck 5.5: etapas automaticas visiveis; tratamento continua invisivel */
+/* FrotaCheck 5.6: etapas automaticas visiveis; tratamento continua invisivel */
 .stage-area{border-top:1px solid var(--line);padding:17px 22px 4px}
 .stage-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
 .stage-heading strong{font-size:13px}.stage-heading span{font-size:11px;font-weight:750;color:var(--muted)}
@@ -116,12 +116,13 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .stage-caption{margin:11px 0 8px;font-size:12px;color:var(--muted);line-height:1.5}
 .model-summary{border:1px solid #e8dfcd;border-radius:11px;padding:12px 14px;margin:12px 0;background:#fffdf6;display:flex;flex-direction:column;gap:4px}
 .model-summary small{color:#786b56;font-size:11px}.model-summary strong{font-size:15px;word-break:break-word}
+.vehicle-specs{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:12px}.vehicle-specs>div{border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}.vehicle-specs small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}.vehicle-specs b{font-size:12px;overflow-wrap:anywhere}@media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.stage-area{padding:15px 17px 5px}.stage-steps{grid-template-columns:1fr}.stage-steps li{padding:9px 12px}.stage-steps li small{display:inline;margin-left:6px}}
 </style>
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.5</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.6</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura por etapas</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck melhora a imagem, lê os dados e verifica o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
@@ -198,6 +199,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="result-tile red"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7zM7.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>Tipo do veículo</div><div class="big" id="category">Aguardando dados</div><span class="type-confidence" id="confidence">—</span><p class="detail-note" id="category-note">O tipo aparecerá após a leitura ou o preenchimento.</p></div>
   <div class="result-tile yellow"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>Licenciamento • calendário 2026</div><div class="big deadline-date" id="deadline">—</div><div class="year" id="renewal-year">Calendário de 2026</div><span class="status neutral" id="status">Aguardando documento</span><p class="detail-note" id="deadline-kind"></p></div>
   <div class="model-summary"><small>Marca / modelo identificado</small><strong id="result-model">Aguardando leitura</strong></div>
+  <div class="vehicle-specs" aria-label="Caracteristicas extraidas do CRLV"><div><small>Espécie / tipo no CRLV</small><b id="result-especie">—</b></div><div><small>PBT</small><b id="result-pbt">—</b></div><div><small>Eixos</small><b id="result-eixos">—</b></div></div>
   <div class="meta"><div class="meta-item"><small>Placa</small><b id="summary-placa">—</b></div><div class="meta-item"><small>UF</small><b id="summary-uf">—</b></div><div class="meta-item"><small>Exercício</small><b id="summary-exercicio">—</b></div></div>
   <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário de 2026.</p>
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
@@ -643,6 +645,9 @@ self.onmessage=e=>{
     const cat=classify(v);
     $('category').textContent=cat.name;
     $('result-model').textContent=v.modelo||'Não identificado — conferir o CRLV';
+    $('result-especie').textContent=v.especie||'Não identificado';
+    $('result-pbt').textContent=v.pbt?v.pbt+' t':'—';
+    $('result-eixos').textContent=v.eixos||'—';
     $('category-note').textContent=cat.note;
     $('confidence').textContent=cat.confidence;
     $('summary-placa').textContent=plateFmt(v.placa)||'—';
@@ -696,7 +701,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.5',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.6',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -727,7 +732,7 @@ self.onmessage=e=>{
   }
   function register(map,key,value,score,origin){if(!value)return;
     const existing=map[key];if(!existing||score>existing.score)map[key]={value,score,origin};
-    else if(existing.value!==value){conflicts.push(`${names[key]}: ${existing.value} × ${value}`);}
+    else if(existing.value!==value && score>=3 && existing.score>=3){conflicts.push(`${names[key]}: ${existing.value} × ${value}`);}
   }
   function makeRows(items){
     const rows=[];
@@ -873,9 +878,109 @@ self.onmessage=e=>{
     }
     const worker=await ocrWorkerPromise;
     // PSM 11 = texto esparso, útil para CRLV em várias colunas.
-    await worker.setParameters({tessedit_pageseg_mode:psm===11?'11':'3'});
+    await worker.setParameters({tessedit_pageseg_mode:psm===7?'7':psm===6?'6':psm===11?'11':'3'});
     const r=await worker.recognize(input);
     return r?.data?.text||'';
+  }
+  // Leitura orientada pelo layout do CRLV-e: cada campo possui uma faixa
+  // independente. Evita misturar PLACA com RENAVAM ou EXERCICIO com ano-modelo.
+  // Coordenadas percentuais do documento A4 digitalizado; a imagem tratada
+  // e a imagem anterior ao filtro sao consultadas como fontes independentes.
+  const CRLV_FIELD_ZONES=[
+    {key:'placa',    box:[.045,.178,.159,.027], psm:7, label:'Placa'},
+    {key:'exercicio',box:[.171,.178,.124,.027], psm:7, label:'Exercício'},
+    {key:'modelo',   box:[.047,.335,.428,.039], psm:7, label:'Marca/modelo'},
+    {key:'especie',  box:[.047,.377,.433,.036], psm:7, label:'Espécie/tipo'},
+    {key:'uf',       box:[.047,.410,.270,.033], psm:7, label:'Placa/UF'},
+    {key:'pbt',      box:[.801,.161,.126,.036], psm:7, label:'PBT'},
+    {key:'eixos',    box:[.794,.189,.060,.038], psm:7, label:'Eixos'}
+  ];
+  function fieldZoneValue(key,raw){
+    const n=norm(String(raw||'')).replace(/[|]/g,' ').trim();
+    if(!n)return null;
+    if(key==='placa'){
+      // Exige formato de placa e nunca usa uma sequencia numerica do Renavam.
+      const exact=n.match(/(?:^|[^A-Z0-9])([A-Z]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2})(?=$|[^A-Z0-9])/);
+      if(exact)return repairPlate(exact[1]);
+      // OCR pode adicionar espacos entre caracteres, mas so recuperamos
+      // isso em uma linha curta para nao transformar o titulo em placa.
+      const withoutLabel=n.replace(/^PLACA\s*[:\-]?\s*/,'').replace(/[^A-Z0-9]/g,'');
+      return withoutLabel.length===7?repairPlate(withoutLabel):null;
+    }
+    if(key==='uf'){
+      const m=n.match(/\b(?:[A-Z]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2})\s*\/\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
+      return m?m[1]:null;
+    }
+    if(key==='modelo'){
+      const lines=n.split(/[\r\n]+/).map(t=>t.trim()).filter(Boolean);
+      const candidates=[];
+      for(const line of lines){
+        const cleaned=line.replace(/^(?:MARCA\s*\/\s*MODELO(?:\s*\/\s*VERSAO)?|MODELO)\s*[:\-]?\s*/, '').split(/\b(?:ESPECIE|PLACA|CHASSI|EXERCICIO|PESO\s+BRUTO|RENAVAM)\b/)[0].trim();
+        if(cleaned.length>=6&&cleaned.length<=65&&/[A-Z]{2}/.test(cleaned)&&/\d|\//.test(cleaned)&& !/\b(?:ANTERIOR|BRASIL|DETRAN|SENATRAN|VEICULO|LICENCIAMENTO)\b/.test(cleaned)){
+          candidates.push(cleaned);
+        }
+      }
+      return candidates.length===1?candidates[0]:null;
+    }
+    if(key==='especie'){
+      const match=n.match(species);return match?match[0]:null;
+    }
+    if(key==='exercicio'){
+      const yrs=n.match(/\b20[12][0-9]\b/g)||[];
+      // Nunca usar ano de fabricacao/modelo: so a faixa EXERCICIO.
+      return yrs.length===1?yrs[0]:null;
+    }
+    if(key==='pbt'){
+      const cleaned=n.replace(/\s/g,'').replace(/O/g,'0');
+      const decimals=cleaned.match(/\d{1,2}[.,]\d{1,2}/g)||[];
+      if(decimals.length===1){const v=parseValue('pbt',decimals[0],true);return v;}
+      return null;
+    }
+    if(key==='eixos'){
+      const sansLabel=n.replace(/(?:E[I1]X[O0]S|N[UO]MERO\s+DE\s+E[I1]X[O0]S)/g,' ');
+      const matches=sansLabel.match(/\b(?:[1-9]|1[0-2])\b/g)||[];
+      return matches.length===1?parseValue('eixos',matches[0],true):null;
+    }
+    return null;
+  }
+  function fieldCrop(source,box){
+    const [x,y,w,h]=box;
+    const sx=Math.max(0,Math.round(source.width*x)),sy=Math.max(0,Math.round(source.height*y));
+    const sw=Math.max(2,Math.min(source.width-sx,Math.round(source.width*w)));
+    const sh=Math.max(2,Math.min(source.height-sy,Math.round(source.height*h)));
+    const factor=Math.max(1,Math.min(3.8,1100/Math.max(sw,sh)));
+    const c=document.createElement('canvas');c.width=Math.round(sw*factor);c.height=Math.round(sh*factor);
+    const ctx=c.getContext('2d',{willReadFrequently:true});
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(source,sx,sy,sw,sh,0,0,c.width,c.height);
+    return c;
+  }
+  async function readCrlvFieldZones(scanned,original,map,parts){
+    const goodPortrait=c=>c?.width>400&&c?.height>550&&c.height/c.width>1.12&&c.height/c.width<2.25;
+    const sources=[{canvas:original,name:'original (conferência de dígitos)'},{canvas:scanned,name:'digitalizado'}].filter(x=>goodPortrait(x.canvas));
+    if(!sources.length)return;
+    for(const zone of CRLV_FIELD_ZONES){
+      if(map[zone.key]?.score>=4)continue;
+      for(const entry of sources){
+        const crop=fieldCrop(entry.canvas,zone.box);
+        let found='';
+        try{found=await ocr(crop,zone.psm);}catch(e){continue;}
+        const value=fieldZoneValue(zone.key,found);
+        if(value){
+          register(map,zone.key,value,4,'Campo localizado · '+entry.name);
+          parts.push('--- CAMPO '+zone.label.toUpperCase()+' ('+entry.name+') ---\n'+found);
+          break;
+        }
+      }
+    }
+    // Placa/UF acima e placa/UF na segunda linha servem para validar uma
+    // unica UF; nunca transformar texto avulso de cidade em estado de registro.
+    if(!map.uf){
+      const text=parts.join('\n');
+      const m=norm(text).match(/\bDETRAN\s*[-/]?\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
+      if(m)register(map,'uf',m[1],2,'Órgão emissor');
+    }
   }
   function missingImportant(map){return !map.placa||!map.exercicio||!map.uf||!map.especie;}
   function canvasRegion(source,x,y,w,h,maxSide=2200){
@@ -906,6 +1011,9 @@ self.onmessage=e=>{
     let text=await ocr(c,11);
     parts.push('--- '+tag+' ORIENTADO ---\n'+text);
     parseText(text,map,2,'Scanner 5.2 / OCR');
+    // Leitura precisa dos valores, antes de repetir OCR em metades da folha.
+    // A copia tratada e lida primeiro; a original preserva caracteres pequenos.
+    await readCrlvFieldZones(c,originalSource||source,map,parts);
     // Reconhecimento por regiões evita que campos pequenos se percam na página inteira.
     if(missingImportant(map)||!map.pbt||!map.eixos||!map.modelo){
       // Colunas superiores do CRLV, onde ficam placa, exercício, espécie e PBT.
@@ -1451,7 +1559,7 @@ self.onmessage=e=>{
       notice('Etapa 3/4 • Identificando o veículo...');
       await yieldScreen();
       const text=parts.join('\n').trim();
-      setExtracted(map,'Scanner 5.2 → OCR por regiões'+(isPDF?' + PDF de apoio':''),text);
+      setExtracted(map,'Scanner 5.2 → OCR de campos por região'+(isPDF?' + PDF de apoio':''),text);
       const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));
       const cat=classify(v);
       if(!v.modelo||cat.name==='Aguardando dados'||cat.name==='A confirmar'){
@@ -1469,7 +1577,7 @@ self.onmessage=e=>{
       }
       const ev=documentEvidence(text,map);
       if(!map.placa||!map.uf||!map.exercicio){
-        notice('Cópia melhorada e OCR concluídos, mas faltam placa, UF ou exercício para confirmar a situação. Confira os campos identificados.','warning');
+        notice('O leitor concluiu a análise, mas não conseguiu confirmar todos os campos essenciais. Confira os campos destacados; nenhum dado ausente será inventado.','warning');
       }else if(ev.level!=='identified'){
         notice('Leitura parcial concluída. Tipo e prazo são sugestões baseadas nos campos encontrados; confira no documento original.','warning');
       }else{
@@ -1724,7 +1832,7 @@ self.onmessage=e=>{
   });
   renderExtraction();analyze();resetStages();
   // Funções de diagnóstico local, sem envio de documentos.
-  window.__FrotaCheckTest={calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,makeEnhancedPdf,setExtracted};
+  window.__FrotaCheckTest={calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
 })();
 
 </script>
