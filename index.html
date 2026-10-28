@@ -102,7 +102,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
 .pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
 .enhance-card[hidden]{display:none!important}
-/* FrotaCheck 5.7.3: etapas automaticas visiveis; tratamento continua invisivel */
+/* FrotaCheck 5.8: etapas automaticas visiveis; tratamento continua invisivel */
 .stage-area{border-top:1px solid var(--line);padding:17px 22px 4px}
 .stage-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
 .stage-heading strong{font-size:13px}.stage-heading span{font-size:11px;font-weight:750;color:var(--muted)}
@@ -122,7 +122,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7.3</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.8</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura por etapas</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck melhora a imagem, lê os dados e verifica o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
@@ -706,7 +706,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.7.3',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.8',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -1024,7 +1024,7 @@ self.onmessage=e=>{
       if(m)register(map,'uf',m[1],2,'Órgão emissor');
     }
   }
-  // Recuperação 5.7.3: prioriza a linha NUMÉRICA dentro da coluna de
+  // Recuperação 5.8: prioriza a linha NUMÉRICA dentro da coluna de
   // EXERCÍCIO e registra os resultados do OCR em diagnóstico local.
   // Não consulta o calendário para escolher um ano e nunca preenche por padrão.
   function yearFromFocusedOCR(raw){
@@ -1067,7 +1067,7 @@ self.onmessage=e=>{
     if(failed){
       // Não mostrar o conteúdo completo do CRLV no diagnóstico.
       const last=exerciseAttempts.slice(-9).map(a=>a.source+' · '+a.mode+': '+(a.reading||'[sem números legíveis]')).join('\n');
-      $('exercise-diag-text').textContent='Foram testadas '+exerciseAttempts.length+' leituras do campo.\n'+last+'\n\nO ano não será presumido. Confira se a versão exibida é V5.7.3 e use “Tentar outra leitura” caso necessário.';
+      $('exercise-diag-text').textContent='Foram testadas '+exerciseAttempts.length+' leituras do campo.\n'+last+'\n\nO ano não será presumido. Confira se a versão exibida é V5.8 e use “Tentar outra leitura” caso necessário.';
     }
   }
   async function recoverExercise(scanned,original,map,parts){
@@ -1139,9 +1139,162 @@ self.onmessage=e=>{
       return {canvas:source,used:false};
     }
   }
+  // FrotaCheck 5.8: o OCR deve acompanhar a orientacao do DOCUMENTO,
+  // nao apenas a orientacao da folha A4. Esta rotina nao modifica o PDF.
+  // Detecta a area impressa e compara OCR nas rotacoes 0/90/180/270.
+  function ocrDocumentArea(source){
+    const scale=Math.min(1,850/Math.max(source.width,source.height));
+    const small=document.createElement('canvas');
+    small.width=Math.max(1,Math.round(source.width*scale));
+    small.height=Math.max(1,Math.round(source.height*scale));
+    const c=small.getContext('2d',{willReadFrequently:true});
+    c.drawImage(source,0,0,small.width,small.height);
+    const img=c.getImageData(0,0,small.width,small.height).data;
+    const w=small.width,h=small.height,rows=new Uint32Array(h),cols=new Uint32Array(w);
+    for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2){
+      const k=(y*w+x)*4;
+      if((img[k]*.299+img[k+1]*.587+img[k+2]*.114)<180){rows[y]++;cols[x]++;}
+    }
+    // Exige conteudo visivel em cada faixa. Nao confundir pixels isolados
+    // de sujeira com as bordas do CRLV.
+    const rowMin=Math.max(5,Math.floor(w*.018));
+    const colMin=Math.max(5,Math.floor(h*.018));
+    let top=0,bottom=h-1,left=0,right=w-1;
+    while(top<h-1&&rows[top]<rowMin)top++;
+    while(bottom>top&&rows[bottom]<rowMin)bottom--;
+    while(left<w-1&&cols[left]<colMin)left++;
+    while(right>left&&cols[right]<colMin)right--;
+    if(bottom-top<h*.25||right-left<w*.25)return source;
+    const px=Math.round(w*.015),py=Math.round(h*.015);
+    top=Math.max(0,top-py);bottom=Math.min(h-1,bottom+py);
+    left=Math.max(0,left-px);right=Math.min(w-1,right+px);
+    // Nao deixa um retangulo ruim recortar mais de 70% de uma dimensao.
+    const sx=left/scale,sy=top/scale,sw=(right-left+1)/scale,sh=(bottom-top+1)/scale;
+    const area=document.createElement('canvas');
+    const maxSide=2200,ratio=Math.min(1,maxSide/Math.max(sw,sh));
+    area.width=Math.max(1,Math.round(sw*ratio));
+    area.height=Math.max(1,Math.round(sh*ratio));
+    area.getContext('2d').drawImage(source,sx,sy,sw,sh,0,0,area.width,area.height);
+    return area;
+  }
+  function ocrTurnCanvas(source,quarterTurns){
+    const turns=((quarterTurns%4)+4)%4;
+    if(!turns)return source;
+    const cv=document.createElement('canvas'),w=source.width,h=source.height;
+    cv.width=turns%2?h:w;cv.height=turns%2?w:h;
+    const ctx=cv.getContext('2d');
+    ctx.translate(cv.width/2,cv.height/2);
+    ctx.rotate(turns*Math.PI/2);
+    ctx.drawImage(source,-w/2,-h/2);
+    return cv;
+  }
+  function orientationQuality(raw){
+    const t=norm(raw||'');
+    const terms=[/BRASIL/,/RENAVAM/,/PLACA/,/EXERC[I1L]C/,/FABRICAC/,/MODELO/,/ESPECIE/,/CAMINH/,/IVECO/,/MERCEDES/,/DIESEL/,/CATEGORIA/,/CHASSI/,/CARGA/,/PROPRIET/,/CARROCERIA/,/AUTOMOVEL/,/ALUGUEL/,/SEGURO/];
+    const hits=terms.filter(re=>re.test(t)).length;
+    const years=(t.match(/\b20(?:1\d|2\d|3\d)\b/g)||[]).length;
+    const legible=(t.match(/\b[A-Z]{4,}\b/g)||[]).length;
+    return hits*10+Math.min(3,years)*3+Math.min(12,legible)*.25;
+  }
+  function targetedScanCrop(source,box){
+    const [x,y,w,h]=box;
+    const sx=Math.round(source.width*x),sy=Math.round(source.height*y),
+      sw=Math.max(2,Math.round(source.width*w)),sh=Math.max(2,Math.round(source.height*h));
+    const factor=Math.min(3,Math.max(1,850/sw));
+    const cv=document.createElement('canvas');
+    cv.width=Math.max(1,Math.round(sw*factor));
+    cv.height=Math.max(1,Math.round(sh*factor));
+    cv.getContext('2d').drawImage(source,sx,sy,sw,sh,0,0,cv.width,cv.height);
+    return cv;
+  }
+  async function recoverFromOrientedImage(scanned,original,map,parts){
+    // Executar apenas quando os campos essenciais estiverem faltando.
+    // Assim documentos bem reconhecidos nao sofrem custo adicional.
+    if(!missingImportant(map)&&map.modelo&&map.especie)return;
+    let best=null;
+    const inputs=[{canvas:original,label:'original'},{canvas:scanned,label:'digitalizada'}]
+      .filter(x=>x.canvas?.width&&x.canvas?.height);
+    for(const input of inputs){
+      const area=ocrDocumentArea(input.canvas);
+      const landscape=area.width>area.height*1.10;
+      const order=landscape?[1,3,0,2]:[0,2,1,3];
+      // No original escaneado, a borda pode estar na lateral de uma folha
+      // A4 vertical. A pontuacao decide a orientacao pelo TEXTO, nao por
+      // uma faixa preta que tambem pode aparecer na base do documento.
+      for(const turn of order.slice(0,2)){
+        const corrected=ocrTurnCanvas(area,turn);
+        // Tentar reconhecimento de orientacao sobre a metade superior;
+        // os campos principais ficam acima do bloco de observacoes.
+        const sample=targetedScanCrop(corrected,[0,0,1,.57]);
+        let text='';
+        try{text=await ocr(sample,6);}catch(_){continue;}
+        const score=orientationQuality(text);
+        if(!best||score>best.score)best={score,text,canvas:corrected,turn,label:input.label};
+        // Evidencia suficientemente forte da orientacao correta.
+        if(score>=45)break;
+      }
+      if(best?.score>=18)break;
+    }
+    if(!best)return;
+    parts.push('--- OCR ORIENTADO AUTOMATICAMENTE ('+best.label+', rotacao '+best.turn*90+' graus) ---\n'+best.text);
+    parseText(best.text,map,2,'OCR orientado (conferir)');
+    // O campo EXERCICIO pode aparecer na mesma linha da placa mesmo quando
+    // os rótulos desaparecem. Só aceitar o ano no BLOCO SUPERIOR ESQUERDO
+    // quando estiver pareado a uma sequencia semelhante a uma placa.
+    if(!map.exercicio && best.canvas.height>best.canvas.width*1.08){
+      const firstBox=targetedScanCrop(best.canvas,[.02,.08,.49,.23]);
+      let firstText='';
+      try{firstText=await ocr(firstBox,6);}catch(_){firstText='';}
+      const n=norm(firstText);
+      const m=n.match(/(?:^|\s)[A-Z0-9]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2}\s+(20[12]\d)(?=\s|$)/m);
+      if(m){register(map,'exercicio',m[1],3,'Ano pareado com placa no bloco superior');parts.push('--- ANO JUNTO A PLACA (PAPEL ORIENTADO) ---\n'+m[1]);}
+    }
+    // As regioes abaixo sao relativas ao PAPEL apos orientar e retirar
+    // margens; nao a uma pagina A4, cujas margens variam muito.
+    if(best.canvas.height>best.canvas.width*1.08){
+      const areas=[
+        {key:'placa',box:[.035,.115,.22,.080]},
+        {key:'exercicio',box:[.145,.115,.16,.090]},
+        {key:'placaUf',box:[.025,.405,.32,.075]},
+        {key:'modelo',box:[.025,.325,.48,.080]},
+        {key:'especie',box:[.025,.368,.48,.085]},
+        {key:'pbt',box:[.755,.075,.20,.085]},
+        {key:'eixos',box:[.765,.104,.15,.075]}
+      ];
+      // Todas as leituras tentadas somente quando realmente faltam dados.
+      for(const a of areas){
+        if(a.key==='placaUf'){if(map.placa&&map.uf)continue;}
+        else if(map[a.key])continue;
+        const crop=targetedScanCrop(best.canvas,a.box);
+        let raw='';try{raw=await ocr(crop,6);}catch(_){continue;}
+        const found=fieldZoneValue(a.key,raw);
+        if(a.key==='placaUf'&&found){
+          if(!map.placa)register(map,'placa',found.placa,2,'Recorte orientado (conferir)');
+          register(map,'uf',found.uf,3,'UF explicita no CRLV');
+        }else if(found)register(map,a.key,found,3,'Recorte orientado pelo papel');
+        if(found)parts.push('--- CAMPO ORIENTADO '+a.key+' ---\n'+raw);
+      }
+      // O ano só pode vir da area EXERCICIO, nunca de fabricacao/modelo.
+      if(!map.exercicio){
+        const rects=[[.16,.14,.10,.04],[.15,.12,.14,.07]];
+        for(const box of rects){
+          const crop=targetedScanCrop(best.canvas,box);
+          let raw='';try{raw=await ocr(crop,7,{digitsOnly:true});}catch(_){continue;}
+          const year=yearFromFocusedOCR(raw);
+          if(year){register(map,'exercicio',year,3,'Ano localizado no papel orientado');break;}
+        }
+      }
+    }
+    // Ao final, campos desconhecidos continuam vazios para conferência.
+  }
   async function readDocumentImage(source,map,parts,tag,alreadyScanned=false,originalSource=null){
     const corrected=alreadyScanned?{canvas:source,used:true}:await scanner52ForOCR(source);
     const c=corrected.canvas;
+    // So rodar a busca de orientacao antes do OCR comum quando a area
+    // impressa ocupa uma folha HORIZONTAL dentro do PDF vertical.
+    const paper=ocrDocumentArea(originalSource||source);
+    const sideways=paper.width>paper.height*1.12;
+    if(sideways)await recoverFromOrientedImage(c,originalSource||source,map,parts);
     let text=await ocr(c,11);
     parts.push('--- '+tag+' ORIENTADO ---\n'+text);
     parseText(text,map,2,'Scanner 5.2 / OCR');
@@ -1172,6 +1325,10 @@ self.onmessage=e=>{
       parts.push('--- '+tag+' ORIGINAL ---\n'+original);
       parseText(original,map,2,'OCR original');
     }
+    // Documentos em retrato com rotacao 180 tambem podem exigir OCR
+    // orientado, mas nao sobrecarregar a leitura quando ja deu certo.
+    if(!sideways&&missingImportant(map))
+      await recoverFromOrientedImage(c,originalSource||source,map,parts);
     return corrected.used;
   }
   // OpenCV é carregado apenas quando necessário. Se falhar, a melhoria local continua.
@@ -1717,7 +1874,7 @@ self.onmessage=e=>{
       const ev=documentEvidence(text,map);
       if(!map.placa||!map.uf||!map.exercicio){
         const missing=['placa','uf','exercicio'].filter(k=>!map[k]).map(k=>names[k]);
-        notice('Leitura parcial: faltou confirmar '+missing.join(', ')+'. O PDF melhorado está disponível; confira os campos destacados ou tente outra leitura.','warning');
+        notice('Leitura parcial: faltou confirmar '+missing.join(', ')+'. O PDF melhorado está disponível. Confira os campos ausentes em ‘Conferir ou corrigir dados’; documentos muito ruins podem exigir confirmação manual.','warning');
       }else if(conflicts.length){
         notice('Leitura concluída, mas há caracteres divergentes entre as áreas do documento. Confira a placa antes de utilizar o resultado.','warning');
       }else if(ev.level!=='identified'){
