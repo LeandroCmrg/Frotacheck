@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck | Leitor e melhoria de CRLV-e</title>
+<title>FrotaCheck | Leitor de CRLV-e</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -26,6 +26,13 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .status{display:inline-block;border-radius:99px;padding:6px 11px;font-weight:850;font-size:11px;margin-top:13px;background:#e9e8e4;color:#615d55}.status.ok{background:#def4e6;color:#1c783b}.status.warn{background:#fff0c2;color:#806100}.status.bad{background:#ffdfdf;color:#a40817}.status.neutral{background:#eceae5;color:#6d6a64}
 .meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:17px;border:1px solid var(--line);border-radius:12px;overflow:hidden}.meta-item{padding:11px 13px;min-width:0}.meta-item+.meta-item{border-left:1px solid var(--line)}.meta-item small{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.7px;display:block}.meta-item b{font-size:14px;overflow-wrap:anywhere}.explanation{font-size:12px;color:#59564f;line-height:1.55;margin:16px 0 0}.result-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}.source{color:#a20b17;font-size:12px;font-weight:800;text-decoration:none}.source:hover{text-decoration:underline}.footer-note{max-width:1158px;margin:25px auto 0;color:#747169;font-size:11px;line-height:1.7}
 .extract-head,.extract-item{font-size:11px}.extract-head{font-weight:750;margin:9px 0}.extract-item{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid #eee}.extract-item b{text-align:right;overflow-wrap:anywhere}.good{color:#196d3d}.maybe{color:#ab7912}.low,.audit-alert{color:#ac2020}
+/* Integração CamScanner Agent - área opcional */
+.camscanner-box{margin:13px 0;border:1px solid #e9db9b;background:#fffdf3;border-radius:12px;padding:13px}
+.cam-head{display:flex;align-items:center;gap:9px;font-weight:850;font-size:13px}
+.cam-head small{font-size:10px;color:#74634a;font-weight:600;margin-left:auto}
+.cam-consent{display:flex;gap:9px;align-items:start;font-size:12px;line-height:1.5;margin:10px 0;color:#58524a}
+.cam-consent input{margin-top:3px;flex-shrink:0;accent-color:#d40511}
+.cam-note{font-size:11px;color:#756b55;margin:7px 0 0}
 /* Ferramenta de legibilidade — preserva a tela principal compacta */
 .enhance-card{border-top:1px solid var(--line);padding:0 22px 20px}
 .enhance-card>summary{cursor:pointer;padding:16px 0 4px;font-weight:850;font-size:13px;list-style:none;display:flex;gap:9px;align-items:center}
@@ -64,6 +71,18 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:520px){.scan-actions .button{flex:1 1 100%}}
 @media(max-width:860px){.layout{grid-template-columns:1fr}.header-chip{display:none}.result-panel{padding:20px}}
 @media(max-width:520px){header{padding:15px 16px}main{padding:24px 13px 30px}.brand-name{font-size:20px}.brand-sub{font-size:9px}.mark{height:39px;width:39px}.intro{margin-bottom:20px}.panel-head{padding:18px 17px 9px}.panel-body{padding:8px 17px 18px}.edit-card{padding:0 17px 16px}.drop{min-height:195px;padding:17px 10px}.result-panel{padding:17px}.result-head{flex-wrap:wrap}.result-tile{padding:18px 15px}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.field.full{grid-column:1/-1}.advanced-layout{grid-template-columns:1fr}.big{font-size:29px}}
+
+/* Configuração de CamScanner: opcional, com consentimento separado por arquivo. */
+.service-card{margin-top:15px;padding:14px;border:1px solid #eee0b2;background:#fffdf6;border-radius:12px}
+.service-card>summary{font-size:13px;font-weight:850;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+.service-card>summary::before{content:'◈';color:var(--red);font-size:19px}
+.service-card>summary::after{content:'⌄';margin-left:auto;font-size:18px;color:var(--red)}
+.service-card[open]>summary::after{transform:rotate(180deg)}
+.service-card>summary::-webkit-details-marker{display:none}
+.service-config{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.service-config .field input{font-size:16px}
+.service-help{font-size:11px;color:var(--muted);line-height:1.5;margin:0}
+.service-state{font-size:11px;color:#6a5b30;font-weight:750;margin-left:auto}
 </style>
 </head>
 <body>
@@ -79,9 +98,18 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <input id="photo-file" type="file" class="sr" accept="image/*" capture="environment" aria-label="Fotografar CRLV completo" />
   <div class="scan-actions"><button class="button primary" type="button" id="open-qr"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM21 14v3M18 20h3" /></svg>Ler QR Code</button><button class="button" type="button" id="take-photo">📷 Fotografar CRLV</button></div>
   <p class="scan-info">No celular, use a câmera. Para preencher os dados sem integração VIO, fotografe o documento inteiro, não apenas o QR.</p>
+  <details class="service-card" id="service-card">
+    <summary>Configurar CamScanner Agent <span id="service-state" class="service-state">Não configurado</span></summary>
+    <div class="service-config">
+      <p class="service-help">O CamScanner melhora imagens pelo serviço conectado ao Cloudflare Worker. A leitura de placa, UF, exercício e classificação permanece local no navegador.</p>
+      <div class="field"><label for="worker-url">Endereço HTTPS do Worker</label><input id="worker-url" type="url" autocomplete="off" spellcheck="false" placeholder="https://frotacheck.seuusuario.workers.dev" /></div>
+      <div class="field"><label for="worker-code">Código de acesso do Worker</label><input id="worker-code" type="password" autocomplete="off" placeholder="Código privado configurado no Cloudflare" /></div>
+      <p class="service-help">O código de acesso não é salvo. Para usar o CamScanner, também é necessário configurar a ponte Node.js autenticada. A autorização para enviar cada documento fica na seção “Melhorar imagem e gerar PDF”.</p>
+    </div>
+  </details>
   <div class="actions"><button class="button ghost" type="button" id="clear">↺ Limpar dados</button></div>
   <div id="file-notice" class="notice" role="status" aria-live="polite">Leitura automática. Revise as informações antes de usar o resultado.</div>
-  <p class="file-hint">Até 15 MB. Imagem e OCR processados no navegador; bibliotecas podem requerer internet.</p>
+  <p class="file-hint">Até 15 MB no leitor local. Envio ao CamScanner somente com autorização.</p>
   </div>
   <details class="enhance-card" id="enhance-card">
     <summary>Melhorar imagem e gerar PDF</summary>
@@ -93,6 +121,14 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     <div class="enhance-preview" id="enhance-previews" hidden>
       <figure><figcaption>Original</figcaption><canvas id="preview-before" aria-label="Prévia do documento original"></canvas></figure>
       <figure><figcaption>Melhorado</figcaption><canvas id="preview-after" aria-label="Prévia do documento melhorado"></canvas></figure>
+    </div>
+    <div class="camscanner-box">
+      <div class="cam-head">◈ CamScanner Agent <small>via serviço conectado</small></div>
+      <p class="enhance-description">Remova sombras e melhore a legibilidade com o CamScanner. Use a URL e o código do Worker em “Configurar CamScanner Agent”.</p>
+      <label class="cam-consent"><input id="cam-consent" type="checkbox"/><span>Autorizo enviar uma imagem da primeira página do CRLV ao CamScanner para tratamento. O original será preservado nesta sessão.</span></label>
+      <button class="button primary" id="cam-enhance" type="button" disabled>◈ Melhorar com CamScanner</button>
+      <p id="cam-feedback" class="enhance-result" role="status" aria-live="polite">Requer conexão do serviço CamScanner e autorização.</p>
+      <p class="cam-note">Para PDFs com várias páginas, esta ação trata somente a primeira página. Para gerar um PDF completo, use a melhoria local acima no documento original.</p>
     </div>
     <button class="button primary enhance-download" id="download-pdf" type="button" disabled>↓ Baixar PDF melhorado</button>
     <p class="enhance-result" id="enhance-feedback" role="status" aria-live="polite">Envie uma foto ou PDF para habilitar a melhoria.</p>
@@ -329,7 +365,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'3.5',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
+    return {version:'3.6',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -418,11 +454,11 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   }
   function docCheck(t){const n=norm(t);return /(?:CRLV|CERTIFICADO DE REGISTRO E LICENCIAMENTO)/.test(n)&&(/PLACA/.test(n))&&(/EXERCICIO/.test(n));}
   function scoreMap(m){return ['placa','exercicio','uf','especie','modelo','pbt','eixos'].reduce((acc,k)=>acc+(m[k]?.score||0),0);}
-  function setExtracted(map,mode,text){
+  function setExtracted(map,mode,text,identified=null){
     fields.filter(k=>k!=='override').forEach(k=>$(k).value='');$('override').value='';
     for(const [key,val] of Object.entries(map)){if($(key))$(key).value=val.value;}
     extraction=map;extractionMode=mode;rawText=text;$('rawtext').textContent=text||'Não foi possível detectar texto.';
-    documentLooksRight=docCheck(text);renderExtraction();analyze();
+    documentLooksRight=identified===null?docCheck(text):Boolean(identified);renderExtraction();analyze();
     const found=Object.keys(map).filter(k=>names[k]);
     if(!map.placa||!map.exercicio||!map.uf||!map.especie)$('edit-fields').open=true;
     if(!documentLooksRight)notice('A leitura não confirmou o formato CRLV-e. Verifique se selecionou o documento correto antes de utilizar os dados.','warning');
@@ -644,6 +680,83 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   async function imageCanvas(input,rotation=0){
     return enhanceCanvas(await drawSourceCanvas(input,rotation,2400),'gray');
   }
+  // Configuração do Worker para tratamento visual CamScanner.
+  // A URL pode ser armazenada no navegador, mas o código de acesso não é salvo.
+  const workerInput=$('worker-url'),workerCode=$('worker-code'),serviceState=$('service-state');
+  try{workerInput.value=localStorage.getItem('frotacheck_worker_url')||'';}catch(e){}
+  workerInput.addEventListener('change',()=>{
+    try{localStorage.setItem('frotacheck_worker_url',workerInput.value.trim());}catch(e){}
+    updateServiceState();
+  });
+  workerInput.addEventListener('input',updateServiceState);
+  workerCode.addEventListener('input',updateServiceState);
+  function workerEndpoint(){
+    const value=workerInput.value.trim();
+    if(!value)return null;
+    try{
+      const u=new URL(value);
+      if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;
+      return u.origin;
+    }catch(e){return null;}
+  }
+  function updateServiceState(){
+    serviceState.textContent=workerEndpoint()&&workerCode.value.trim()?'Dados informados (não testados)':'Não configurado';
+  }
+  updateServiceState();
+  // CamScanner Agent: usa somente o backend protegido; nunca envia OAuth ou credenciais para o GitHub.
+  let originalFileForCam=null,camBusy=false;
+  const camConsent=$('cam-consent'),camBtn=$('cam-enhance'),camStatus=$('cam-feedback');
+  function camMessage(msg,type=''){camStatus.textContent=msg;camStatus.className='enhance-result '+type;}
+  function camUrl(){const endpoint=workerEndpoint();return endpoint?endpoint+'/camscanner/enhance':null;}
+  function updateCamState(){camBtn.disabled=camBusy||pending||!lastFile;}
+  camConsent.addEventListener('change',()=>{updateCamState();});
+  async function camEnhance(){
+    if(!lastFile||camBusy||pending)return;
+    if(!camUrl()||!workerCode.value.trim()){
+      $('service-card').open=true;
+      camMessage('Configure o endereço do Worker e o código de acesso na seção “Configurar CamScanner Agent”.','error');return;
+    }
+    if(!camConsent.checked){camMessage('Marque a autorização de envio ao CamScanner antes de continuar.','error');return;}
+    if(lastFile.size>15*1024*1024){camMessage('O arquivo original excede 15 MB.','error');return;}
+    camBusy=true;camBtn.disabled=true;camBtn.textContent='Tratando documento...';
+    const original=lastFile;
+    try{
+      camMessage('Preparando a primeira página do documento...');
+      const [page]=await getCanvasForDocument(original,2300,true);
+      const dataUrl=page.toDataURL('image/jpeg',0.88);
+      const imageBase64=dataUrl.split(',')[1];
+      if(!imageBase64||imageBase64.length>8*1024*1024)throw Error('Imagem muito grande para o CamScanner.');
+      camMessage('Enviando ao CamScanner Agent para melhorar a leitura...');
+      const res=await fetch(camUrl(),{
+        method:'POST',headers:{'Content-Type':'application/json','X-FrotaCheck-Code':workerCode.value.trim()},
+        body:JSON.stringify({mime:'image/jpeg',base64:imageBase64}),
+        signal:AbortSignal.timeout(120000)
+      });
+      const data=await res.json().catch(()=>({error:'Resposta inválida do serviço CamScanner.'}));
+      if(!res.ok)throw Error(data.error||'Serviço CamScanner indisponível.');
+      if(!['image/jpeg','image/png'].includes(data.mime)||typeof data.base64!=='string'||!data.base64.length)throw Error('O serviço CamScanner não retornou uma imagem válida.');
+      const binary=atob(data.base64);
+      if(binary.length>12*1024*1024)throw Error('Imagem retornada excede o limite permitido.');
+      const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+      const ext=data.mime==='image/png'?'png':'jpg';
+      const result=new File([bytes],(original.name.replace(/\.[^.]+$/,'')||'CRLV')+'-CamScanner.'+ext,{type:data.mime});
+      if(!originalFileForCam)originalFileForCam=original;
+      lastFile=result;
+      camMessage('Imagem melhorada. Reanalisando para identificar tipo e vencimento...','success');
+      await processFile(result);
+      $('enhance-card').open=true;
+      camMessage('CamScanner aplicado à primeira página. Confira tipo, prazo e prévia antes de baixar o PDF tratado. O CRLV original não foi alterado.','success');
+    }catch(e){
+      camMessage('CamScanner não concluiu: '+(e.message||String(e))+'. O leitor local continua disponível.','error');
+      if(lastFile!==original){lastFile=original;}
+    }finally{camBusy=false;camBtn.textContent='◈ Melhorar com CamScanner';updateCamState();}
+  }
+  async function handleFile(file){
+    if(!file)return;
+    // Leitura do documento sempre local: PDF.js / Tesseract, sem serviço externo de OCR.
+    lastFile=file;originalFileForCam=null;updateCamState();
+    return processFile(file);
+  }
   async function processFile(file,forceOCR=false){
     if(!file)return;if(file.size>15*1024*1024){notice('Tamanho máximo: 15 MB.','danger');return;}
     const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name),isImage=/^image\/(png|jpeg|webp)$/.test(file.type)||/\.(png|jpe?g|webp)$/i.test(file.name);
@@ -783,20 +896,21 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   $('qr-retry').addEventListener('click',async()=>{await qrStop();await qrStart();});
   $('take-photo').addEventListener('click',()=>{$('photo-file').click();});
   $('qr-photo').addEventListener('click',()=>{void qrClose();$('photo-file').click();});
-  $('photo-file').addEventListener('change',e=>{const file=e.target.files?.[0];if(file)void processFile(file);e.target.value='';});
+  $('photo-file').addEventListener('change',e=>{const file=e.target.files?.[0];if(file)void handleFile(file);e.target.value='';});
   fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
   $('placa').addEventListener('input',e=>{const p=plateFmt(e.target.value).slice(0,7);if(p!==e.target.value)e.target.value=p;});
-  $('file').addEventListener('change',e=>processFile(e.target.files?.[0]));
+  $('file').addEventListener('change',e=>{void handleFile(e.target.files?.[0]);e.target.value='';});
   $('select-file').addEventListener('click',e=>{e.stopPropagation();$('file').click();});
   const drop=$('dropzone');drop.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click();});drop.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('file').click();}});
   ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
   ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
-  drop.addEventListener('drop',e=>processFile(e.dataTransfer.files?.[0]));
+  drop.addEventListener('drop',e=>{void handleFile(e.dataTransfer.files?.[0]);});
+  $('cam-enhance').addEventListener('click',()=>{void camEnhance();});
   $('force-ocr').addEventListener('click',()=>{if(lastFile)processFile(lastFile,true);else notice('Selecione um arquivo primeiro.','warning');});
   $('enhance-preview-button').addEventListener('click',()=>{if(lastFile)void refreshEnhancementPreview();});
   $('enhance-mode').addEventListener('change',()=>{if(lastFile)void refreshEnhancementPreview();});
   $('download-pdf').addEventListener('click',()=>{void createEnhancedPDF();});
-  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;previewToken++;$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
+  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;originalFileForCam=null;camConsent.checked=false;camMessage('Requer conexão do serviço CamScanner e autorização.');updateCamState();previewToken++;$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
   $('copy-summary').addEventListener('click',async()=>{
     const r=analyze();
     const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário de renovação: ${r.renewalYear||'-'}\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
@@ -804,8 +918,8 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     catch(e){notice('Não foi possível copiar automaticamente.','warning');}
   });
   renderExtraction();analyze();
-  // API para testes funcionais de regras e parser sem acessar documentos de produção.
-  window.__FrotaCheckTest={calendar,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,enhanceCanvas};
+  // API para testes funcionais das regras do calendário e extração.
+  window.__FrotaCheckTest={calendar,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,enhanceCanvas,workerEndpoint,camUrl};
 })();
 
 </script>
