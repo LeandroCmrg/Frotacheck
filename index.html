@@ -80,7 +80,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <input id="photo-file" type="file" class="sr" accept="image/*" capture="environment" aria-label="Fotografar CRLV completo" />
   <div class="scan-actions"><button class="button primary" type="button" id="open-qr"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM21 14v3M18 20h3" /></svg>Ler QR Code</button><button class="button" type="button" id="take-photo">📷 Fotografar CRLV</button></div>
   <p class="scan-info">No celular, use a câmera. Para preencher os dados sem integração VIO, fotografe o documento inteiro, não apenas o QR.</p>
-  <div class="actions"><button class="button ghost" type="button" id="clear">↺ Limpar dados</button></div>
+  <div class="actions"><button class="button" type="button" id="retry-reading" disabled>↻ Tentar outra leitura</button><button class="button ghost" type="button" id="clear">↺ Limpar dados</button></div>
   <div id="file-notice" class="notice" role="status" aria-live="polite">Leitura automática. Revise as informações antes de usar o resultado.</div>
   <p class="file-hint">Até 15 MB. Tratamento e OCR no navegador, sem envio do documento a serviços externos.</p>
   </div>
@@ -332,7 +332,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'3.9',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
+    return {version:'4.0',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -419,18 +419,56 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     if(!map.placa){const candidates=txt.match(/\b[A-Z]{3}[0-9][A-Z0-9][0-9]{2}\b/g);if(candidates?.length===1)register(map,'placa',candidates[0],1,'Busca livre (revisar)');}
     if(!map.especie){const m=txt.match(species);if(m)register(map,'especie',m[0],1,'Busca livre (revisar)');}
   }
-  function docCheck(t){const n=norm(t);return /(?:CRLV|CERTIFICADO DE REGISTRO E LICENCIAMENTO)/.test(n)&&(/PLACA/.test(n))&&(/EXERCICIO/.test(n));}
+  // A identificação OCR usa evidências independentes em vez de exigir que três
+  // palavras sejam transcritas perfeitamente. Isso reduz falsos negativos em fotos.
+  // Não equivale à autenticação do documento na Senatran/Detran.
+  function documentEvidence(text,map={}){
+    const n=norm(text).replace(/[|_]/g,' ').replace(/\s+/g,' ');
+    const title=/(?:\bCRLV\s*[-E]?\b|CERTIFICADO\s+DE\s+REGISTRO\s+E\s+LICENCIAMENTO|REGISTRO\s+E\s+LICENCIAMENTO\s+DE\s+VEICULO)/.test(n);
+    const markers=[
+      /\bRENAVAM\b/,/\bSENATRAN\b/,/\bDETRAN\b/,
+      /\bCHASSI\b/,/\bESPECIE\s*[\/\-]?\s*TIPO\b/,
+      /\bMARCA\s*[\/\-]?\s*MODELO\b/,/\bPESO\s+BRUTO\s+TOTAL\b/,
+      /\bPLACA\b/,/\bEXERC[I1L]C[I1L]O\b/,
+      /\bNUMERO\s+DO\s+CRV\b/,/\bCODIGO\s+DE\s+SEGURANCA\b/
+    ].filter(re=>re.test(n)).length;
+    const core=['placa','exercicio','uf'].filter(k=>map[k]?.value).length;
+    const other=['especie','modelo','pbt','eixos'].filter(k=>map[k]?.value).length;
+    const vehicle=!!(map.placa?.value&&map.exercicio?.value);
+    // O título parcialmente reconhecido + campos, ou várias âncoras técnicas
+    // + dados coerentes, constituem indício forte do formato CRLV.
+    const identified=(title&&(core>=1||markers>=3)) ||
+      (vehicle&&core>=3&&other>=1&&markers>=4) ||
+      (vehicle&&other>=2&&markers>=5);
+    const probable=!identified&&(title||
+      (vehicle&&(markers>=2||other>=1))||
+      (core>=2&&markers>=3));
+    return {level:identified?'identified':probable?'probable':'unconfirmed',title,markers,core,other};
+  }
+  function docCheck(t,map={}){return documentEvidence(t,map).level==='identified';}
   function scoreMap(m){return ['placa','exercicio','uf','especie','modelo','pbt','eixos'].reduce((acc,k)=>acc+(m[k]?.score||0),0);}
   function setExtracted(map,mode,text,identified=null){
     fields.filter(k=>k!=='override').forEach(k=>$(k).value='');$('override').value='';
     for(const [key,val] of Object.entries(map)){if($(key))$(key).value=val.value;}
     extraction=map;extractionMode=mode;rawText=text;$('rawtext').textContent=text||'Não foi possível detectar texto.';
-    documentLooksRight=identified===null?docCheck(text):Boolean(identified);renderExtraction();analyze();
+    const evidence=documentEvidence(text,map);
+    if(identified===true)evidence.level='identified';
+    // Dados de um QR legível não comprovam autenticidade; manter alerta separado.
+    documentLooksRight=evidence.level==='identified';renderExtraction();analyze();
     const found=Object.keys(map).filter(k=>names[k]);
-    if(!map.placa||!map.exercicio||!map.uf||!map.especie)$('edit-fields').open=true;
-    if(!documentLooksRight)notice('A leitura não confirmou o formato CRLV-e. Verifique se selecionou o documento correto antes de utilizar os dados.','warning');
-    else if(!map.placa||!map.exercicio||!map.uf)notice('Leitura parcial: revise placa, exercício e UF. Os campos ausentes precisam ser preenchidos manualmente.','warning');
-    else notice('Leitura concluída: '+found.map(k=>names[k]).join(', ')+'. Confira todos os campos antes de continuar.','success');
+    const essentials=['placa','exercicio','uf'].filter(k=>!map[k]?.value);
+    if(essentials.length||!map.especie||evidence.level!=='identified')$('edit-fields').open=true;
+    if(evidence.level==='identified'&&!essentials.length){
+      notice('CRLV reconhecido. Tipo e prazo calculados com os dados lidos. Confira as informações antes do uso.','success');
+    }else if(evidence.level==='identified'){
+      notice('CRLV reconhecido, mas faltam dados: '+essentials.map(k=>names[k]).join(', ')+'. Confira ou corrija em “Conferir ou corrigir dados”.','warning');
+    }else if(evidence.level==='probable'){
+      notice('Foram encontrados dados compatíveis com CRLV, mas a imagem não permitiu confirmar todos os campos. Confira os dados ou toque em “Tentar outra leitura”.','warning');
+    }else if(found.length){
+      notice('Alguns campos foram identificados, mas o documento ainda não pôde ser reconhecido com segurança. Confira os dados ou tente outra leitura.','warning');
+    }else{
+      notice('Não foi possível ler informações suficientes. Tente uma foto mais nítida, use “Tentar outra leitura” ou preencha os campos manualmente.','warning');
+    }
   }
   const loadScript=url=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=url;s.onload=res;s.onerror=()=>rej(Error('Não foi possível carregar a biblioteca pela internet.'));document.head.append(s);});
   let pdfLibLoading=null;
@@ -731,7 +769,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name),isImage=/^image\/(png|jpeg|webp)$/.test(file.type)||/\.(png|jpe?g|webp)$/i.test(file.name);
     if(!isPDF&&!isImage){notice('Apenas PDF, PNG, JPG e WebP.','danger');return;}
     if(pending)return;pending=true;lastFile=file;documentLooksRight=false;
-    $('enhance-preview-button').disabled=false;$('download-pdf').disabled=false;$('retry-enhanced-ocr').disabled=false;
+    $('enhance-preview-button').disabled=false;$('download-pdf').disabled=false;$('retry-enhanced-ocr').disabled=false;$('retry-reading').disabled=false;
     void refreshEnhancementPreview(file);
     if(!forceOCR){fields.forEach(k=>$(k).value='');extraction={};conflicts=[];rawText='';$('rawtext').textContent='Aguardando leitura...';renderExtraction();analyze();}$('select-file').disabled=$('force-ocr').disabled=true;
     notice(forceOCR?'Reprocessando com OCR forçado...':'Lendo arquivo e identificando campos...');
@@ -747,15 +785,20 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
             const text=await page.getTextContent();const rows=makeRows(text.items);parseCoordinates(rows,map);
             const t=rows.map(r=>r.parts.map(p=>p.text).join('  ')).join('\n');content+='\n'+t;parseText(t,map,2,'Texto do PDF');
           }
-          if(forceOCR||(!map.placa||!map.exercicio||!map.uf||!map.especie)){
+          if(forceOCR||(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed')){
             ocrNeeded=true;
             const v=page.getViewport({scale:2});const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);await page.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;
             let target=canvas;if(angle!==0){target=await imageCanvas(canvas.toDataURL('image/png'),angle);}
             const ocrText=await ocr(await enhanceCanvasSmart(target,'gray'));content+='\n--- OCR PÁGINA '+i+' ---\n'+ocrText;parseText(ocrText,map,2,'OCR cinza');source='PDF + OCR';
-            if(!map.placa||!map.exercicio||!map.uf||!map.especie){
+            if(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed'){
               const second=await ocr(await enhanceCanvasSmart(target,'mono'));
               content+='\n--- OCR P&B PÁGINA '+i+' ---\n'+second;
               parseText(second,map,2,'OCR P&B');
+            }
+            if(!map.placa||!map.exercicio||documentEvidence(content,map).level==='unconfirmed'){
+              const third=await ocr(target); // Alguns selos e fontes ficam ilegíveis após o filtro.
+              content+='\n--- OCR ORIGINAL PÁGINA '+i+' ---\n'+third;
+              parseText(third,map,2,'OCR original');
             }
           }
         }
@@ -764,10 +807,15 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
         const canvas=await drawSourceCanvas(file,angle,2400);
         content=await ocr(await enhanceCanvasSmart(canvas,'gray'));
         parseText(content,map,2,'OCR cinza');source='Imagem + OCR';
-        if(!map.placa||!map.exercicio||!map.uf||!map.especie){
+        if(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed'){
           const second=await ocr(await enhanceCanvasSmart(canvas,'mono'));
           content+='\n--- OCR P&B ---\n'+second;
           parseText(second,map,2,'OCR P&B');
+        }
+        if(!map.placa||!map.exercicio||documentEvidence(content,map).level==='unconfirmed'){
+          const third=await ocr(canvas);
+          content+='\n--- OCR ORIGINAL ---\n'+third;
+          parseText(third,map,2,'OCR original');
         }
       }
       // Se dois métodos discordaram, mantém o valor de maior score e expõe a divergência.
@@ -875,11 +923,12 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
   drop.addEventListener('drop',e=>{void handleFile(e.dataTransfer.files?.[0]);});
   $('retry-enhanced-ocr').addEventListener('click',()=>{if(lastFile)void processFile(lastFile,true);});
+  $('retry-reading').addEventListener('click',()=>{if(lastFile)void processFile(lastFile,true);});
   $('force-ocr').addEventListener('click',()=>{if(lastFile)processFile(lastFile,true);else notice('Selecione um arquivo primeiro.','warning');});
   $('enhance-preview-button').addEventListener('click',()=>{if(lastFile)void refreshEnhancementPreview();});
   $('enhance-mode').addEventListener('change',()=>{if(lastFile)void refreshEnhancementPreview();});
   $('download-pdf').addEventListener('click',()=>{void createEnhancedPDF();});
-  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;previewToken++;$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
+  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;previewToken++;$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
   $('copy-summary').addEventListener('click',async()=>{
     const r=analyze();
     const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário de renovação: ${r.renewalYear||'-'}\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
@@ -888,7 +937,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   });
   renderExtraction();analyze();
   // API de teste para calendários, extração e tratamento local de imagens.
-  window.__FrotaCheckTest={calendar,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,enhanceCanvas,enhanceCanvasSmart,makeEnhancedPdf};
+  window.__FrotaCheckTest={calendar,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,makeEnhancedPdf,setExtracted};
 })();
 
 </script>
