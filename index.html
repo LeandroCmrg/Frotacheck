@@ -102,7 +102,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
 .pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
 .enhance-card[hidden]{display:none!important}
-/* FrotaCheck 5.7.2: etapas automaticas visiveis; tratamento continua invisivel */
+/* FrotaCheck 5.7.3: etapas automaticas visiveis; tratamento continua invisivel */
 .stage-area{border-top:1px solid var(--line);padding:17px 22px 4px}
 .stage-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
 .stage-heading strong{font-size:13px}.stage-heading span{font-size:11px;font-weight:750;color:var(--muted)}
@@ -113,7 +113,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .stage-steps li.running{background:#fff8dc;border-color:#f2d26f;color:#473d18}.stage-steps li.running .stage-dot{background:var(--yellow);color:#271900}
 .stage-steps li.done{background:#ecf7ed;border-color:#b9dfc2;color:#1c5830}.stage-steps li.done .stage-dot{background:#247e42;color:white}
 .stage-steps li.failed{background:#fff0ef;border-color:#efb8b3;color:#92242a}.stage-steps li.failed .stage-dot{background:#d40511;color:white}
-.stage-caption{margin:11px 0 8px;font-size:12px;color:var(--muted);line-height:1.5}
+.exercise-diag{margin:6px 0 12px;padding:9px 12px;border-radius:10px;background:#fff7e9;border:1px solid #e7c17c;font-size:12px;line-height:1.55}.exercise-diag summary{font-weight:750;cursor:pointer}.exercise-diag p{margin:6px 0 0;white-space:pre-wrap}.stage-caption{margin:11px 0 8px;font-size:12px;color:var(--muted);line-height:1.5}
 .model-summary{border:1px solid #e8dfcd;border-radius:11px;padding:12px 14px;margin:12px 0;background:#fffdf6;display:flex;flex-direction:column;gap:4px}
 .model-summary small{color:#786b56;font-size:11px}.model-summary strong{font-size:15px;word-break:break-word}
 .vehicle-specs{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:12px}.vehicle-specs>div{border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}.vehicle-specs small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}.vehicle-specs b{font-size:12px;overflow-wrap:anywhere}@media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
@@ -122,7 +122,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7.2</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.7.3</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura por etapas</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck melhora a imagem, lê os dados e verifica o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
@@ -146,6 +146,10 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
       <li data-phase="3"><span class="stage-dot">4</span><span>Consultar prazo 2026<small>UF, placa e tipo de veículo</small></span></li>
     </ol>
     <p class="stage-caption" id="stage-caption" role="status" aria-live="polite">Selecione um CRLV para começar.</p>
+    <details id="exercise-diag" class="exercise-diag" hidden>
+      <summary>Diagnóstico do exercício não reconhecido</summary>
+      <p id="exercise-diag-text">O navegador ainda não encontrou o ano.</p>
+    </details>
   </section>
   <div class="pdf-only" id="pdf-only">
     <button class="button primary enhance-download" id="download-pdf" type="button" disabled>↓ Baixar PDF melhorado</button>
@@ -548,6 +552,7 @@ self.onmessage=e=>{
   let enhancementBusy=false,previewToken=0;
   let documentLooksRight=false;
   let opencvReadyPromise=null,ocrWorkerPromise=null,lastEnhancementEngine="Ajuste local";
+  let exerciseAttempts=[];
   let scanOriginal=null,autoCorners=null,manualCorners=null,cropDrag=-1,cropQuality='';
   const clip01=n=>Math.min(.995,Math.max(.005,n));
   const defaultScanCorners=()=>[{x:.055,y:.055},{x:.945,y:.055},{x:.945,y:.945},{x:.055,y:.945}];
@@ -701,7 +706,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.7.2',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.7.3',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -1019,44 +1024,98 @@ self.onmessage=e=>{
       if(m)register(map,'uf',m[1],2,'Órgão emissor');
     }
   }
-  // Fallback 5.7.2: recuperar o EXERCÍCIO quando o OCR textual não conseguiu.
-  // Não é uma suposição baseada na data atual ou no calendário de 2026:
-  // lê somente o retângulo do valor localizado abaixo de EXERCÍCIO no CRLV-e.
+  // Recuperação 5.7.3: prioriza a linha NUMÉRICA dentro da coluna de
+  // EXERCÍCIO e registra os resultados do OCR em diagnóstico local.
+  // Não consulta o calendário para escolher um ano e nunca preenche por padrão.
   function yearFromFocusedOCR(raw){
-    const value=String(raw||'').toUpperCase().replace(/[OQ]/g,'0').replace(/[IL|]/g,'1');
-    // Em recortes muito estreitos o OCR pode espaçar os quatro algarismos.
-    const compact=value.replace(/[\s.·_:;-]+/g,'').replace(/[^0-9]/g,'');
-    if(/^20[12][0-9]$/.test(compact))return compact;
-    const matches=[...new Set(value.match(/\b20[12][0-9]\b/g)||[])];
+    const text=String(raw||'').toUpperCase();
+    const convert=s=>s.replace(/[OQ]/g,'0').replace(/[IL|]/g,'1');
+    const clean=convert(text).replace(/[\s.·_:;-]+/g,'').replace(/[^0-9]/g,'');
+    if(/^20[0-3][0-9]$/.test(clean))return clean;
+    const matches=[...new Set((convert(text).match(/(?:^|[^0-9])(20[0-3][0-9])(?=$|[^0-9])/g)||[])
+      .map(x=>x.match(/20[0-3][0-9]/)?.[0]).filter(Boolean))];
     return matches.length===1?matches[0]:null;
+  }
+  function exerciseCrop(source,rect,style='normal'){
+    const [x,y,w,h]=rect,sw=source.width,sh=source.height;
+    const sx=Math.max(0,Math.round(sw*x)),sy=Math.max(0,Math.round(sh*y));
+    const cw=Math.max(1,Math.min(sw-sx,Math.round(sw*w)));
+    const ch=Math.max(1,Math.min(sh-sy,Math.round(sh*h)));
+    // Margem branca evita que dígitos encostem no limite do PSM 7.
+    const factor=Math.max(2.5,Math.min(5,620/cw));
+    const pad=28,out=document.createElement('canvas');
+    out.width=Math.round(cw*factor)+2*pad;out.height=Math.round(ch*factor)+2*pad;
+    const ctx=out.getContext('2d',{willReadFrequently:true});
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,out.width,out.height);
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(source,sx,sy,cw,ch,pad,pad,out.width-2*pad,out.height-2*pad);
+    if(style!=='normal'){
+      const image=ctx.getImageData(0,0,out.width,out.height),a=image.data;
+      for(let k=0;k<a.length;k+=4){
+        const gray=.299*a[k]+.587*a[k+1]+.114*a[k+2];
+        const v=style==='mono'?(gray<168?0:255):Math.min(255,Math.max(0,(gray-98)*1.27+98));
+        a[k]=a[k+1]=a[k+2]=v;
+      }
+      ctx.putImageData(image,0,0);
+    }
+    return out;
+  }
+  function displayExerciseDiagnostic(){
+    const d=$('exercise-diag');if(!d)return;
+    const failed=!$('exercicio').value.trim()&&exerciseAttempts.length>0;
+    d.hidden=!failed;
+    if(failed){
+      // Não mostrar o conteúdo completo do CRLV no diagnóstico.
+      const last=exerciseAttempts.slice(-9).map(a=>a.source+' · '+a.mode+': '+(a.reading||'[sem números legíveis]')).join('\n');
+      $('exercise-diag-text').textContent='Foram testadas '+exerciseAttempts.length+' leituras do campo.\n'+last+'\n\nO ano não será presumido. Confira se a versão exibida é V5.7.3 e use “Tentar outra leitura” caso necessário.';
+    }
   }
   async function recoverExercise(scanned,original,map,parts){
     if(map.exercicio?.value)return;
     const portrait=c=>c&&c.width>420&&c.height>550&&c.height/c.width>1.12&&c.height/c.width<2.25;
     const sources=[
-      {canvas:original,label:'PDF/foto original'},
-      {canvas:scanned,label:'cópia digitalizada'}
+      {canvas:original,label:'Original'},
+      {canvas:scanned,label:'Digitalizada'}
     ].filter(x=>portrait(x.canvas));
-    const zones=[
-      // Apenas a linha dos quatro dígitos. Não inclui fabricação/modelo (2018/2019).
-      {box:[.196,.181,.076,.017],psm:7},
-      {box:[.192,.179,.082,.021],psm:7},
-      {box:[.185,.171,.107,.028],psm:6},
-      {box:[.180,.165,.125,.038],psm:6}
+    // Medidas obtidas da posição do EXERCÍCIO no CRLV-e digitalizado A4.
+    // Retângulos mínimos contêm só os quatro números, sem ANO MODELO.
+    // Uma foto/PDF original e a cópia recortada pelo Scanner 5.2 não
+    // compartilham as mesmas coordenadas! Usar regiões distintas.
+    const originalAreas=[
+      {box:[.196,.181,.076,.017],mode:7},
+      {box:[.194,.180,.080,.020],mode:7},
+      {box:[.192,.176,.088,.025],mode:6}
+    ];
+    const scannedAreas=[
+      // Depois do recorte Scanner 5.2, o ano migra para aproximadamente
+      // x=16% e y=13,6% neste layout de CRLV-e.
+      {box:[.160,.136,.072,.017],mode:7},
+      {box:[.156,.125,.090,.027],mode:7},
+      // Alternativas para digitalizações com margens conservadas.
+      {box:[.196,.181,.076,.017],mode:7},
+      {box:[.192,.176,.088,.025],mode:6}
     ];
     for(const src of sources){
-      for(const z of zones){
-        let raw='';
-        try{raw=await ocr(fieldCrop(src.canvas,z.box),z.psm,{digitsOnly:true});}
-        catch(_){continue;}
-        const value=yearFromFocusedOCR(raw);
-        if(!value)continue;
-        register(map,'exercicio',value,4,'Exercício isolado · '+src.label);
-        parts.push('--- EXERCÍCIO EM RECORTE NUMÉRICO ('+src.label+') ---\n'+raw.trim());
-        return;
+      const areas=src.label==='Digitalizada'?scannedAreas:originalAreas;
+      for(let i=0;i<areas.length;i++){
+        const a=areas[i];
+        // O tratamento mono fica apenas no OCR do exercício, não no PDF.
+        const styles=i===0?['normal','mono']:i===1?['normal','gray']:['gray'];
+        for(const style of styles){
+          const crop=exerciseCrop(src.canvas,a.box,style);
+          let raw='';
+          try{raw=await ocr(crop,a.mode,{digitsOnly:true});}
+          catch(err){exerciseAttempts.push({source:src.label,mode:'OCR indisponível',reading:''});continue;}
+          const value=yearFromFocusedOCR(raw);
+          exerciseAttempts.push({source:src.label,mode:style+' / PSM '+a.mode,reading:String(raw||'').replace(/[^0-9OQIL|.\s]/gi,'').trim().slice(0,18)});
+          if(!value)continue;
+          register(map,'exercicio',value,4,'Ano isolado · '+src.label);
+          parts.push('--- EXERCÍCIO OCR DIRECIONADO ('+src.label+') ---\n'+value);
+          return;
+        }
       }
     }
-    parts.push('--- EXERCÍCIO: leitura dirigida não conclusiva; conferir campo na cópia ---');
+    parts.push('--- EXERCÍCIO: OCR numérico não conclusivo; conferir visualmente o campo ---');
   }
   function canvasRegion(source,x,y,w,h,maxSide=2200){
     const sx=Math.round(source.width*x),sy=Math.round(source.height*y);
@@ -1570,7 +1629,8 @@ self.onmessage=e=>{
     if(pending)return;
     pending=true;
     const taskId=++activeProcessId;
-    lastFile=file;documentLooksRight=false;
+    lastFile=file;documentLooksRight=false;exerciseAttempts=[];
+    $('exercise-diag').hidden=true;
     $('retry-reading').disabled=true;
     $('select-file').disabled=$('force-ocr').disabled=true;
     let currentStage=0;
@@ -1638,6 +1698,7 @@ self.onmessage=e=>{
       await yieldScreen();
       const text=parts.join('\n').trim();
       setExtracted(map,'Scanner 5.2 → OCR de campos por região'+(isPDF?' + PDF de apoio':''),text);
+      displayExerciseDiagnostic();
       const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));
       const cat=classify(v);
       if(!v.modelo||cat.name==='Aguardando dados'||cat.name==='A confirmar'){
@@ -1904,7 +1965,7 @@ self.onmessage=e=>{
     finally{if(version===pdfGeneration){pdfBusy=null;pdfButton('↓ Baixar PDF melhorado',false);}}
   }
   $('download-pdf').addEventListener('click',()=>{void createEnhancedPDF();});
-  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;processedCache=null;activeProcessId++;resetProcessedPDF();resetStages();previewToken++;scanOriginal=null;autoCorners=null;manualCorners=null;cropDrag=-1;$('scan-crop').hidden=true;$('crop-mode').value='auto';$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
+  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;exerciseAttempts=[];$('exercise-diag').hidden=true;processedCache=null;activeProcessId++;resetProcessedPDF();resetStages();previewToken++;scanOriginal=null;autoCorners=null;manualCorners=null;cropDrag=-1;$('scan-crop').hidden=true;$('crop-mode').value='auto';$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
   $('copy-summary').addEventListener('click',async()=>{
     const r=analyze();
     const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário consultado: 2026\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
@@ -1913,7 +1974,7 @@ self.onmessage=e=>{
   });
   renderExtraction();analyze();resetStages();
   // Funções de diagnóstico local, sem envio de documentos.
-  window.__FrotaCheckTest={calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
+  window.__FrotaCheckTest={yearFromFocusedOCR,calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
 })();
 
 </script>
