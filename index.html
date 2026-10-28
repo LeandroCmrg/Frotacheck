@@ -26,13 +26,6 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .status{display:inline-block;border-radius:99px;padding:6px 11px;font-weight:850;font-size:11px;margin-top:13px;background:#e9e8e4;color:#615d55}.status.ok{background:#def4e6;color:#1c783b}.status.warn{background:#fff0c2;color:#806100}.status.bad{background:#ffdfdf;color:#a40817}.status.neutral{background:#eceae5;color:#6d6a64}
 .meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:17px;border:1px solid var(--line);border-radius:12px;overflow:hidden}.meta-item{padding:11px 13px;min-width:0}.meta-item+.meta-item{border-left:1px solid var(--line)}.meta-item small{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.7px;display:block}.meta-item b{font-size:14px;overflow-wrap:anywhere}.explanation{font-size:12px;color:#59564f;line-height:1.55;margin:16px 0 0}.result-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}.source{color:#a20b17;font-size:12px;font-weight:800;text-decoration:none}.source:hover{text-decoration:underline}.footer-note{max-width:1158px;margin:25px auto 0;color:#747169;font-size:11px;line-height:1.7}
 .extract-head,.extract-item{font-size:11px}.extract-head{font-weight:750;margin:9px 0}.extract-item{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid #eee}.extract-item b{text-align:right;overflow-wrap:anywhere}.good{color:#196d3d}.maybe{color:#ab7912}.low,.audit-alert{color:#ac2020}
-/* Integração CamScanner Agent - área opcional */
-.camscanner-box{margin:13px 0;border:1px solid #e9db9b;background:#fffdf3;border-radius:12px;padding:13px}
-.cam-head{display:flex;align-items:center;gap:9px;font-weight:850;font-size:13px}
-.cam-head small{font-size:10px;color:#74634a;font-weight:600;margin-left:auto}
-.cam-consent{display:flex;gap:9px;align-items:start;font-size:12px;line-height:1.5;margin:10px 0;color:#58524a}
-.cam-consent input{margin-top:3px;flex-shrink:0;accent-color:#d40511}
-.cam-note{font-size:11px;color:#756b55;margin:7px 0 0}
 /* Ferramenta de legibilidade — preserva a tela principal compacta */
 .enhance-card{border-top:1px solid var(--line);padding:0 22px 20px}
 .enhance-card>summary{cursor:pointer;padding:16px 0 4px;font-weight:850;font-size:13px;list-style:none;display:flex;gap:9px;align-items:center}
@@ -72,24 +65,13 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:860px){.layout{grid-template-columns:1fr}.header-chip{display:none}.result-panel{padding:20px}}
 @media(max-width:520px){header{padding:15px 16px}main{padding:24px 13px 30px}.brand-name{font-size:20px}.brand-sub{font-size:9px}.mark{height:39px;width:39px}.intro{margin-bottom:20px}.panel-head{padding:18px 17px 9px}.panel-body{padding:8px 17px 18px}.edit-card{padding:0 17px 16px}.drop{min-height:195px;padding:17px 10px}.result-panel{padding:17px}.result-head{flex-wrap:wrap}.result-tile{padding:18px 15px}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.field.full{grid-column:1/-1}.advanced-layout{grid-template-columns:1fr}.big{font-size:29px}}
 
-/* Configuração de CamScanner: opcional, com consentimento separado por arquivo. */
-.service-card{margin-top:15px;padding:14px;border:1px solid #eee0b2;background:#fffdf6;border-radius:12px}
-.service-card>summary{font-size:13px;font-weight:850;cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
-.service-card>summary::before{content:'◈';color:var(--red);font-size:19px}
-.service-card>summary::after{content:'⌄';margin-left:auto;font-size:18px;color:var(--red)}
-.service-card[open]>summary::after{transform:rotate(180deg)}
-.service-card>summary::-webkit-details-marker{display:none}
-.service-config{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
-.service-config .field input{font-size:16px}
-.service-help{font-size:11px;color:var(--muted);line-height:1.5;margin:0}
-.service-state{font-size:11px;color:#6a5b30;font-weight:750;margin-left:auto}
 </style>
 </head>
 <body>
 <div class="topstripe"></div>
 <header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS</div></div></div></div></header>
 <main>
-<div class="intro"><span class="eyebrow">Leitor de CRLV-e</span><h1>Tipo do veículo e vencimento.</h1><p>Envie o CRLV-e, confira tipo e vencimento e melhore documentos difíceis de ler.</p></div>
+<div class="intro"><span class="eyebrow">Leitor de CRLV-e</span><h1>Tipo do veículo e vencimento.</h1><p>Envie uma foto ou PDF. O FrotaCheck melhora a imagem, lê o documento e mostra tipo e vencimento.</p></div>
 <div class="layout">
 <section class="panel" aria-labelledby="upload-title">
   <div class="panel-head"><h2 class="panel-title" id="upload-title"><span class="number">1</span>Enviar documento</h2><p>CRLV-e em PDF ou imagem</p></div>
@@ -98,41 +80,25 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <input id="photo-file" type="file" class="sr" accept="image/*" capture="environment" aria-label="Fotografar CRLV completo" />
   <div class="scan-actions"><button class="button primary" type="button" id="open-qr"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM21 14v3M18 20h3" /></svg>Ler QR Code</button><button class="button" type="button" id="take-photo">📷 Fotografar CRLV</button></div>
   <p class="scan-info">No celular, use a câmera. Para preencher os dados sem integração VIO, fotografe o documento inteiro, não apenas o QR.</p>
-  <details class="service-card" id="service-card">
-    <summary>Configurar CamScanner Agent <span id="service-state" class="service-state">Não configurado</span></summary>
-    <div class="service-config">
-      <p class="service-help">O CamScanner melhora imagens pelo serviço conectado ao Cloudflare Worker. A leitura de placa, UF, exercício e classificação permanece local no navegador.</p>
-      <div class="field"><label for="worker-url">Endereço HTTPS do Worker</label><input id="worker-url" type="url" autocomplete="off" spellcheck="false" placeholder="https://frotacheck.seuusuario.workers.dev" /></div>
-      <div class="field"><label for="worker-code">Código de acesso do Worker</label><input id="worker-code" type="password" autocomplete="off" placeholder="Código privado configurado no Cloudflare" /></div>
-      <p class="service-help">O código de acesso não é salvo. Para usar o CamScanner, também é necessário configurar a ponte Node.js autenticada. A autorização para enviar cada documento fica na seção “Melhorar imagem e gerar PDF”.</p>
-    </div>
-  </details>
   <div class="actions"><button class="button ghost" type="button" id="clear">↺ Limpar dados</button></div>
   <div id="file-notice" class="notice" role="status" aria-live="polite">Leitura automática. Revise as informações antes de usar o resultado.</div>
-  <p class="file-hint">Até 15 MB no leitor local. Envio ao CamScanner somente com autorização.</p>
+  <p class="file-hint">Até 15 MB. Tratamento e OCR no navegador, sem envio do documento a serviços externos.</p>
   </div>
   <details class="enhance-card" id="enhance-card">
     <summary>Melhorar imagem e gerar PDF</summary>
-    <p class="enhance-description">Para foto escura, documento apagado ou digitalização ruim. Compare a imagem antes de baixar.</p>
+    <p class="enhance-description">Melhoria automática com OpenCV.js e alternativa local. Confira o antes e depois antes de baixar.</p>
     <div class="enhance-toolbar">
-      <div class="field"><label for="enhance-mode">Melhoria visual</label><select id="enhance-mode"><option value="color">Automática (cores)</option><option value="gray">Cinza e alto contraste</option><option value="mono">Preto e branco</option></select></div>
+      <div class="field"><label for="enhance-mode">Melhoria visual</label><select id="enhance-mode"><option value="color">Automática • manter cores</option><option value="gray">Leitura • cinza e contraste</option><option value="mono">Leitura • preto e branco</option></select></div>
       <button class="button" type="button" id="enhance-preview-button" disabled>↻ Atualizar prévia</button>
     </div>
     <div class="enhance-preview" id="enhance-previews" hidden>
       <figure><figcaption>Original</figcaption><canvas id="preview-before" aria-label="Prévia do documento original"></canvas></figure>
       <figure><figcaption>Melhorado</figcaption><canvas id="preview-after" aria-label="Prévia do documento melhorado"></canvas></figure>
     </div>
-    <div class="camscanner-box">
-      <div class="cam-head">◈ CamScanner Agent <small>via serviço conectado</small></div>
-      <p class="enhance-description">Remova sombras e melhore a legibilidade com o CamScanner. Use a URL e o código do Worker em “Configurar CamScanner Agent”.</p>
-      <label class="cam-consent"><input id="cam-consent" type="checkbox"/><span>Autorizo enviar uma imagem da primeira página do CRLV ao CamScanner para tratamento. O original será preservado nesta sessão.</span></label>
-      <button class="button primary" id="cam-enhance" type="button" disabled>◈ Melhorar com CamScanner</button>
-      <p id="cam-feedback" class="enhance-result" role="status" aria-live="polite">Requer conexão do serviço CamScanner e autorização.</p>
-      <p class="cam-note">Para PDFs com várias páginas, esta ação trata somente a primeira página. Para gerar um PDF completo, use a melhoria local acima no documento original.</p>
-    </div>
+    <button class="button" style="width:100%;margin-top:4px" id="retry-enhanced-ocr" type="button" disabled>◉ Tentar leitura com imagem melhorada</button>
     <button class="button primary enhance-download" id="download-pdf" type="button" disabled>↓ Baixar PDF melhorado</button>
     <p class="enhance-result" id="enhance-feedback" role="status" aria-live="polite">Envie uma foto ou PDF para habilitar a melhoria.</p>
-    <p class="scan-info">Cópia de leitura, não substitui o CRLV oficial. O tratamento não recupera letras que não aparecem no original.</p>
+    <p class="scan-info">PDF para leitura, não substitui o CRLV oficial. O original fica preservado. A correção não recupera texto inexistente ou ilegível.</p>
   </details>
   <details class="edit-card" id="edit-fields"><summary>Conferir ou corrigir dados</summary>
     <div class="fields">
@@ -241,6 +207,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   let lastFile=null,rawText='',extraction={}, conflicts=[],extractionMode='manual',pending=false;
   let enhancementBusy=false,previewToken=0;
   let documentLooksRight=false;
+  let opencvReadyPromise=null,ocrWorkerPromise=null,lastEnhancementEngine="Ajuste local";
   // Para o Pará, a dezena e a unidade finais determinam o vencimento.
   // Cada linha cobre finais 01..91, 02..92 etc., em três grupos: 0-3 / 4-6 / 7-9.
   const paCalendar={
@@ -365,7 +332,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'3.6',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
+    return {version:'3.9',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -476,10 +443,82 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     return window.pdfjsLib;
   }
-  async function ocr(input){if(!window.Tesseract){await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');}if(!window.Tesseract)throw Error('Motor OCR indisponível.');
-    const r=await window.Tesseract.recognize(input,'por',{logger:p=>{if(p.status==='recognizing text')notice('Reconhecendo caracteres... '+Math.round(100*p.progress)+'%');}});return r?.data?.text||'';
+  // Reutiliza um único worker Tesseract: evita carregar o idioma para cada CRLV.
+  async function ocr(input){
+    if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+    if(!window.Tesseract)throw Error('Motor OCR indisponível. Conecte-se à internet e recarregue.');
+    if(!ocrWorkerPromise){
+      ocrWorkerPromise=window.Tesseract.createWorker('por',1,{
+        logger:p=>{if(p.status==='recognizing text')notice('Reconhecendo caracteres... '+Math.round(p.progress*100)+'%');}
+      }).catch(err=>{ocrWorkerPromise=null;throw err;});
+    }
+    const worker=await ocrWorkerPromise;
+    const r=await worker.recognize(input);
+    return r?.data?.text||'';
   }
-  /* Melhoria local de imagens: normalização de contraste, escala de cinza
+  // OpenCV é carregado apenas quando necessário. Se falhar, a melhoria local continua.
+  async function opencvLib(){
+    if(opencvReadyPromise)return opencvReadyPromise;
+    opencvReadyPromise=(async()=>{
+      if(!window.cv)await loadScript('https://docs.opencv.org/4.10.0/opencv.js');
+      let lib=window.cv;
+      if(lib&&typeof lib.then==='function')lib=await lib;
+      if(lib?.Mat&&typeof lib.imread==='function')return lib;
+      const start=Date.now();
+      while(Date.now()-start<14000){
+        await new Promise(resolve=>setTimeout(resolve,200));
+        lib=window.cv;
+        if(lib&&typeof lib.then==='function')lib=await lib;
+        if(lib?.Mat&&typeof lib.imread==='function')return lib;
+      }
+      throw Error('OpenCV.js não ficou disponível a tempo.');
+    })(); // A falha fica em cache nesta sessão para não tentar baixar repetidamente.
+    return opencvReadyPromise;
+  }
+  async function enhanceCanvasSmart(source,mode='color'){
+    let cv;
+    try{cv=await opencvLib();}
+    catch(error){lastEnhancementEngine='Ajuste local (OpenCV indisponível)';return enhanceCanvas(source,mode);}
+    let src,gray,balanced,blurred,output,clahe;
+    try{
+      src=cv.imread(source);gray=new cv.Mat();balanced=new cv.Mat();
+      cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY);
+      if(typeof cv.createCLAHE==='function'){
+        clahe=cv.createCLAHE(2.2,new cv.Size(8,8));clahe.apply(gray,balanced);
+      }else cv.equalizeHist(gray,balanced);
+      const out=document.createElement('canvas');out.width=source.width;out.height=source.height;
+      if(mode==='mono'){
+        blurred=new cv.Mat();output=new cv.Mat();
+        cv.GaussianBlur(balanced,blurred,new cv.Size(3,3),0,0,cv.BORDER_DEFAULT);
+        cv.adaptiveThreshold(blurred,output,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,cv.THRESH_BINARY,35,12);
+        cv.imshow(out,output);
+      }else if(mode==='gray')cv.imshow(out,balanced);
+      else{
+        // Mantém o selo e os detalhes coloridos, corrigindo a luminância pixel a pixel.
+        const ctx=out.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(source,0,0);
+        const pixels=ctx.getImageData(0,0,out.width,out.height),data=pixels.data;
+        const y=gray.data,enhanced=balanced.data;
+        for(let i=0;i<y.length;i++){
+          const k=i*4,base=Math.max(12,y[i]);
+          const target=Math.max(0,Math.min(255,y[i]*.24+enhanced[i]*.76));
+          const factor=Math.max(.45,Math.min(2.3,target/base));
+          data[k]=Math.min(255,data[k]*factor);
+          data[k+1]=Math.min(255,data[k+1]*factor);
+          data[k+2]=Math.min(255,data[k+2]*factor);
+        }
+        ctx.putImageData(pixels,0,0);
+      }
+      lastEnhancementEngine='OpenCV.js';
+      return out;
+    }catch(error){
+      lastEnhancementEngine='Ajuste local (falha no OpenCV)';
+      return enhanceCanvas(source,mode);
+    }finally{
+      [src,gray,balanced,blurred,output,clahe].forEach(x=>{try{x?.delete?.();}catch(e){}});
+    }
+  }
+  /* Melhoria local de reserva: normalização de contraste, escala de cinza
      e limiar adaptativo para variações de iluminação. Não é autenticação. */
   const clamp8=x=>x<0?0:x>255?255:Math.round(x);
   function enhanceCanvas(source,mode='color'){
@@ -605,11 +644,12 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     try{
       const [original]=await getCanvasForDocument(file,1100,true);
       if(token!==previewToken)return;
-      const processed=enhanceCanvas(original,enhanceMode());
+      const processed=await enhanceCanvasSmart(original,enhanceMode());
+      if(token!==previewToken)return;
       copyCanvasPreview(original,$('preview-before'));
       copyCanvasPreview(processed,$('preview-after'));
       $('enhance-previews').hidden=false;
-      improveMessage('Prévia pronta. Confira se todos os dados estão legíveis e baixe o PDF.','success');
+      improveMessage('Prévia pronta com '+lastEnhancementEngine+'. Confira a legibilidade e baixe o PDF.','success');
     }catch(e){if(token===previewToken)improveMessage('Não foi possível mostrar a prévia: '+(e.message||String(e)),'error');}
   }
   // PDF mínimo em imagem, feito localmente: exportação sem contratar API e sem
@@ -665,96 +705,25 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
       const processed=[];
       for(let i=0;i<rawPages.length;i++){
         improveMessage('Melhorando página '+(i+1)+' de '+rawPages.length+'...');
-        processed.push(enhanceCanvas(rawPages[i],mode));
+        processed.push(await enhanceCanvasSmart(rawPages[i],mode));
       }
       const blob=makeEnhancedPdf(processed);
       const filename=(file.name.replace(/\.[^.]+$/,'').replace(/[^a-z0-9áàâãéêíóôõúç_-]/gi,'_').slice(0,65)||'CRLV')+'-melhorado.pdf';
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),60000);
-      improveMessage('PDF preparado. Confira as páginas antes de utilizá-lo.','success');
+      improveMessage('PDF preparado com '+lastEnhancementEngine+'. Confira as páginas antes de utilizá-lo.','success');
       if(pdfInput)notice('PDF melhorado gerado como imagem: o texto pesquisável do PDF original pode não ser preservado. Guarde o CRLV original.','warning');
     }catch(e){improveMessage('Falha ao gerar PDF: '+(e.message||String(e)),'error');}
     finally{enhancementBusy=false;btn.textContent='↓ Baixar PDF melhorado';btn.disabled=!lastFile;}
   }
   async function imageCanvas(input,rotation=0){
-    return enhanceCanvas(await drawSourceCanvas(input,rotation,2400),'gray');
-  }
-  // Configuração do Worker para tratamento visual CamScanner.
-  // A URL pode ser armazenada no navegador, mas o código de acesso não é salvo.
-  const workerInput=$('worker-url'),workerCode=$('worker-code'),serviceState=$('service-state');
-  try{workerInput.value=localStorage.getItem('frotacheck_worker_url')||'';}catch(e){}
-  workerInput.addEventListener('change',()=>{
-    try{localStorage.setItem('frotacheck_worker_url',workerInput.value.trim());}catch(e){}
-    updateServiceState();
-  });
-  workerInput.addEventListener('input',updateServiceState);
-  workerCode.addEventListener('input',updateServiceState);
-  function workerEndpoint(){
-    const value=workerInput.value.trim();
-    if(!value)return null;
-    try{
-      const u=new URL(value);
-      if(u.protocol!=='https:'||u.username||u.password||u.search||u.hash)return null;
-      return u.origin;
-    }catch(e){return null;}
-  }
-  function updateServiceState(){
-    serviceState.textContent=workerEndpoint()&&workerCode.value.trim()?'Dados informados (não testados)':'Não configurado';
-  }
-  updateServiceState();
-  // CamScanner Agent: usa somente o backend protegido; nunca envia OAuth ou credenciais para o GitHub.
-  let originalFileForCam=null,camBusy=false;
-  const camConsent=$('cam-consent'),camBtn=$('cam-enhance'),camStatus=$('cam-feedback');
-  function camMessage(msg,type=''){camStatus.textContent=msg;camStatus.className='enhance-result '+type;}
-  function camUrl(){const endpoint=workerEndpoint();return endpoint?endpoint+'/camscanner/enhance':null;}
-  function updateCamState(){camBtn.disabled=camBusy||pending||!lastFile;}
-  camConsent.addEventListener('change',()=>{updateCamState();});
-  async function camEnhance(){
-    if(!lastFile||camBusy||pending)return;
-    if(!camUrl()||!workerCode.value.trim()){
-      $('service-card').open=true;
-      camMessage('Configure o endereço do Worker e o código de acesso na seção “Configurar CamScanner Agent”.','error');return;
-    }
-    if(!camConsent.checked){camMessage('Marque a autorização de envio ao CamScanner antes de continuar.','error');return;}
-    if(lastFile.size>15*1024*1024){camMessage('O arquivo original excede 15 MB.','error');return;}
-    camBusy=true;camBtn.disabled=true;camBtn.textContent='Tratando documento...';
-    const original=lastFile;
-    try{
-      camMessage('Preparando a primeira página do documento...');
-      const [page]=await getCanvasForDocument(original,2300,true);
-      const dataUrl=page.toDataURL('image/jpeg',0.88);
-      const imageBase64=dataUrl.split(',')[1];
-      if(!imageBase64||imageBase64.length>8*1024*1024)throw Error('Imagem muito grande para o CamScanner.');
-      camMessage('Enviando ao CamScanner Agent para melhorar a leitura...');
-      const res=await fetch(camUrl(),{
-        method:'POST',headers:{'Content-Type':'application/json','X-FrotaCheck-Code':workerCode.value.trim()},
-        body:JSON.stringify({mime:'image/jpeg',base64:imageBase64}),
-        signal:AbortSignal.timeout(120000)
-      });
-      const data=await res.json().catch(()=>({error:'Resposta inválida do serviço CamScanner.'}));
-      if(!res.ok)throw Error(data.error||'Serviço CamScanner indisponível.');
-      if(!['image/jpeg','image/png'].includes(data.mime)||typeof data.base64!=='string'||!data.base64.length)throw Error('O serviço CamScanner não retornou uma imagem válida.');
-      const binary=atob(data.base64);
-      if(binary.length>12*1024*1024)throw Error('Imagem retornada excede o limite permitido.');
-      const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
-      const ext=data.mime==='image/png'?'png':'jpg';
-      const result=new File([bytes],(original.name.replace(/\.[^.]+$/,'')||'CRLV')+'-CamScanner.'+ext,{type:data.mime});
-      if(!originalFileForCam)originalFileForCam=original;
-      lastFile=result;
-      camMessage('Imagem melhorada. Reanalisando para identificar tipo e vencimento...','success');
-      await processFile(result);
-      $('enhance-card').open=true;
-      camMessage('CamScanner aplicado à primeira página. Confira tipo, prazo e prévia antes de baixar o PDF tratado. O CRLV original não foi alterado.','success');
-    }catch(e){
-      camMessage('CamScanner não concluiu: '+(e.message||String(e))+'. O leitor local continua disponível.','error');
-      if(lastFile!==original){lastFile=original;}
-    }finally{camBusy=false;camBtn.textContent='◈ Melhorar com CamScanner';updateCamState();}
+    return await enhanceCanvasSmart(await drawSourceCanvas(input,rotation,2400),'gray');
   }
   async function handleFile(file){
     if(!file)return;
     // Leitura do documento sempre local: PDF.js / Tesseract, sem serviço externo de OCR.
-    lastFile=file;originalFileForCam=null;updateCamState();
+    lastFile=file;
     return processFile(file);
   }
   async function processFile(file,forceOCR=false){
@@ -762,7 +731,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name),isImage=/^image\/(png|jpeg|webp)$/.test(file.type)||/\.(png|jpe?g|webp)$/i.test(file.name);
     if(!isPDF&&!isImage){notice('Apenas PDF, PNG, JPG e WebP.','danger');return;}
     if(pending)return;pending=true;lastFile=file;documentLooksRight=false;
-    $('enhance-preview-button').disabled=false;$('download-pdf').disabled=false;
+    $('enhance-preview-button').disabled=false;$('download-pdf').disabled=false;$('retry-enhanced-ocr').disabled=false;
     void refreshEnhancementPreview(file);
     if(!forceOCR){fields.forEach(k=>$(k).value='');extraction={};conflicts=[];rawText='';$('rawtext').textContent='Aguardando leitura...';renderExtraction();analyze();}$('select-file').disabled=$('force-ocr').disabled=true;
     notice(forceOCR?'Reprocessando com OCR forçado...':'Lendo arquivo e identificando campos...');
@@ -782,9 +751,9 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
             ocrNeeded=true;
             const v=page.getViewport({scale:2});const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);await page.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;
             let target=canvas;if(angle!==0){target=await imageCanvas(canvas.toDataURL('image/png'),angle);}
-            const ocrText=await ocr(enhanceCanvas(target,'gray'));content+='\n--- OCR PÁGINA '+i+' ---\n'+ocrText;parseText(ocrText,map,2,'OCR cinza');source='PDF + OCR';
+            const ocrText=await ocr(await enhanceCanvasSmart(target,'gray'));content+='\n--- OCR PÁGINA '+i+' ---\n'+ocrText;parseText(ocrText,map,2,'OCR cinza');source='PDF + OCR';
             if(!map.placa||!map.exercicio||!map.uf||!map.especie){
-              const second=await ocr(enhanceCanvas(target,'mono'));
+              const second=await ocr(await enhanceCanvasSmart(target,'mono'));
               content+='\n--- OCR P&B PÁGINA '+i+' ---\n'+second;
               parseText(second,map,2,'OCR P&B');
             }
@@ -793,17 +762,17 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
         if(forceOCR)source='OCR forçado de PDF';else if(!ocrNeeded)source='Texto estruturado do PDF';
       }else{
         const canvas=await drawSourceCanvas(file,angle,2400);
-        content=await ocr(enhanceCanvas(canvas,'gray'));
+        content=await ocr(await enhanceCanvasSmart(canvas,'gray'));
         parseText(content,map,2,'OCR cinza');source='Imagem + OCR';
         if(!map.placa||!map.exercicio||!map.uf||!map.especie){
-          const second=await ocr(enhanceCanvas(canvas,'mono'));
+          const second=await ocr(await enhanceCanvasSmart(canvas,'mono'));
           content+='\n--- OCR P&B ---\n'+second;
           parseText(second,map,2,'OCR P&B');
         }
       }
       // Se dois métodos discordaram, mantém o valor de maior score e expõe a divergência.
       conflicts=[...new Set(conflicts)];setExtracted(map,source,content.trim());
-    }catch(e){notice('Falha na leitura: '+(e.message||String(e))+'. Preencha manualmente ou tente outro arquivo.','danger');$('rawtext').textContent='Não foi possível processar o arquivo.';}
+    }catch(e){notice('Falha na leitura automática: '+(e.message||String(e))+'. Tente “Leitura com imagem melhorada” ou confira os campos manualmente. O PDF melhorado continua disponível.','danger');$('rawtext').textContent='Não foi possível processar o arquivo.';}
     finally{pending=false;$('select-file').disabled=$('force-ocr').disabled=false;}
   }
   // QR com câmera: reconhecimento óptico é diferente da decodificação/validação VIO.
@@ -905,12 +874,12 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
   ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
   drop.addEventListener('drop',e=>{void handleFile(e.dataTransfer.files?.[0]);});
-  $('cam-enhance').addEventListener('click',()=>{void camEnhance();});
+  $('retry-enhanced-ocr').addEventListener('click',()=>{if(lastFile)void processFile(lastFile,true);});
   $('force-ocr').addEventListener('click',()=>{if(lastFile)processFile(lastFile,true);else notice('Selecione um arquivo primeiro.','warning');});
   $('enhance-preview-button').addEventListener('click',()=>{if(lastFile)void refreshEnhancementPreview();});
   $('enhance-mode').addEventListener('change',()=>{if(lastFile)void refreshEnhancementPreview();});
   $('download-pdf').addEventListener('click',()=>{void createEnhancedPDF();});
-  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;originalFileForCam=null;camConsent.checked=false;camMessage('Requer conexão do serviço CamScanner e autorização.');updateCamState();previewToken++;$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
+  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;previewToken++;$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
   $('copy-summary').addEventListener('click',async()=>{
     const r=analyze();
     const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário de renovação: ${r.renewalYear||'-'}\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
@@ -918,8 +887,8 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     catch(e){notice('Não foi possível copiar automaticamente.','warning');}
   });
   renderExtraction();analyze();
-  // API para testes funcionais das regras do calendário e extração.
-  window.__FrotaCheckTest={calendar,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,enhanceCanvas,workerEndpoint,camUrl};
+  // API de teste para calendários, extração e tratamento local de imagens.
+  window.__FrotaCheckTest={calendar,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,enhanceCanvas,enhanceCanvasSmart,makeEnhancedPdf};
 })();
 
 </script>
