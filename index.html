@@ -2,13 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FrotaCheck | Scanner 4.7 — teste</title>
+<title>FrotaCheck | Scanner 4.8 — teste</title>
 <style>
 :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f7f5;color:#252525}*{box-sizing:border-box}body{margin:0}.stripe{height:7px;background:linear-gradient(90deg,#ffcc00 76%,#d40511 76%)}header{background:#ffcc00;border-bottom:1px solid #e9bd00;padding:17px 22px}.wrap{max-width:970px;margin:auto;display:flex;align-items:center;gap:12px}.logo{background:#d40511;color:#fff;font-weight:900;font-size:22px;border-radius:10px;width:43px;height:43px;display:grid;place-items:center}h1{font-size:22px;margin:0}small{color:#705100;font-size:11px;font-weight:700;letter-spacing:.06em}main{max-width:970px;margin:24px auto;padding:0 18px}.panel{padding:22px;border:1px solid #e6e3da;border-radius:16px;background:#fff;box-shadow:0 7px 28px #00000008}h2{font-size:24px;margin:0 0 7px}.sub{font-size:14px;line-height:1.5;color:#565656;margin:0 0 16px}.drop{border:2px dashed #d9c071;background:#fffdf4;min-height:135px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:20px;text-align:center;border-radius:13px;cursor:pointer}.drop strong{font-size:17px}.drop span{color:#5f5a4c;font-size:13px}.btn{background:#d40511;color:#fff;border:0;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:750;cursor:pointer}.btn.dark{background:#282828}.btn.light{background:#f1ece2;color:#272727}.btn:disabled{background:#b4b4b4;color:#fff;cursor:not-allowed}.drop:focus-visible,.btn:focus-visible{outline:3px solid #bd7b00;outline-offset:3px}#file{display:none}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.msg{background:#fff7e5;border:1px solid #f0dca4;border-radius:10px;padding:12px 15px;color:#77511b;font-size:13px;line-height:1.5}.msg.good{background:#eef9f0;border-color:#b7dec0;color:#235e37}.msg.bad{background:#fff0ed;border-color:#ebc4bd;color:#972d24}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}.card{border:1px solid #e8e4dd;border-radius:12px;padding:13px;min-width:0}.card h3{font-size:15px;margin:0 0 12px}.viewport{min-height:155px;display:grid;place-items:center;background:#edeae6;border-radius:8px;overflow:hidden}.viewport canvas{max-width:100%;max-height:600px;width:auto;height:auto;object-fit:contain;display:block}.caption{font-size:12px;line-height:1.5;color:#606060}.hidden{display:none!important}.progress{height:6px;background:#ececec;overflow:hidden;border-radius:30px;margin:12px 0}.progress>div{height:100%;background:#d40511;width:0;transition:width .1s}details#results{margin:18px 0;padding:13px;border-radius:11px;border:1px solid #e9e2d6}details#results>summary{font-weight:750;cursor:pointer;padding:6px}details#results>summary:focus-visible{outline:2px solid #bd7b00}.warning{margin-top:18px;font-size:12px;color:#666;line-height:1.5}@media(max-width:620px){main{margin:14px auto}.panel{padding:16px}.grid{grid-template-columns:1fr}.actions .btn{flex:1}h2{font-size:21px}}
 </style>
 </head>
-<body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>SCANNER 4.7 • DIGITALIZAÇÃO PRETO E BRANCO</small></div></div></header>
-<main><div class="panel"><h2>Digitalização automática do documento</h2><p class="sub">Envie uma foto ou PDF. Agora buscamos o padrão de documento digitalizado: fundo branco, texto preto, recorte seguro e formato do CRLV aberto. O original permanece intacto. Esta é uma versão de teste, separada do FrotaCheck principal.</p>
+<body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>SCANNER 4.8 • LEITURA NATURAL</small></div></div></header>
+<main><div class="panel"><h2>Digitalização automática do documento</h2><p class="sub">Envie uma foto ou PDF. Tratamento equilibrado: preserva o recorte aprovado, clareia o papel e mantém letras e linhas definidas sem contraste excessivo. O original permanece intacto. Esta é uma versão de teste, separada do FrotaCheck principal.</p>
 <label class="drop" id="drop" for="file" role="button" tabindex="0"><span style="font-size:32px">📄</span><strong>Selecionar foto ou PDF</strong><span>JPG, PNG, WebP ou PDF de até 15 MB</span></label><input id="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf">
 <div class="actions"><button class="btn" id="download" disabled>↓ Baixar PDF melhorado</button></div>
 <div class="msg" id="status" role="status" aria-live="polite">Pronto para testar. A digitalização é feita no seu navegador, sem API externa.</div><div id="progress" class="progress hidden"><div id="bar"></div></div>
@@ -17,7 +17,7 @@
 </div></main>
 <script id="worker-source" type="text/plain">
  'use strict';
-// FrotaCheck Scanner 4.7: recorte seguro + preto e branco adaptativo.
+// FrotaCheck Scanner 4.8: mesmo recorte seguro + tonalidade equilibrada para leitura.
 function rotate(src,w,h,turn){if(turn===0)return {pixels:src,width:w,height:h};const out=new Uint8ClampedArray(src.length),W=h,H=w;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const s=(y*w+x)*4;let X,Y;if(turn===1){X=h-1-y;Y=x;}else{X=y;Y=w-1-x;}const d=(Y*W+X)*4;out[d]=src[s];out[d+1]=src[s+1];out[d+2]=src[s+2];out[d+3]=255;}return {pixels:out,width:W,height:H};}
 function cut(src,w,h,b){const out=new Uint8ClampedArray(b.w*b.h*4);for(let y=0;y<b.h;y++)for(let x=0;x<b.w;x++){const si=((y+b.y)*w+b.x+x)*4,di=(y*b.w+x)*4;out[di]=src[si];out[di+1]=src[si+1];out[di+2]=src[si+2];out[di+3]=255;}return {pixels:out,width:b.w,height:b.h};}
 function percentile(arr,p){const s=arr.slice().sort((a,b)=>a-b);return s[Math.max(0,Math.min(s.length-1,Math.floor(p*(s.length-1))))]||0;}
@@ -37,33 +37,41 @@ function detectMargins(src,W,H){
   const med=(a,b)=>percentile(Array.from(smooth.slice(Math.floor(W*a),Math.max(Math.floor(W*a)+1,Math.floor(W*b)))),.5);
   const outerL=med(.005,.025),innerL=med(.11,.23),outerR=med(.967,.996),innerR=med(.78,.9);
   let left=0,right=W;
-  if(outerL>75 && outerL<205 && innerL-outerL>17){const threshold=outerL+(innerL-outerL)*.59;for(let x=Math.round(W*.014);x<Math.round(W*.20);x++){if(smooth[x]>threshold&&smooth[Math.min(W-1,x+r)]>threshold){left=Math.min(W*.12,Math.max(0,x+Math.round(W*.006)));break;}}}
-  if(outerR<210 && innerR-outerR>17){const threshold=outerR+(innerR-outerR)*.57;for(let x=Math.round(W*.987);x>Math.round(W*.79);x--){if(smooth[x]>threshold&&smooth[Math.max(0,x-r)]>threshold){right=Math.max(W*.88,Math.min(W,x-Math.round(W*.003)));break;}}}
+  if(outerL>75 && innerL-outerL>17){const threshold=outerL+(innerL-outerL)*.59;for(let x=Math.round(W*.014);x<Math.round(W*.20);x++){if(smooth[x]>threshold&&smooth[Math.min(W-1,x+r)]>threshold){left=Math.min(W*.12,Math.max(0,x+Math.round(W*.006)));break;}}}
+  if(innerR-outerR>17){const threshold=outerR+(innerR-outerR)*.57;for(let x=Math.round(W*.987);x>Math.round(W*.79);x--){if(smooth[x]>threshold&&smooth[Math.max(0,x-r)]>threshold){right=Math.max(W*.88,Math.min(W,x-Math.round(W*.003)));break;}}}
   left=Math.round(left);right=Math.round(right);
   if(right-left<W*.76||(left<6&&W-right<6))return null;
   // Não recortar caso haja indício de tinta escura exatamente na margem detectada.
   return {x:left,y:0,w:right-left,h:H};
 }
-function adaptiveBW(src,W,H){
-  const N=W*H,gray=new Uint8Array(N),integral=new Float64Array((W+1)*(H+1));
+function gentleScan(src,W,H){
+  // Normalizacao local de luz: corrige sombras mantendo tons intermediarios.
+  // Evita binarizacao dura de 0/255 para preservar bordas finas e QR Codes.
+  const N=W*H, gray=new Uint8Array(N), integral=new Float64Array((W+1)*(H+1));
   for(let y=0;y<H;y++){
     let sum=0;const row=(y+1)*(W+1),above=y*(W+1);
     for(let x=0;x<W;x++){
-      const k=y*W+x,p=k*4;const g=Math.round(.299*src[p]+.587*src[p+1]+.114*src[p+2]);gray[k]=g;
-      sum+=g;integral[row+x+1]=integral[above+x+1]+sum;
+      const k=y*W+x,p=k*4,g=Math.round(.299*src[p]+.587*src[p+1]+.114*src[p+2]);
+      gray[k]=g;sum+=g;integral[row+x+1]=integral[above+x+1]+sum;
     }
   }
-  let radius=Math.max(17,Math.min(68,Math.round(Math.min(W,H)*.034)));const C=13;
+  const radius=Math.max(23,Math.min(80,Math.round(Math.min(W,H)*.043)));
   const out=new Uint8ClampedArray(N*4);
   for(let y=0;y<H;y++){
-    const y0=Math.max(0,y-radius),y1=Math.min(H-1,y+radius);
-    const upper=y0*(W+1),lower=(y1+1)*(W+1);
+    const y0=Math.max(0,y-radius),y1=Math.min(H-1,y+radius),upper=y0*(W+1),lower=(y1+1)*(W+1);
     for(let x=0;x<W;x++){
-      const x0=Math.max(0,x-radius),x1=Math.min(W-1,x+radius),k=y*W+x;
+      const x0=Math.max(0,x-radius),x1=Math.min(W-1,x+radius),k=y*W+x,p=k*4;
       const sum=integral[lower+x1+1]-integral[upper+x1+1]-integral[lower+x0]+integral[upper+x0];
       const mean=sum/((x1-x0+1)*(y1-y0+1));
-      const v=gray[k] <= mean-C || gray[k]<37 ? 0:255;
-      const p=k*4;out[p]=out[p+1]=out[p+2]=v;out[p+3]=255;
+      const g=gray[k];
+      // Localmente, fundo escuro por sombra vira papel claro; a tinta permanece.
+      const ink=Math.max(0,(mean-g)*(222/Math.max(90,mean))-2.8);
+      let v=Math.max(30,Math.min(250,249-2.0*ink));
+      // Preserva faixas escuras oficiais, sem apagar letras brancas em seu interior.
+      if(mean<98 && g<100)v=Math.min(v,Math.max(18,Math.min(100,g*.78+10)));
+      if(g<35)v=Math.min(v,32);
+      v=Math.round(v);
+      out[p]=out[p+1]=out[p+2]=v;out[p+3]=255;
     }
   }
   return out;
@@ -77,8 +85,8 @@ self.onmessage=e=>{const {id,buffer,w,h,full,extra}=e.data;
     // páginas A4 estreitas continuam em pé. A correção manual existe apenas no teste.
     if(!full && W/H>.72 && W/H<.99){let r=rotate(pix,W,H,3);pix=r.pixels;W=r.width;H=r.height;notes.push('CRLV orientado em paisagem, como a referência.');}
     for(let k=0;k<(extra||0);k++){let r=rotate(pix,W,H,1);pix=r.pixels;W=r.width;H=r.height;}
-    const result=adaptiveBW(pix,W,H);
-    notes.push('Digitalização alto contraste: fundo branco e texto preto.');
+    const result=gentleScan(pix,W,H);
+    notes.push('Digitalização suave: fundo clareado, letras legíveis e contraste moderado.');
     self.postMessage({id,ok:true,buffer:result.buffer,w:W,h:H,notes:notes.join(' ')},[result.buffer]);
   }catch(err){self.postMessage({id,ok:false,error:String(err?.message||err).slice(0,200)});}
 };
