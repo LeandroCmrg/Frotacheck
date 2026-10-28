@@ -1,21 +1,194 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FrotaCheck | Scanner 5.2 — orientação automática</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffcc00" />
+<meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
+<title>FrotaCheck | Leitor de CRLV-e</title>
 <style>
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f7f5;color:#252525}*{box-sizing:border-box}body{margin:0}.stripe{height:7px;background:linear-gradient(90deg,#ffcc00 76%,#d40511 76%)}header{background:#ffcc00;border-bottom:1px solid #e9bd00;padding:17px 22px}.wrap{max-width:970px;margin:auto;display:flex;align-items:center;gap:12px}.logo{background:#d40511;color:#fff;font-weight:900;font-size:22px;border-radius:10px;width:43px;height:43px;display:grid;place-items:center}h1{font-size:22px;margin:0}small{color:#705100;font-size:11px;font-weight:700;letter-spacing:.06em}main{max-width:970px;margin:24px auto;padding:0 18px}.panel{padding:22px;border:1px solid #e6e3da;border-radius:16px;background:#fff;box-shadow:0 7px 28px #00000008}h2{font-size:24px;margin:0 0 7px}.sub{font-size:14px;line-height:1.5;color:#565656;margin:0 0 16px}.drop{border:2px dashed #d9c071;background:#fffdf4;min-height:135px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:20px;text-align:center;border-radius:13px;cursor:pointer}.drop strong{font-size:17px}.drop span{color:#5f5a4c;font-size:13px}.btn{background:#d40511;color:#fff;border:0;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:750;cursor:pointer}.btn.dark{background:#282828}.btn.light{background:#f1ece2;color:#272727}.btn:disabled{background:#b4b4b4;color:#fff;cursor:not-allowed}.drop:focus-visible,.btn:focus-visible{outline:3px solid #bd7b00;outline-offset:3px}#file{display:none}.actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.msg{background:#fff7e5;border:1px solid #f0dca4;border-radius:10px;padding:12px 15px;color:#77511b;font-size:13px;line-height:1.5}.msg.good{background:#eef9f0;border-color:#b7dec0;color:#235e37}.msg.bad{background:#fff0ed;border-color:#ebc4bd;color:#972d24}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}.card{border:1px solid #e8e4dd;border-radius:12px;padding:13px;min-width:0}.card h3{font-size:15px;margin:0 0 12px}.viewport{min-height:155px;display:grid;place-items:center;background:#edeae6;border-radius:8px;overflow:hidden}.viewport canvas{max-width:100%;max-height:600px;width:auto;height:auto;object-fit:contain;display:block}.caption{font-size:12px;line-height:1.5;color:#606060}.hidden{display:none!important}.progress{height:6px;background:#ececec;overflow:hidden;border-radius:30px;margin:12px 0}.progress>div{height:100%;background:#d40511;width:0;transition:width .1s}details#results{margin:18px 0;padding:13px;border-radius:11px;border:1px solid #e9e2d6}details#results>summary{font-weight:750;cursor:pointer;padding:6px}details#results>summary:focus-visible{outline:2px solid #bd7b00}.warning{margin-top:18px;font-size:12px;color:#666;line-height:1.5}@media(max-width:620px){main{margin:14px auto}.panel{padding:16px}.grid{grid-template-columns:1fr}.actions .btn{flex:1}h2{font-size:21px}}
+:root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
+*{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+.topstripe{background:var(--red);height:7px}
+header{background:var(--yellow);padding:21px max(22px,calc((100vw - 1160px)/2));border-bottom:1px solid #ecc000}
+.header-inner{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.brand{display:flex;align-items:center;gap:12px}.mark{height:44px;width:44px;border-radius:11px;background:var(--red);color:white;display:grid;place-items:center;font-weight:900;font-size:21px;letter-spacing:-1px;box-shadow:4px 4px 0 #b1870030}.brand-name{font-size:23px;font-weight:850;letter-spacing:-1px;line-height:1.1}.brand-sub{font-size:11px;font-weight:700;letter-spacing:1.3px;color:#593f00}
+.header-chip{background:#fff4bb;border:1px solid #e5b800;border-radius:999px;padding:7px 13px;font-size:11px;font-weight:850;color:#7e0c13;letter-spacing:.3px}
+main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25px}.eyebrow{color:var(--red);font-size:12px;letter-spacing:1.4px;text-transform:uppercase;font-weight:850}h1{font-size:clamp(27px,3vw,36px);letter-spacing:-1.3px;margin:5px 0 6px;line-height:1.2}.intro p{margin:0;color:var(--muted);font-size:14px}
+.layout{display:grid;grid-template-columns:minmax(330px,.88fr) minmax(0,1.12fr);align-items:start;gap:22px}.panel{background:var(--white);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 14px 35px #291e110a;min-width:0;overflow:hidden}.panel-title{display:flex;align-items:center;gap:9px;font-weight:850;font-size:17px;margin:0}.number{border-radius:8px;width:29px;height:29px;background:#fff2b2;color:var(--red);display:grid;place-items:center;font-weight:900;font-size:13px}.panel-head{padding:22px 22px 10px}.panel-head p{color:var(--muted);font-size:12px;margin:3px 0 0 38px}.panel-body{padding:10px 22px 22px}
+.drop{border:2px dashed #ded7bf;background:#fffdf3;border-radius:16px;min-height:215px;padding:22px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;outline-offset:3px;transition:background .15s,border-color .15s}.drop.drag,.drop:hover{background:#fff6d6;border-color:var(--red)}.drop:focus-visible{outline:2px solid var(--red)}.upload-icon{width:51px;height:51px;background:#ffedaa;border-radius:15px;display:grid;place-items:center;color:var(--red)}.drop b{font-size:15px}.drop p{font-size:12px;color:var(--muted);margin:0 0 5px}.button{border:1px solid var(--line);background:white;color:var(--ink);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 15px;min-height:42px;font-size:13px;font-weight:800;transition:background .15s}.button:hover{background:#fff8de}.button.primary{background:var(--red);border-color:var(--red);color:white}.button.primary:hover{background:var(--red-dark)}.button.ghost{border:0;padding:8px 0;color:var(--muted);background:transparent}.button.ghost:hover{color:var(--red)}.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}.file-hint{font-size:11px;color:var(--muted);margin:11px 0 0}
+.notice{border:1px solid #eee1af;background:#fff9df;color:#76570b;font-size:12px;border-radius:10px;padding:10px 12px;margin-top:15px}.notice.success{background:#e9f8ee;border-color:#bce8c5;color:#236a35}.notice.warning{background:#fff1d7;border-color:#e8c985;color:#8c5b0c}.notice.danger{background:#ffebeb;border-color:#ffb5b5;color:#aa1024}
+.edit-card{border-top:1px solid var(--line);padding:0 22px 19px}.edit-card>summary,.inner-details>summary{cursor:pointer;font-size:13px;font-weight:800;list-style:none;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}.edit-card>summary::after,.inner-details>summary::after{content:'⌄';font-size:20px;font-weight:400;color:var(--red);line-height:1}.edit-card[open]>summary::after,.inner-details[open]>summary::after{transform:rotate(180deg)}.edit-card>summary::-webkit-details-marker,.inner-details>summary::-webkit-details-marker{display:none}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{min-width:0}.field.full{grid-column:1/-1}.field label{display:block;color:#56534c;font-size:12px;font-weight:750;margin:0 0 5px}.field input,.field select{height:43px;width:100%;background:#fff;border:1px solid #dad6cb;border-radius:9px;color:var(--ink);padding:0 11px;font-size:16px;min-width:0}.field input:focus,.field select:focus{outline:2px solid #f4cd43;outline-offset:0;border-color:#d7a600}.hint{font-size:11px;color:var(--muted);margin:6px 0 0}.inner-details{border-top:1px solid #eae7e1;margin-top:17px}.advanced-layout{display:grid;grid-template-columns:1fr auto;align-items:end;gap:11px}.advanced-layout .button{height:43px}.debug{font-size:12px;color:var(--muted);margin-top:16px}.debug pre{white-space:pre-wrap;overflow:auto;max-height:230px;background:#f5f4ef;padding:11px;border-radius:9px}.sr{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+.result-panel{padding:24px}.result-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}.result-head h2{font-size:19px;letter-spacing:-.5px;margin:0}.result-tag{background:#fff5cb;color:#915b0a;border-radius:99px;padding:6px 10px;font-size:10px;font-weight:850;white-space:nowrap}
+.result-tile{border:1px solid var(--line);border-radius:16px;padding:21px 20px;background:white;margin-top:13px}.result-tile.red{background:#fff7f7;border-color:#f8d5d5}.result-tile.yellow{background:#fffbec;border-color:#f1e0a6}.tile-head{display:flex;align-items:center;gap:9px;font-weight:750;color:#655f56;font-size:12px;margin-bottom:7px}.tile-head svg{width:20px;height:20px;stroke:var(--red);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}.big{font-size:clamp(27px,3vw,38px);line-height:1.16;font-weight:900;letter-spacing:-1px;overflow-wrap:anywhere}.type-confidence{color:#a93335;background:white;padding:5px 9px;font-size:11px;border-radius:99px;border:1px solid #f2cbcb;display:inline-flex;max-width:100%;margin-top:12px;font-weight:700}.detail-note{font-size:12px;color:#675f55;margin:11px 0 0;line-height:1.6}.year{font-size:12px;color:#7b630d;margin-top:6px}
+.deadline-date{color:#686868}.deadline-date.on-time{color:#168044}.deadline-date.overdue{color:#c00d1b}
+.status{display:inline-block;border-radius:99px;padding:6px 11px;font-weight:850;font-size:11px;margin-top:13px;background:#e9e8e4;color:#615d55}.status.ok{background:#def4e6;color:#1c783b}.status.warn{background:#fff0c2;color:#806100}.status.bad{background:#ffdfdf;color:#a40817}.status.neutral{background:#eceae5;color:#6d6a64}
+.meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:17px;border:1px solid var(--line);border-radius:12px;overflow:hidden}.meta-item{padding:11px 13px;min-width:0}.meta-item+.meta-item{border-left:1px solid var(--line)}.meta-item small{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.7px;display:block}.meta-item b{font-size:14px;overflow-wrap:anywhere}.explanation{font-size:12px;color:#59564f;line-height:1.55;margin:16px 0 0}.result-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}.source{color:#a20b17;font-size:12px;font-weight:800;text-decoration:none}.source:hover{text-decoration:underline}.footer-note{max-width:1158px;margin:25px auto 0;color:#747169;font-size:11px;line-height:1.7}
+.extract-head,.extract-item{font-size:11px}.extract-head{font-weight:750;margin:9px 0}.extract-item{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid #eee}.extract-item b{text-align:right;overflow-wrap:anywhere}.good{color:#196d3d}.maybe{color:#ab7912}.low,.audit-alert{color:#ac2020}
+/* Ferramenta de legibilidade — preserva a tela principal compacta */
+.enhance-card{border-top:1px solid var(--line);padding:0 22px 20px}
+.enhance-card>summary{cursor:pointer;padding:16px 0 4px;font-weight:850;font-size:13px;list-style:none;display:flex;gap:9px;align-items:center}
+.enhance-card>summary::-webkit-details-marker{display:none}
+.enhance-card>summary::before{content:'▧';color:var(--red);font-size:19px}
+.enhance-card>summary::after{content:'⌄';margin-left:auto;color:var(--red);font-size:19px;font-weight:400}
+.enhance-card[open]>summary::after{transform:rotate(180deg)}
+.enhance-description{color:var(--muted);font-size:12px;margin:9px 0 14px}
+.enhance-toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:flex-end}
+.enhance-toolbar .field{flex:1 1 160px}
+.enhance-toolbar .button{flex:1 1 160px}
+.enhance-preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
+.enhance-preview figure{margin:0;min-width:0;background:#f6f5f0;border:1px solid var(--line);border-radius:11px;padding:9px}
+.enhance-preview figcaption{text-align:center;font-size:11px;font-weight:800;margin-bottom:6px;color:#68655e}
+.enhance-preview canvas{display:block;max-width:100%;width:auto;height:auto;max-height:240px;margin:auto;background:white;border-radius:4px;box-shadow:0 1px 5px #0002}
+.enhance-result{font-size:12px;margin:9px 0 0;color:var(--muted)}
+.enhance-result.success{color:#176a36}.enhance-result.error{color:#aa1024}
+.enhance-download{width:100%;margin-top:11px}
+@media(max-width:520px){.enhance-card{padding:0 17px 16px}.enhance-preview canvas{max-height:180px}}
+/* Leitura móvel: câmera de QR e fotografia do documento */
+.scan-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.scan-actions .button{flex:1 1 155px}
+.scan-info{font-size:11px;color:var(--muted);margin:8px 0 0}
+.scanner-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(25,22,17,.75);padding:18px}
+.scanner-overlay[hidden]{display:none!important}
+.scanner-box{width:min(100%,480px);max-height:95dvh;overflow:auto;background:white;border-radius:18px;border-top:7px solid var(--yellow);padding:18px;box-shadow:0 18px 60px #0005}
+.scanner-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.scanner-head h2{font-size:20px;margin:0}
+.scanner-head p{font-size:12px;color:var(--muted);margin:3px 0 10px}
+.scanner-screen{min-height:215px;background:#222;border-radius:12px;overflow:hidden;display:grid;place-items:center;color:white;text-align:center;font-size:13px}
+.scanner-screen video{max-width:100%}
+.scanner-foot{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.scanner-foot .button{flex:1 1 130px}
+.scanner-feedback{font-size:12px;color:#5b4a17;background:#fff6d2;border:1px solid #ead98f;border-radius:10px;padding:10px 12px;margin-top:12px;line-height:1.5}
+.scanner-feedback[hidden]{display:none}
+@media(max-width:520px){.scan-actions .button{flex:1 1 100%}}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.header-chip{display:none}.result-panel{padding:20px}}
+@media(max-width:520px){header{padding:15px 16px}main{padding:24px 13px 30px}.brand-name{font-size:20px}.brand-sub{font-size:9px}.mark{height:39px;width:39px}.intro{margin-bottom:20px}.panel-head{padding:18px 17px 9px}.panel-body{padding:8px 17px 18px}.edit-card{padding:0 17px 16px}.drop{min-height:195px;padding:17px 10px}.result-panel{padding:17px}.result-head{flex-wrap:wrap}.result-tile{padding:18px 15px}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}.field.full{grid-column:1/-1}.advanced-layout{grid-template-columns:1fr}.big{font-size:29px}}
+
+
+/* Scanner de documentos: quadrilátero editável e correção de perspectiva */
+.scan-crop{border:1px solid #eadfbd;background:#fffdf5;border-radius:13px;padding:13px;margin:12px 0}
+.scan-crop .field{flex:1 1 200px}.scan-crop small{color:#6b6250;font-size:11px;display:block;margin:8px 0}
+.crop-editor-wrap{display:flex;justify-content:center;align-items:center;background:#e8e6df;border-radius:11px;padding:10px;min-height:90px;overflow:hidden;margin:10px 0}
+#crop-editor{display:block;max-width:100%;max-height:390px;width:auto;height:auto;touch-action:none;cursor:crosshair;border-radius:3px}
+.crop-actions{display:flex;flex-wrap:wrap;gap:8px}.crop-actions .button{flex:1 1 170px}
+.crop-help{font-size:11px;color:#655f55;margin:9px 0 0}.crop-message{font-size:12px;color:#6d614a;margin:9px 0 0}
+@media(max-width:520px){#crop-editor{max-height:330px}.scan-crop{padding:11px}.crop-actions .button{flex:1 1 100%}}
+
+
+/* CamScanner integrado ou por importação: fluxos reais e distintos */
+.cs-quick{margin:14px 0 0;background:#fff8e0;border:1px solid #f3d78b;border-radius:13px;padding:15px}
+.cs-quick strong{display:block;font-size:14px;margin-bottom:5px}
+.cs-quick p,.cs-ag-desc{font-size:12px;color:#635e51;margin:0 0 11px;line-height:1.55}
+.cs-quick .scan-actions{margin-top:8px;gap:8px}
+.cs-quick a.button{text-decoration:none}
+.cs-ag{border-top:1px solid var(--line);padding:0 22px 20px}
+.cs-ag>summary{cursor:pointer;font-weight:850;font-size:13px;padding:16px 0;list-style:none}
+.cs-ag>summary::-webkit-details-marker{display:none}
+.cs-ag>summary:after{content:'⌄';float:right;color:var(--red)}
+.cs-ag[open]>summary:after{content:'⌃'}
+.cs-rows{display:grid;grid-template-columns:1fr;gap:11px}
+.cs-rows input{width:100%;height:43px;border:1px solid #dad6cb;border-radius:9px;padding:0 11px;font-size:16px}
+.cs-rows label{font-size:12px;font-weight:750;color:#56534c;display:block;margin:0 0 5px}
+.cs-consent{display:flex;align-items:flex-start;gap:9px;margin:12px 0;font-size:12px;line-height:1.5}
+.cs-consent input{margin-top:3px;accent-color:var(--red)}
+.cs-status{font-size:12px;margin-top:9px;line-height:1.5}
+.cs-status.error{color:#a40817}.cs-status.ok{color:#167c40}
+@media(max-width:520px){.cs-ag{padding:0 17px 18px}.cs-quick .scan-actions{flex-direction:column;align-items:stretch}.cs-quick .button{width:100%}}
+
+/* Versão 4.4: PDF via processamento externo, sem código de acesso e sem filtros expostos. */
+.pdf-only{margin:12px 0 0;display:flex;flex-direction:column;gap:8px}
+.pdf-only .enhance-download{width:100%;min-height:48px;font-size:14px}
+.pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
+.pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
+.enhance-card[hidden]{display:none!important}
 </style>
 </head>
-<body><div class="stripe"></div><header><div class="wrap"><div class="logo">F</div><div><h1>FrotaCheck</h1><small>SCANNER 5.2 • ORIENTAÇÃO AUTOMÁTICA</small></div></div></header>
-<main><div class="panel"><h2>Digitalização automática do documento</h2><p class="sub">Envie uma foto ou PDF. Recorte pelas bordas do papel, orientação automática com reconhecimento do cabeçalho e clareamento suave de dobras e sombras. O PDF é A4 retrato e o sistema posiciona automaticamente o documento, sem botão de rotação manual. O original permanece intacto. Esta é uma versão de teste, separada do FrotaCheck principal.</p>
-<label class="drop" id="drop" for="file" role="button" tabindex="0"><span style="font-size:32px">📄</span><strong>Selecionar foto ou PDF</strong><span>JPG, PNG, WebP ou PDF de até 15 MB</span></label><input id="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf">
-<div class="actions"><button class="btn" id="download" disabled>↓ Baixar PDF melhorado</button></div>
-<div class="msg" id="status" role="status" aria-live="polite">Pronto para testar. A digitalização é feita no seu navegador, sem API externa.</div><div id="progress" class="progress hidden"><div id="bar"></div></div>
-<details id="results" class="hidden"><summary>Conferir antes e depois (teste)</summary><div class="grid"><section class="card"><h3>Original</h3><div class="viewport" id="before"></div></section><section class="card"><h3>Digitalizado</h3><div class="viewport" id="after"></div></section></div><p class="caption" id="notes"></p></details>
-<p class="warning"><strong>Importante:</strong> a cópia tratada não substitui o CRLV oficial. Informações existentes, anotações oficiais, QR Codes e bordas não podem ser apagados. Dobras profundas podem continuar visíveis. Documento muito desfocado ou cortado na fotografia não pode ser recuperado com garantia.</p>
-</div></main>
-<script id="worker-source" type="text/plain">
+<body>
+<div class="topstripe"></div>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.3</div></div></div></div></header>
+<main>
+<div class="intro"><span class="eyebrow">Leitor de CRLV-e</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie uma foto ou PDF para identificar a categoria do veículo e consultar o calendário estadual de 2026.</p></div>
+<div class="layout">
+<section class="panel" aria-labelledby="upload-title">
+  <div class="panel-head"><h2 class="panel-title" id="upload-title"><span class="number">1</span>Enviar documento</h2><p>CRLV-e em PDF ou imagem</p></div>
+  <div class="panel-body"><div id="dropzone" class="drop" role="button" tabindex="0" aria-label="Selecionar CRLV-e"><div class="upload-icon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10z"/><path d="M13 3v7h7M8 15h8M8 18h6"/></svg></div><b>Selecione seu CRLV-e</b><p>Arraste o arquivo ou clique abaixo</p><button class="button primary" type="button" id="select-file">Escolher arquivo</button></div>
+  <input id="file" type="file" class="sr" accept="application/pdf,image/png,image/jpeg,image/webp,.pdf,.jpg,.jpeg,.png,.webp" />
+  <input id="photo-file" type="file" class="sr" accept="image/*" capture="environment" aria-label="Fotografar CRLV completo" />
+  <div class="scan-actions"><button class="button primary" type="button" id="open-qr"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM21 14v3M18 20h3" /></svg>Ler QR Code</button><button class="button" type="button" id="take-photo">📷 Fotografar CRLV</button></div>
+  <p class="scan-info">No celular, use a câmera. O QR oficial VIO não é decodificado sem serviço autorizado.</p>
+  <div class="actions"><button class="button" type="button" id="retry-reading" disabled>↻ Tentar outra leitura</button><button class="button ghost" type="button" id="clear">↺ Limpar dados</button></div>
+  <div id="file-notice" class="notice" role="status" aria-live="polite">Leitura automática. Revise as informações antes de usar o resultado.</div>
+  <p class="file-hint">Até 15 MB. Leitura e PDF melhorado processados no navegador, sem envio a serviços externos.</p>
+  </div>
+  <div class="pdf-only" id="pdf-only">
+    <button class="button primary enhance-download" id="download-pdf" type="button" disabled>↓ Baixar PDF melhorado</button>
+    <p class="pdf-status" id="pdf-only-status" role="status" aria-live="polite">Envie um documento para preparar a cópia melhorada.</p>
+  </div>
+  <details class="enhance-card" id="enhance-card" hidden aria-hidden="true">
+    <summary>Motor de tratamento interno</summary>
+    <p class="enhance-description">Detecta a folha na fotografia, remove o fundo externo, endireita a perspectiva e melhora a leitura sem substituir informações originais.</p>
+    <div class="enhance-toolbar">
+      <div class="field"><label for="enhance-mode">Melhoria visual</label><select id="enhance-mode"><option value="color">Automática • manter cores</option><option value="gray">Leitura • cinza e contraste</option><option value="mono">Leitura • preto e branco</option></select></div>
+      <button class="button" type="button" id="enhance-preview-button" disabled>↻ Atualizar prévia</button>
+    </div>
+    <div class="scan-crop" id="scan-crop" hidden>
+      <div class="field"><label for="crop-mode">Enquadramento da folha</label>
+        <select id="crop-mode"><option value="auto">Detectar e recortar automaticamente</option><option value="manual">Ajustar os 4 cantos manualmente</option><option value="none">Manter documento inteiro (sem recorte)</option></select>
+      </div>
+      <div class="crop-editor-wrap"><canvas id="crop-editor" aria-label="Prévia de recorte com quatro cantos ajustáveis"></canvas></div>
+      <div class="crop-actions"><button class="button" type="button" id="detect-crop">⌗ Detectar bordas novamente</button><button class="button" type="button" id="reset-crop">↺ Reiniciar cantos</button></div>
+      <p id="crop-message" class="crop-message" role="status">Preparando detecção de bordas...</p>
+      <p class="crop-help">Se o recorte não ficar certo, escolha “Ajustar os 4 cantos manualmente” e arraste as bolinhas até as bordas do papel. Em PDFs com várias páginas, o ajuste manual se aplica à primeira.</p>
+    </div>
+    <div class="enhance-preview" id="enhance-previews" hidden>
+      <figure><figcaption>Original</figcaption><canvas id="preview-before" aria-label="Prévia do documento original"></canvas></figure>
+      <figure><figcaption>Melhorado</figcaption><canvas id="preview-after" aria-label="Prévia do documento melhorado"></canvas></figure>
+    </div>
+    <button class="button" style="width:100%;margin-top:4px" id="retry-enhanced-ocr" type="button" disabled>◉ Tentar leitura com imagem melhorada</button>
+    <p class="enhance-result" id="enhance-feedback" role="status" aria-live="polite">Envie uma foto ou PDF para habilitar a melhoria.</p>
+    <p class="scan-info">O PDF exportado é uma cópia visual para leitura, não um CRLV digital oficial. Marcas, anotações e rasuras do documento original não são apagadas; somente ruído visual, sombras e fundo da foto podem ser reduzidos.</p>
+  </details>
+  <details class="edit-card" id="edit-fields"><summary>Conferir ou corrigir dados</summary>
+    <div class="fields">
+      <div class="field"><label for="placa">Placa</label><input id="placa" placeholder="ABC1D23" maxlength="7" autocomplete="off" /></div>
+      <div class="field"><label for="uf">UF</label><select id="uf"><option value="">Selecione</option></select></div>
+      <div class="field"><label for="exercicio">Exercício do CRLV</label><input id="exercicio" inputmode="numeric" maxlength="4" placeholder="2025" /></div>
+      <div class="field"><label for="eixos">Eixos</label><input id="eixos" type="number" min="1" max="12" placeholder="Ex.: 2" /></div>
+      <div class="field full"><label for="especie">Espécie / tipo no documento</label><input id="especie" placeholder="Ex.: CARGA CAMINHÃO" /></div>
+      <div class="field full"><label for="modelo">Marca / modelo</label><input id="modelo" placeholder="Ex.: VW/24.280" /></div>
+      <div class="field"><label for="pbt">PBT (toneladas)</label><input id="pbt" inputmode="decimal" placeholder="Ex.: 16" /></div>
+      <div class="field"><label for="comprimento">Comprimento (m)</label><input id="comprimento" inputmode="decimal" placeholder="Ex.: 7,2" /></div>
+      <div class="field"><label for="largura">Largura (m)</label><input id="largura" inputmode="decimal" placeholder="Ex.: 2,5" /></div>
+      <div class="field full"><label for="override">Tipo confirmado pelo analista</label><select id="override"><option value="">Usar classificação automática</option><option>Passeio</option><option>Van</option><option>VUC</option><option>Médio</option><option>Toco</option><option>Truck</option><option>Carreta</option><option>Outro / a confirmar</option></select></div>
+    </div>
+    <details class="inner-details"><summary>Opções avançadas de leitura</summary>
+      <div class="advanced-layout"><div class="field"><label for="rotation">Rotação da imagem / OCR</label><select id="rotation"><option value="0">0° · original</option><option value="90">90°</option><option value="180">180°</option><option value="270">270°</option></select></div><button class="button" type="button" id="force-ocr">↻ Reprocessar com OCR</button></div>
+      <details class="debug"><summary>Detalhes técnicos da extração</summary><div id="extract-audit"></div><pre id="rawtext">Nenhum arquivo analisado.</pre></details>
+    </details>
+  </details>
+</section>
+<section class="panel result-panel" aria-labelledby="result-title">
+  <div class="result-head"><h2 id="result-title">Resultado do CRLV-e</h2><span class="result-tag">CONSULTA DE APOIO</span></div>
+  <div class="result-tile red"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7zM7.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>Tipo do veículo</div><div class="big" id="category">Aguardando dados</div><span class="type-confidence" id="confidence">—</span><p class="detail-note" id="category-note">O tipo aparecerá após a leitura ou o preenchimento.</p></div>
+  <div class="result-tile yellow"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>Licenciamento • calendário 2026</div><div class="big deadline-date" id="deadline">—</div><div class="year" id="renewal-year">Calendário de 2026</div><span class="status neutral" id="status">Aguardando documento</span><p class="detail-note" id="deadline-kind"></p></div>
+  <div class="meta"><div class="meta-item"><small>Placa</small><b id="summary-placa">—</b></div><div class="meta-item"><small>UF</small><b id="summary-uf">—</b></div><div class="meta-item"><small>Exercício</small><b id="summary-exercicio">—</b></div></div>
+  <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário de 2026.</p>
+  <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
+</section>
+</div>
+<div class="footer-note">Calendários de 2026 para as 27 UFs, sem projeções para outros anos. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. Categorias como VUC, toco e truck são sugestões operacionais e podem exigir conferência técnica.</div>
+</main>
+<div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
+  <div class="scanner-box">
+    <div class="scanner-head"><div><h2 id="qr-modal-title">Ler QR Code</h2><p>Aponte a câmera para o QR do CRLV-e.</p></div><button class="button" type="button" id="qr-close" aria-label="Fechar leitor">✕</button></div>
+    <div id="qr-reader" class="scanner-screen">Preparando câmera...</div>
+    <div id="qr-feedback" class="scanner-feedback" role="status" aria-live="polite" hidden></div>
+    <div class="scanner-foot"><button class="button primary" id="qr-photo" type="button">📷 Fotografar CRLV completo</button><button class="button" id="qr-retry" type="button" hidden>↻ Tentar novamente</button></div>
+    <p class="scan-info">O QR Seguro VIO requer tecnologia autorizada do Serpro para decodificação. O scanner não confirma autenticidade.</p>
+  </div>
+</div>
+<script id="scanner52-worker-source" type="text/plain">
 'use strict';
 /* FrotaCheck Scanner 5.2 | executado no navegador em Web Worker.
    Nao recria texto, nao apaga dados e nao envia documentos. */
@@ -257,19 +430,1126 @@ self.onmessage=e=>{
   self.postMessage({id,ok:true,buffer:pixels.buffer,w:s.W,h:s.H,notes:notes.join(' ')},[pixels.buffer]);
  }catch(err){self.postMessage({id,ok:false,error:String(err?.message||err).slice(0,180)});}
 };
-
 </script>
 <script>
-(()=>{'use strict';const $=id=>document.getElementById(id);const input=$('file');let file=null,prepared=[],busy=false,worker=null,seq=0,pending=new Map();const pdfLib='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';let pdfReady=null;const pause=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));function status(t,k=''){$('status').className='msg '+k;$('status').textContent=t;}function progress(n){$('progress').classList.remove('hidden');$('bar').style.width=n+'%';}function canvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}function scale(w,h,max=1950){const s=Math.min(1,max/Math.max(w,h));return [Math.max(1,Math.round(w*s)),Math.max(1,Math.round(h*s))];}function resized(src,w,h){const c=canvas(w,h);const ctx=c.getContext('2d',{willReadFrequently:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(src,0,0,w,h);return c;}
-async function imgPages(f){let im;try{im=await createImageBitmap(f,{imageOrientation:'from-image'});}catch{im=await new Promise((ok,bad)=>{const u=URL.createObjectURL(f),a=new Image();a.onload=()=>{URL.revokeObjectURL(u);ok(a)};a.onerror=()=>{URL.revokeObjectURL(u);bad(Error('Imagem inválida'))};a.src=u;});}const [w,h]=scale(im.width||im.naturalWidth,im.height||im.naturalHeight,1950);const c=resized(im,w,h);im.close?.();return [c];}
-async function loadPdf(){if(pdfReady)return pdfReady;pdfReady=new Promise((ok,bad)=>{let done=false;const el=document.createElement('script');const t=setTimeout(()=>{if(!done){done=true;bad(Error('PDF.js não carregou. Teste com fotografia JPG/PNG.'));}},14000);el.src=pdfLib;el.onload=()=>{if(done)return;done=true;clearTimeout(t);window.pdfjsLib?ok(window.pdfjsLib):bad(Error('PDF.js indisponível'))};el.onerror=()=>{if(done)return;done=true;clearTimeout(t);bad(Error('Falha ao carregar PDF.js'))};document.head.appendChild(el)});return pdfReady;}
-async function pdfPages(f){const pdfjs=await loadPdf();pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const p=await pdfjs.getDocument({data:await f.arrayBuffer()}).promise;const n=Math.min(p.numPages,4),out=[];for(let i=1;i<=n;i++){status(`Abrindo PDF, página ${i}/${n}…`);await pause();const page=await p.getPage(i),vp0=page.getViewport({scale:1}),s=Math.min(1.9,1950/Math.max(vp0.width,vp0.height)),vp=page.getViewport({scale:s});const c=canvas(Math.ceil(vp.width),Math.ceil(vp.height));await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;out.push(c);page.cleanup();}await p.destroy();return out;}
-function initWorker(){if(worker)return;const blob=new Blob([$('worker-source').textContent],{type:'text/javascript'}),url=URL.createObjectURL(blob);worker=new Worker(url);URL.revokeObjectURL(url);worker.onmessage=e=>{const r=e.data,p=pending.get(r.id);if(!p)return;pending.delete(r.id);clearTimeout(p.t);r.ok?p.ok(r):p.bad(Error(r.error));};worker.onerror=()=>{for(const p of pending.values()){clearTimeout(p.t);p.bad(Error('Processamento interrompido'))}pending.clear();worker.terminate();worker=null;};}
-function run(c){return new Promise((ok,bad)=>{initWorker();const id=++seq,ctx=c.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,c.width,c.height).data;const t=setTimeout(()=>{if(pending.has(id)){pending.delete(id);worker?.terminate();worker=null;bad(Error('Tempo excedido; a imagem foi preservada.'));}},20000);pending.set(id,{ok,bad,t});worker.postMessage({id,buffer:data.buffer,w:c.width,h:c.height},[data.buffer]);});}
-function makeCanvas(d){const c=canvas(d.w,d.h);c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(d.buffer),d.w,d.h),0,0);return c;}function preview(el,c){el.replaceChildren(resized(c,c.width,c.height));}
-async function process(f){if(!f||busy)return;if(f.size>15*1024*1024){status('Arquivo acima de 15 MB.','bad');return;}file=f;busy=true;prepared=[];$('download').disabled=true;$('results').classList.add('hidden');try{progress(5);status('Abrindo arquivo…');await pause();const pages=f.type==='application/pdf'||/\.pdf$/i.test(f.name)?await pdfPages(f):await imgPages(f);progress(28);for(let i=0;i<pages.length;i++){status(`Processando página ${i+1} de ${pages.length}…`);await pause();let r;try{const d=await run(pages[i]);r={original:pages[i],processed:makeCanvas(d),notes:d.notes};}catch(err){r={original:pages[i],processed:resized(pages[i],pages[i].width,pages[i].height),notes:'Falha no tratamento; página original preservada: '+err.message,failed:true};}prepared.push(r);progress(28+Math.round((i+1)/pages.length*70));}preview($('before'),prepared[0].original);preview($('after'),prepared[0].processed);$('notes').textContent=prepared[0].notes+' O PDF deve ser conferido visualmente antes de ser utilizado.';$('results').classList.remove('hidden');const treated=prepared.filter(p=>!p.failed).length;$('download').disabled=treated===0;status(treated===0?'Não foi possível melhorar o documento. A cópia original foi preservada; tente outro arquivo.':treated===prepared.length?'PDF melhorado pronto para baixar. Confira o resultado antes de utilizar.':'PDF parcialmente melhorado. Algumas páginas foram preservadas sem alterações; confira o resultado.',treated===0?'bad':treated===prepared.length?'good':'');}catch(e){status('Falha na leitura: '+(e?.message||'arquivo inválido'),'bad');}finally{busy=false;$('progress').classList.add('hidden');}}
-input.addEventListener('change',()=>{if(input.files?.length)process(input.files[0]);});$('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}});$('drop').addEventListener('dragover',e=>e.preventDefault());$('drop').addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files?.length){process(e.dataTransfer.files[0])}});
-const enc=s=>new TextEncoder().encode(s);function makePDF(images){const parts=[],offsets=[0];let size=0;const push=b=>{parts.push(b);size+=b.length},str=s=>push(enc(s));const obj=(i,contents)=>{offsets[i]=size;str(`${i} 0 obj\n`);for(const v of contents)typeof v==='string'?str(v):push(v);str('\nendobj\n');};str('%PDF-1.4\n');const n=images.length;obj(1,['<< /Type /Catalog /Pages 2 0 R >>']);obj(2,[`<< /Type /Pages /Kids [${images.map((_,i)=>`${3+i*3} 0 R`).join(' ')}] /Count ${n} >>`]);for(let i=0;i<n;i++){const im=images[i],p=3+i*3,c=p+1,x=p+2;let w=595,h=842,dw=w-20,dh=dw*im.h/im.w;if(dh>h-20){dh=h-20;dw=dh*im.w/im.h;}obj(p,[`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${w} ${h}] /Resources << /XObject << /I0 ${x} 0 R >> >> /Contents ${c} 0 R >>`]);const cmd=`q\n${dw.toFixed(3)} 0 0 ${dh.toFixed(3)} ${((w-dw)/2).toFixed(3)} ${((h-dh)/2).toFixed(3)} cm\n/I0 Do\nQ`;obj(c,[`<< /Length ${enc(cmd).length} >>\nstream\n${cmd}\nendstream`]);obj(x,[`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.data.length} >>\nstream\n`,im.data,'\nendstream']);}const xref=size;str(`xref\n0 ${3+n*3}\n0000000000 65535 f \n`);for(let i=1;i<3+n*3;i++)str(`${String(offsets[i]).padStart(10,'0')} 00000 n \n`);str(`trailer\n<< /Size ${3+n*3} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);return new Blob(parts,{type:'application/pdf'});}
-$('download').onclick=async()=>{if(busy||!prepared.length)return;$('download').disabled=true;try{status('Gerando PDF…');const imgs=[];for(const p of prepared){const b=await new Promise((ok,bad)=>p.processed.toBlob(b=>b?ok(b):bad(Error('Falha ao gerar imagem')),'image/jpeg',.92));imgs.push({data:new Uint8Array(await b.arrayBuffer()),w:p.processed.width,h:p.processed.height});await pause();}const u=URL.createObjectURL(makePDF(imgs)),a=document.createElement('a');a.href=u;a.download=(file?.name||'documento').replace(/\.[^.]+$/,'')+'-copia-legivel.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(u),60000);status('PDF melhorado gerado. Verifique a legibilidade e se todas as informações permanecem presentes.','good');}catch(e){status('Erro ao exportar PDF: '+e.message,'bad');}finally{$('download').disabled=false;}};
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const names={placa:'Placa',uf:'UF de registro',exercicio:'Exercício do CRLV',especie:'Espécie/tipo',modelo:'Marca/modelo',pbt:'PBT',eixos:'Eixos'};
+  const fields=['placa','uf','exercicio','especie','modelo','pbt','eixos','comprimento','largura','override'];
+  const ufs=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+  for(const uf of ufs){const opt=document.createElement('option');opt.value=uf;opt.textContent=uf;$('uf').append(opt);}
+  const dates={
+    SP:{url:'https://poupatempo.sp.gov.br/carta/1DD2C9F8-815F-49D4-9D47-F09885256ECE',note:'Calendários diferentes para caminhão/caminhão-trator e demais veículos.',kind:'renovação / circulação'},
+    PR:{url:'https://www.detran.pr.gov.br/Noticia/Alerta-para-placas-com-final-8-9-e-0-calendario-do-licenciamento-de-2026-esta-perto-da',kind:'renovação'},
+    MG:{url:'https://www.agenciaminas.mg.gov.br/noticia/licenciamento-anual-de-veiculos-em-minas-gerais-tem-calendario-definido-para-2026',note:'Exigência do CRLV 2026 a partir do dia seguinte.',kind:'exigência do CRLV'},
+    RJ:{url:'https://detran.rj.gov.br/veiculo/calendarios/licenciamento.html',note:'Calendário prorrogado em maio de 2026.',kind:'renovação / circulação'},
+    RS:{url:'https://www.detran.rs.gov.br/veiculos/servicos/986',kind:'renovação / circulação'},
+    DF:{url:'https://www.sinj.df.gov.br/sinj/Norma/4753424a5f4842f99f687c68149ab057/detran_ins_291_2026.html',note:'Instrução n.º 291/2026, de 27/08.',kind:'renovação / fiscalização'},
+    ES:{url:'https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/2026/Calend%C3%A1rio%20de%20Licenciamento%202026.pdf',kind:'vencimento do licenciamento'},
+    GO:{url:'https://goias.gov.br/detran/prazo-para-pagamento-do-licenciamento-anual-2026-vence-nesta-quinta-feira/',kind:'pagamento de IPVA + taxa'},
+    MT:{url:'https://www.transparencia.mt.gov.br/en/web/detran/w/detran-mt-divulga-calend%C3%A1rio-de-pagamento-do-licenciamento-2026',kind:'pagamento / emissão'},
+    MS:{url:'https://legisgov.detran.ms.gov.br/normas/9445',note:'Finais 7 e 8 prorrogados a 18/09/2026 pela Portaria Detran-MS 215/2026.',kind:'vencimento do licenciamento'},
+    SC:{url:'https://www.sef.sc.gov.br/noticias/secretaria-de-estado-da-fazenda-divulga-calendario-do-ipva-para-2026',kind:'pagamento do licenciamento'},
+    SE:{url:'https://www.detran.se.gov.br/',kind:'licenciamento / IPVA'},
+    RO:{url:'https://rondonia.ro.gov.br/proprietarios-de-veiculos-com-placa-final-zero-devem-regularizar-o-licenciamento-ate-29-de-outubro/',note:'Para placa final 0, comunicado de 26/10/2026 informa prazo de 29/10, em vez dos 30/10 da tabela original. Confirmar atualizações.',kind:'pagamento do licenciamento'},
+    BA:{url:'https://www.ba.gov.br/comunicacao/noticias/2026-09/384020/ipva-2026-confira-o-calendario-do-mes-de-setembro',note:'Prazo de licenciamento alinhado à 5ª parcela/cota única do IPVA, conforme Detran-BA.',kind:'licenciamento / 5ª parcela IPVA'},
+    PB:{url:'https://detran.pb.gov.br/servi%C3%A7os/ve%C3%ADculos/calend%C3%A1rio-2026/',note:'Prazo divulgado para 3ª parcela/cota única com taxas de licenciamento.',kind:'licenciamento / pagamento'},
+    AC:{url:'https://www.legisweb.com.br/legislacao/?id=492501',note:'Portaria Detran/AC 230/2026. Há diferença na reprodução da data para finais 7 e 8; confira o DOE.',kind:'renovação',uncertainFinals:[7,8]},
+    AL:{url:'https://www.detran.al.gov.br/conteudo/calendario-de-licenciamento/',kind:'validade do CRLV anterior'},
+    AP:{url:'https://www.legisweb.com.br/legislacao/?id=492728',note:'Portaria SEFAZ/AP 3/2026 fixa prazo máximo de licenciamento em 30/09.',kind:'prazo máximo de licenciamento'},
+    AM:{url:'https://www.detran.am.gov.br/servicos/licenciamento-anual-crlv-e/',note:'Referência de encerramento do IPVA. O Detran-AM orienta consultar o licenciamento por placa e Renavam. Não equivale à validade do CRLV.',kind:'referência do pagamento de IPVA — confirmar CRLV',provisional:true},
+    CE:{url:'https://www.ce.gov.br/2026/02/23/detran-ce-divulga-calendario-de-licenciamento-2026-para-veiculos-automotores/',kind:'pagamento do licenciamento'},
+    MA:{url:'https://www.legisweb.com.br/legislacao/?id=487414',note:'Data exibida: dia anterior ao início de fiscalização previsto na Portaria GABIN 405/2025.',kind:'fim da validade do CRLV anterior'},
+    PA:{url:'https://www.detran.pa.gov.br/conteudo/298',note:'O Pará usa os DOIS últimos algarismos da placa, divididos em três grupos para cada final.',kind:'pagamento do licenciamento'},
+    PE:{url:'https://www.detran.pe.gov.br/duvidas-veiculos/documento-do-veiculo-crlv',note:'Validade do CRLV anterior segue o calendário por grupos da Portaria 8.417/2021.',kind:'validade do CRLV anterior'},
+    PI:{url:'https://www.gov.br/prf/pt-br/noticias/estaduais/piaui/prf-alerta-para-encerramento-do-prazo-de-licenciamento-de-veiculos-no-piaui-nesta-terca-feira-31',kind:'fim da validade do CRLV anterior'},
+    RN:{url:'https://portal.detran.rn.gov.br/servicos/veiculo/licenciamento',note:'O Detran-RN informa a validade do CRLV anterior por MÊS, sem dia exato. O site exibe o último dia do mês como referência.',kind:'validade do CRLV anterior (mês informado)',provisional:true},
+    RR:{url:'https://www.sefaz.rr.gov.br/downloads?catid=1063&id=26354&m=0&task=download.send',note:'Portaria conjunta divulgada pela Sefaz/RR. Confirmar possíveis prorrogações.',kind:'prazo de pagamento do licenciamento'},
+    TO:{url:'https://www.legisweb.com.br/legislacao/?id=490496',note:'Portaria GAB/PRES 26/2026.',kind:'prazo de pagamento do licenciamento'}
+  };
+  const table={
+    PR:{1:'08-14',2:'08-28',3:'09-09',4:'09-18',5:'09-28',6:'10-09',7:'10-20',8:'10-30',9:'11-13',0:'11-27'},
+    ES:{1:'09-09',2:'09-09',3:'09-10',4:'09-10',5:'09-11',6:'09-11',7:'09-14',8:'09-14',9:'09-15',0:'09-15'},
+    GO:{1:'09-15',2:'09-15',3:'10-15',4:'10-15',5:'10-15',6:'10-15',7:'10-15',8:'10-15',9:'10-15',0:'10-15'},
+    MS:{1:'07-29',2:'07-29',3:'07-29',4:'07-31',5:'07-31',6:'07-31',7:'09-18',8:'09-18',9:'09-30',0:'10-30'},
+    SC:{1:'03-31',2:'04-30',3:'05-31',4:'06-30',5:'07-31',6:'08-31',7:'09-30',8:'10-31',9:'11-30',0:'12-30'},
+    SE:{1:'04-30',2:'04-30',3:'05-29',4:'05-29',5:'06-30',6:'07-31',7:'08-31',8:'09-30',9:'10-30',0:'11-30'},
+    RO:{1:'03-31',2:'03-31',3:'03-31',4:'04-30',5:'05-29',6:'06-30',7:'07-31',8:'08-31',9:'09-30',0:'10-29'},
+    BA:{1:'07-30',2:'07-31',3:'08-28',4:'08-31',5:'09-29',6:'09-30',7:'10-29',8:'10-30',9:'11-27',0:'11-30'},
+    PB:{1:'03-31',2:'04-30',3:'05-29',4:'06-30',5:'07-31',6:'08-31',7:'09-30',8:'10-30',9:'11-30',0:'12-30'},
+    AC:{1:'05-29',2:'05-29',3:'06-30',4:'06-30',5:'07-31',6:'07-31',7:'08-31',8:'08-31',9:'09-30',0:'10-30'},
+    AL:{1:'08-31',2:'08-31',3:'09-30',4:'09-30',5:'10-31',6:'10-31',7:'11-30',8:'11-30',9:'12-31',0:'12-31'},
+    CE:{1:'03-10',2:'04-10',3:'05-11',4:'06-10',5:'07-10',6:'08-10',7:'09-10',8:'10-12',9:'11-10',0:'12-10'},
+    MA:{1:'06-03',2:'06-03',3:'06-07',4:'06-07',5:'06-14',6:'06-14',7:'06-21',8:'06-21',9:'06-28',0:'06-28'},
+    PE:{1:'09-30',2:'09-30',3:'10-31',4:'10-31',5:'10-31',6:'11-30',7:'11-30',8:'11-30',9:'12-31',0:'12-31'},
+    RN:{1:'09-30',2:'09-30',3:'10-31',4:'10-31',5:'10-31',6:'11-30',7:'11-30',8:'11-30',9:'12-31',0:'12-31'},
+    AM:{1:'03-31',2:'04-30',3:'05-29',4:'06-30',5:'07-31',6:'08-31',7:'09-30',8:'10-30',9:'11-30',0:'12-29'},
+    TO:{1:'09-30',2:'09-30',3:'10-30',4:'10-30',5:'10-30',6:'10-30',7:'10-30',8:'10-30',9:'10-30',0:'10-30'}
+  };
+  const today=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate(),12,0,0);};
+  const date=(m,d)=>new Date(2026,m-1,d,12,0,0);
+  const monthEnd=m=>new Date(2026,m,0,12,0,0);
+  const norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[\u00A0\t ]+/g,' ').trim();
+  const num=s=>{let n=Number(String(s??'').replace(/\s/g,'').replace(',','.'));return n>0&&Number.isFinite(n)?n:null;};
+  const plateFmt=s=>norm(s).replace(/[^A-Z0-9]/g,'');
+  const validPlate=s=>/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(plateFmt(s));
+  const plateFinal=s=>validPlate(s)?Number(plateFmt(s).slice(-1)):null;
+  const fmt=d=>d.toLocaleDateString('pt-BR');
+  let lastFile=null,rawText='',extraction={}, conflicts=[],extractionMode='manual',pending=false;
+  let enhancementBusy=false,previewToken=0;
+  let documentLooksRight=false;
+  let opencvReadyPromise=null,ocrWorkerPromise=null,lastEnhancementEngine="Ajuste local";
+  let scanOriginal=null,autoCorners=null,manualCorners=null,cropDrag=-1,cropQuality='';
+  const clip01=n=>Math.min(.995,Math.max(.005,n));
+  const defaultScanCorners=()=>[{x:.055,y:.055},{x:.945,y:.055},{x:.945,y:.945},{x:.055,y:.945}];
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+
+  // Para o Pará, a dezena e a unidade finais determinam o vencimento.
+  // Cada linha cobre finais 01..91, 02..92 etc., em três grupos: 0-3 / 4-6 / 7-9.
+  const paCalendar={
+    1:['03-06','03-13','03-20'], 2:['03-27','04-10','04-17'],
+    3:['04-24','05-08','05-15'], 4:['05-22','05-29','06-12'],
+    5:['06-19','06-26','07-03'], 6:['07-10','07-17','08-07'],
+    7:['08-14','08-21','08-28'], 8:['09-04','09-11','09-18'],
+    9:['09-25','10-02','10-16'], 0:['10-23','11-06','11-13']
+  };
+  function calendar(uf,final,year,type,placa){
+    if(year!==2026||final===null||!dates[uf])return null;
+    let d=null;
+    if(uf==='SP'){
+      const n=norm(type);const truck=/\bCAMINHAO(?:\s*-\s*TRATOR)?\b/.test(n);
+      if(!n||!/(CAMINHAO|CAMINHONETE|AUTOMOVEL|CAMIONETA|ONIBUS|MICROONIBUS|SEMI.REBOQUE|REBOQUE|UTILITARIO|MOTOCICLETA|TRATOR|MOTONETA)/.test(n))return {incomplete:'Em SP, informe a espécie/tipo: caminhões têm prazos diferentes.'};
+      const m=truck?([1,2].includes(final)?9:[3,4,5].includes(final)?10:[6,7,8].includes(final)?11:12):([1,2].includes(final)?7:[3,4].includes(final)?8:[5,6].includes(final)?9:[7,8].includes(final)?10:final===9?11:12);
+      d=monthEnd(m);
+    } else if(uf==='PA'){
+      if(!validPlate(placa))return {incomplete:'No Pará, informe a placa completa para considerar os dois últimos dígitos.'};
+      const suffix=plateFmt(placa).slice(-2);
+      const group=Math.floor(Number(suffix[0]) / 4)===0 ? 0 : Number(suffix[0])<=6?1:2;
+      const [m,day]=paCalendar[final][group].split('-').map(Number);
+      d=date(m,day);
+    } else if(uf==='MG')d=monthEnd([1,2,3].includes(final)?8:[4,5,6].includes(final)?9:10);
+    else if(uf==='RJ')d=monthEnd([0,1,2].includes(final)?7:[3,4,5].includes(final)?8:9);
+    else if(uf==='RS')d=date(7,31);
+    else if(uf==='DF')d=monthEnd([1,2].includes(final)?9:[3,4,5].includes(final)?10:[6,7,8].includes(final)?11:12);
+    else if(uf==='MT')d=monthEnd([1,2,3].includes(final)?3:final===0?10:final);
+    else if(uf==='PI'||uf==='RR')d=date(3,31);
+    else if(uf==='AP')d=date(9,30);
+    else if(table[uf]){const [m,day]=table[uf][final].split('-').map(Number);d=date(m,day);}
+    return d?{date:d,...dates[uf],uncertain:!!dates[uf].provisional||(uf==='AC'&&[7,8].includes(final))}:null;
+  }
+  function classify(v){
+    const type=norm(v.especie).replace(/\s*[-/]\s*/g,' ');
+    const model=norm(v.modelo),e=num(v.eixos),pbt=num(v.pbt);
+    const length=num(v.comprimento),width=num(v.largura);
+    if(v.override)return {name:v.override,confidence:'Confirmado pelo analista',note:'Tipo operacional informado manualmente; confira os critérios internos.'};
+    // Reboques e cavalos possuem documentos distintos. Nao inferir eixos do conjunto.
+    if(/\bSEMI\s*REBOQUE\b/.test(type))return {name:'Carreta',confidence:'Semirreboque identificado',note:'CRLV de semirreboque; a composicao completa depende do cavalo mecanico.'};
+    if(/CAMINHAO\s*TRATOR|CAVALO\s*MECANICO/.test(type+' '+model))return {name:'Carreta',confidence:'Cavalo mecânico identificado',note:'CRLV de caminhão-trator; confirmar o semirreboque acoplado.'};
+    if(/\bREBOQUE\b/.test(type))return {name:'Outro / a confirmar',confidence:'Documento de reboque',note:'Reboque isolado não define o tipo da composição.'};
+    const truck=/\bCAMINHAO\b/.test(type);
+    const vanPattern=/SPRINTER|DUCATO|MASTER|TRANSIT|BOXER|JUMPER|\bVAN\b|\bKOMBI\b|\bVITO\b|EXPERT|JUMPY|SCUDO|DAILY\s*MINIBUS/;
+    if(!truck&&vanPattern.test(model+' '+type))return {name:'Van',confidence:'Modelo identificado',note:'Classificação operacional por modelo; confirme a versão e se é de carga ou passageiros.'};
+    if(!truck&&/\b(MICRO\s*ONIBUS|ONIBUS)\b/.test(type))return {name:'Outro / a confirmar',confidence:'Tipo diferente de van',note:'O CRLV indica ônibus/micro-ônibus. Confirme se a classificação interna permite van.'};
+    if(!truck&&/\bAUTOMOVEL\b/.test(type))return {name:'Passeio',confidence:'Espécie/tipo do CRLV',note:'Automóvel reconhecido pelo tipo documental.'};
+    if(!truck&&/\bCAMIONETA\b/.test(type))return {name:'Passeio',confidence:'Categoria sugerida',note:'Camioneta pode ter uso comercial; confirme finalidade se necessário.'};
+    if(truck){
+      if(e&&e>=3)return {name:'Truck',confidence:e===3?'3 eixos identificados':'3 ou mais eixos',note:e===3?'Caminhão de três eixos.':'Caminhão de '+e+' eixos: confirmar configuração especial (ex.: bitruck).'};
+      if(e===2){
+        if(length&&width&&length<=7.2&&width<=2.5)return {name:'VUC',confidence:'Compatível por dimensões',note:'2 eixos; '+length.toLocaleString('pt-BR')+' m de comprimento e '+width.toLocaleString('pt-BR')+' m de largura. Regras de VUC dependem da cidade e podem exigir autorização.'};
+        if(pbt>=12)return {name:'Toco',confidence:'Triagem: 2 eixos / PBT',note:'Caminhão de dois eixos, PBT '+pbt.toLocaleString('pt-BR')+' t. Critério operacional, não classificação legal universal.'};
+        if(pbt>=3.5)return {name:'Médio',confidence:'Triagem: 2 eixos / PBT',note:'Caminhão de dois eixos, PBT '+pbt.toLocaleString('pt-BR')+' t. Sem dimensões, VUC não pode ser descartado.'};
+        if(pbt)return {name:'A confirmar',confidence:'Dimensões necessárias',note:'Caminhão de dois eixos e PBT '+pbt.toLocaleString('pt-BR')+' t. Sem dimensões, não é possível confirmar VUC.'};
+        return {name:'A confirmar',confidence:'PBT necessário',note:'Caminhão de 2 eixos: informe PBT e dimensões para distinguir médio, toco ou VUC.'};
+      }
+      return {name:'A confirmar',confidence:'Número de eixos não confirmado',note:'O CRLV indica caminhão; informe eixos e PBT para separar médio, toco e truck.'};
+    }
+    if(/CAMINHONETE|FURGAO|UTILITARIO/.test(type))return {name:'Outro / a confirmar',confidence:'Tipo comercial a conferir',note:'Confira carroceria, modelo e dimensões; não classificar automaticamente como passeio ou VUC.'};
+    return {name:'Aguardando dados',confidence:'Dados insuficientes',note:'Preencha espécie/tipo e, para caminhões, PBT e eixos.'};
+  }
+  function notice(t,kind=''){const n=$('file-notice');n.textContent=t;n.className='notice '+kind;}
+  function renderExtraction(){
+    const box=$('extract-audit');box.replaceChildren();
+    const head=document.createElement('div');head.className='extract-head';head.textContent=rawText?'Revisão do leitor · '+extractionMode:'Ainda não há documento lido.';box.append(head);
+    if(!rawText)return;
+    for(const [key,label] of Object.entries(names)){
+      const obj=extraction[key];const item=document.createElement('div');item.className='extract-item';
+      const t=document.createElement('span');t.textContent=label;const b=document.createElement('b');
+      if(obj){b.textContent=obj.value+' · '+obj.origin; b.className=obj.score>=3?'good':obj.score===2?'maybe':'low';}
+      else if($(key)?.value?.trim()){b.textContent='Revisado pelo analista';b.className='maybe';}
+      else {b.textContent='Não identificado';b.className='low';}
+      item.append(t,b);box.append(item);
+    }
+    if(conflicts.length){const p=document.createElement('p');p.className='audit-alert';p.textContent='⚠️ Leituras divergentes: '+conflicts.join('; ')+'. Confirme manualmente.';box.append(p);}
+  }
+  function showSource(uf,cal){
+    const a=$('source-link');
+    if(!dates[uf] || !cal?.date){a.hidden=true;a.removeAttribute('href');return;}
+    a.href=cal.url||dates[uf].url;
+    a.textContent='Ver referência do calendário de '+uf+' ↗';
+    a.hidden=false;
+  }
+  // Calendário fixo de 2026. O exercício do CRLV é usado apenas para
+  // interpretar a situação, sem inventar renovação/vencimento de anos futuros.
+  function analyze(){
+    const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));
+    const final=plateFinal(v.placa),exc=Number(v.exercicio),validYear=/^20\d{2}$/.test(v.exercicio);
+    const cat=classify(v);
+    $('category').textContent=cat.name;
+    $('category-note').textContent=cat.note;
+    $('confidence').textContent=cat.confidence;
+    $('summary-placa').textContent=plateFmt(v.placa)||'—';
+    $('summary-uf').textContent=v.uf||'—';
+    $('summary-exercicio').textContent=v.exercicio||'—';
+    $('deadline').textContent='—';
+    $('deadline').className='big deadline-date';
+    $('renewal-year').textContent='Tabela estadual de licenciamento 2026';
+    let title='Aguardando dados',msg='Informe placa e UF para consultar o calendário de 2026.';
+    let css='neutral',dl=null;
+    if(final===null){title='Informe a placa';msg='É preciso informar uma placa válida para identificar o seu final.';}
+    else if(!v.uf){title='Informe a UF';msg='É necessário informar o estado de registro do veículo.';}
+    else if(!dates[v.uf]){title='UF não mapeada';msg='A tabela de 2026 deste estado precisa de confirmação no Detran.';}
+    else{
+      dl=calendar(v.uf,final,2026,v.especie,v.placa);
+      if(dl?.incomplete){title='Confirme o tipo';msg=dl.incomplete;}
+      else if(dl?.date){
+        $('deadline').textContent=fmt(dl.date);
+        const delta=Math.round((dl.date-today())/86400000);
+        if(dl.uncertain){
+          title='Data de referência';css='neutral';
+          msg='Este estado exige confirmação adicional. A data exibida não comprova vencimento nem regularidade.';
+        }else if(!validYear){
+          title='Prazo de 2026';css='neutral';
+          msg='Confira o exercício do CRLV para interpretar o prazo: a data é da tabela de 2026.';
+        }else if(exc===2026){
+          title='CRLV exercício 2026';css='ok';$('deadline').classList.add('on-time');
+          msg='O CRLV apresentado já é do exercício de 2026. A data exibida é o prazo do calendário 2026, NÃO o vencimento deste documento. A situação oficial deve ser consultada no Detran.';
+        }else if(exc===2025){
+          if(delta<0){title='Prazo 2026 encerrado';css='bad';$('deadline').classList.add('overdue');msg='O documento está no exercício 2025 e o prazo de licenciamento 2026 já passou. Verifique se foi emitido um CRLV 2026 atualizado.';}
+          else if(delta<=30){title=delta===0?'Prazo termina hoje':'Prazo próximo';css='warn';$('deadline').classList.add('on-time');msg=delta===0?'O prazo do calendário 2026 termina hoje.':'Faltam '+delta+' dias para o prazo da tabela 2026.';}
+          else{title='Dentro do prazo 2026';css='ok';$('deadline').classList.add('on-time');msg='O prazo de licenciamento 2026 ainda não terminou no calendário consultado.';}
+        }else if(exc<2025){
+          title='Exercício antigo — verificar';css='bad';
+          msg='O CRLV apresentado é anterior a 2025. A tabela de 2026, isoladamente, não comprova a situação; consulte o Detran.';
+        }else{
+          title='Exercício fora da tabela';css='neutral';
+          msg='Este site apresenta apenas os prazos de 2026. Confirme a data e o exercício do documento.';
+        }
+        if(dl.note)msg+=' '+dl.note;
+        if(['GO','SC','BA','PB','MT','MS','ES','SE','RO','CE','PA','RR','TO','AM'].includes(v.uf))msg+=' Atenção: o prazo pode se referir a pagamento, distinto da data de exigência para circulação.';
+      }else {title='Prazo não encontrado';msg='Não foi possível calcular a data de 2026 com os dados informados.';}
+    }
+    $('status').textContent=title;
+    $('status').className='status '+css;
+    $('status-explanation').textContent=msg;
+    $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
+    showSource(v.uf,dl);
+    return {version:'5.3',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+  }
+  const aliases={
+    placa:[/^PLACA(?: ATUAL)?$/],
+    exercicio:[/^EXERCICIO$/],
+    uf:[/^UF$/, /^UF DE REGISTRO$/],
+    especie:[/^ESPECIE\s*\/\s*TIPO$/],
+    modelo:[/^MARCA\s*\/\s*MODELO(?:\s*\/\s*VERSAO)?$/],
+    pbt:[/^PESO BRUTO TOTAL$/, /^PBT$/],
+    eixos:[/^EIXOS$/, /^NUMERO DE EIXOS$/]
+  };
+  const isLabel=t=>Object.values(aliases).flat().some(re=>re.test(norm(t).replace(/\s*:\s*$/,'')));
+  const species=/(?:CARGA|PASSAGEIRO|PASSAGEIROS|MISTO|ESPECIAL|TRACAO)\s+(?:CAMINHAO(?:\s*-\s*TRATOR)?|AUTOMOVEL|CAMINHONETE|CAMIONETA|FURGAO|MICRO\s*-?\s*ONIBUS|ONIBUS|UTILITARIO|SEMI\s*-?\s*REBOQUE|REBOQUE|MOTOCICLETA)/;
+  function repairPlate(s){const parts=norm(s).replace(/[^A-Z0-9]/g,'').slice(0,7).split('');if(parts.length!==7)return null;
+    // Substituições restritas ao formato conhecido, apenas em leitura contextualizada.
+    for(let i of [0,1,2]){if(parts[i]==='0')parts[i]='O';if(parts[i]==='1')parts[i]='I';if(parts[i]==='5')parts[i]='S';}
+    for(let i of [3,5,6]){if(parts[i]==='O'||parts[i]==='Q')parts[i]='0';if(parts[i]==='I'||parts[i]==='L')parts[i]='1';if(parts[i]==='S')parts[i]='5';if(parts[i]==='B')parts[i]='8';}
+    const v=parts.join('');return validPlate(v)?v:null;
+  }
+  function parseValue(key,value,contextual=false){let s=norm(value).replace(/^[:#-]\s*/,'').trim();if(!s)return null;
+    if(key==='placa'){const m=s.match(/[A-Z0-9]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2}/);const v=m&&(contextual?repairPlate(m[0]):validPlate(m[0])?m[0]:null);return v||null;}
+    if(key==='exercicio'){const m=s.match(/\b20\d{2}\b/);return m?m[0]:null;}
+    if(key==='uf'){const m=s.match(/\b(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);return m?m[0]:null;}
+    if(key==='especie'){const m=s.match(species);return m?m[0].replace(/\s+/g,' '):null;}
+    if(key==='modelo') {const cropped=s.split(/\b(?:CHASSI|COR PREDOMINANTE|COMBUSTIVEL|PLACA|ESPECIE|CATEGORIA|EXERCICIO)\b/)[0].trim();return cropped.length>=4&&cropped.length<=85&&!isLabel(cropped)?cropped:null;}
+    if(key==='pbt'){const m=s.match(/\b\d{1,6}(?:[.,]\d{1,3})?\b/);if(!m)return null;let n=num(m[0]);if(n&&n>200&&n<=100000)n/=1000;return n&&n<=200?String(n).replace('.',','):null;}
+    if(key==='eixos'){const m=s.match(/\b\d{1,2}\b/);return m&&Number(m[0])>0&&Number(m[0])<=12?String(Number(m[0])):null;}
+    return null;
+  }
+  function register(map,key,value,score,origin){if(!value)return;
+    const existing=map[key];if(!existing||score>existing.score)map[key]={value,score,origin};
+    else if(existing.value!==value){conflicts.push(`${names[key]}: ${existing.value} × ${value}`);}
+  }
+  function makeRows(items){
+    const rows=[];
+    for(const it of items||[]){if(!it.str?.trim()||!it.transform)continue;const y=it.transform[5];let row=rows.find(r=>Math.abs(r.y-y)<=3);if(!row){row={y,parts:[]};rows.push(row);}row.parts.push({x:it.transform[4],y,text:it.str.trim()});}
+    rows.sort((a,b)=>b.y-a.y);rows.forEach(r=>r.parts.sort((a,b)=>a.x-b.x));return rows;
+  }
+  function parseCoordinates(rows,map){
+    for(let index=0;index<rows.length;index++){
+      const row=rows[index];for(let col=0;col<row.parts.length;col++){
+        const cell=row.parts[col];const s=norm(cell.text).replace(/\s*:\s*$/,'');
+        for(const [key,patterns] of Object.entries(aliases)){
+          const accepted=patterns.some(p=>p.test(s));if(!accepted)continue;
+          const inline=cell.text.match(/:\s*(.+)$/)?.[1];if(inline)register(map,key,parseValue(key,inline,true),3,'Rótulo e valor');
+          // Em PDFs com várias colunas, associa o valor abaixo ao X do cabeçalho.
+          for(let j=index+1;j<Math.min(index+4,rows.length);j++){
+            const down=rows[j];if(Math.abs(down.y-row.y)>65)break;
+            const near=down.parts.filter(i=>Math.abs(i.x-cell.x)<35&&!isLabel(i.text)).sort((a,b)=>Math.abs(a.x-cell.x)-Math.abs(b.x-cell.x));
+            let found=false;
+            for(const p of near){const val=parseValue(key,p.text,true);if(val){register(map,key,val,3,'Posição no PDF');found=true;break;}}
+            if(found)break;
+          }
+        }
+      }
+    }
+  }
+  function parseText(raw,map,score=2,origin='Texto contextual'){
+    const txt=norm(raw);const lines=raw.split(/\r?\n/).map(norm).filter(Boolean);
+    // Rótulos na linha de cima e valores na linha de baixo (CRLV-e tabular, PDF ou OCR).
+    for(let i=0;i<lines.length;i++){
+      const line=lines[i];
+      for(const [key,patterns] of Object.entries(aliases)){
+        if(patterns.some(p=>p.test(line.replace(/\s*:\s*$/,'')))){
+          if(i+1<lines.length)register(map,key,parseValue(key,lines[i+1],true),score,origin);
+        }
+      }
+      let m=line.match(/^(?:PLACA(?: ATUAL)?\s*[:\-]?\s+)([A-Z0-9]{7})\b/);if(m)register(map,'placa',parseValue('placa',m[1],true),score,origin);
+      m=line.match(/^EXERCICIO\s*[:\-]?\s+(20\d{2})\b/);if(m)register(map,'exercicio',parseValue('exercicio',m[1],true),score,origin);
+      m=line.match(/^PESO BRUTO TOTAL\s*[:\-]?\s+(\d+[.,]?\d*)/);if(m)register(map,'pbt',parseValue('pbt',m[1],true),score,origin);
+      m=line.match(/^EIXOS\s*[:\-]?\s+(\d{1,2})\b/);if(m)register(map,'eixos',parseValue('eixos',m[1],true),score,origin);
+      m=line.match(/^(?:ESPECIE\s*\/\s*TIPO)\s*[:\-]?\s+(.+)$/);if(m)register(map,'especie',parseValue('especie',m[1],true),score,origin);
+      m=line.match(/^(?:MARCA\s*\/\s*MODELO(?:\s*\/\s*VERSAO)?)\s*[:\-]?\s+(.+)$/);if(m)register(map,'modelo',parseValue('modelo',m[1],true),score,origin);
+      // Exemplo: CODIGO RENAVAM   PLACA   EXERCICIO, depois 123... ABC1D23 2025.
+      if(/\bPLACA\b/.test(line)&&/\bEXERCICIO\b/.test(line)&&i+1<lines.length){
+        const next=lines[i+1],paired=next.match(/\b[A-Z0-9]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2}\b\s+(20\d{2})\b/);
+        if(paired){register(map,'placa',parseValue('placa',paired[0],true),score,origin);register(map,'exercicio',paired[1],score,origin);}
+      }
+    }
+    const detran=txt.match(/\bDETRAN\s*[-/]\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
+    if(detran)register(map,'uf',detran[1],score,'Órgão emissor');
+    const loc=txt.match(/\bUF DE REGISTRO\s*[:\-]?\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
+    if(loc)register(map,'uf',loc[1],score,'UF registrada');
+    // Busca isolada de placa somente se não existe âncora mais confiável.
+    if(!map.placa){const candidates=txt.match(/\b[A-Z]{3}[0-9][A-Z0-9][0-9]{2}\b/g);if(candidates?.length===1)register(map,'placa',candidates[0],1,'Busca livre (revisar)');}
+    if(!map.especie){const m=txt.match(species);if(m)register(map,'especie',m[0],1,'Busca livre (revisar)');}
+  }
+  // A identificação OCR usa evidências independentes em vez de exigir que três
+  // palavras sejam transcritas perfeitamente. Isso reduz falsos negativos em fotos.
+  // Não equivale à autenticação do documento na Senatran/Detran.
+  function documentEvidence(text,map={}){
+    const n=norm(text).replace(/[|_]/g,' ').replace(/\s+/g,' ');
+    const title=/(?:\bCRLV\s*[-E]?\b|CERTIFICADO\s+DE\s+REGISTRO\s+E\s+LICENCIAMENTO|REGISTRO\s+E\s+LICENCIAMENTO\s+DE\s+VEICULO)/.test(n);
+    const markers=[
+      /\bRENAVAM\b/,/\bSENATRAN\b/,/\bDETRAN\b/,
+      /\bCHASSI\b/,/\bESPECIE\s*[\/\-]?\s*TIPO\b/,
+      /\bMARCA\s*[\/\-]?\s*MODELO\b/,/\bPESO\s+BRUTO\s+TOTAL\b/,
+      /\bPLACA\b/,/\bEXERC[I1L]C[I1L]O\b/,
+      /\bNUMERO\s+DO\s+CRV\b/,/\bCODIGO\s+DE\s+SEGURANCA\b/
+    ].filter(re=>re.test(n)).length;
+    const core=['placa','exercicio','uf'].filter(k=>map[k]?.value).length;
+    const other=['especie','modelo','pbt','eixos'].filter(k=>map[k]?.value).length;
+    const vehicle=!!(map.placa?.value&&map.exercicio?.value);
+    // O título parcialmente reconhecido + campos, ou várias âncoras técnicas
+    // + dados coerentes, constituem indício forte do formato CRLV.
+    const identified=(title&&(core>=1||markers>=3)) ||
+      (vehicle&&core>=3&&other>=1&&markers>=4) ||
+      (vehicle&&other>=2&&markers>=5);
+    const probable=!identified&&(title||
+      (vehicle&&(markers>=2||other>=1))||
+      (core>=2&&markers>=3));
+    return {level:identified?'identified':probable?'probable':'unconfirmed',title,markers,core,other};
+  }
+  function docCheck(t,map={}){return documentEvidence(t,map).level==='identified';}
+  function scoreMap(m){return ['placa','exercicio','uf','especie','modelo','pbt','eixos'].reduce((acc,k)=>acc+(m[k]?.score||0),0);}
+  function setExtracted(map,mode,text,identified=null){
+    fields.filter(k=>k!=='override').forEach(k=>$(k).value='');$('override').value='';
+    for(const [key,val] of Object.entries(map)){if($(key))$(key).value=val.value;}
+    extraction=map;extractionMode=mode;rawText=text;$('rawtext').textContent=text||'Não foi possível detectar texto.';
+    const evidence=documentEvidence(text,map);
+    if(identified===true)evidence.level='identified';
+    // Dados de um QR legível não comprovam autenticidade; manter alerta separado.
+    documentLooksRight=evidence.level==='identified';renderExtraction();analyze();
+    const found=Object.keys(map).filter(k=>names[k]);
+    const essentials=['placa','exercicio','uf'].filter(k=>!map[k]?.value);
+    if(essentials.length||!map.especie||evidence.level!=='identified')$('edit-fields').open=true;
+    if(evidence.level==='identified'&&!essentials.length){
+      notice('CRLV reconhecido. Tipo e prazo calculados com os dados lidos. Confira as informações antes do uso.','success');
+    }else if(evidence.level==='identified'){
+      notice('CRLV reconhecido, mas faltam dados: '+essentials.map(k=>names[k]).join(', ')+'. Confira ou corrija em “Conferir ou corrigir dados”.','warning');
+    }else if(evidence.level==='probable'){
+      notice('Foram encontrados dados compatíveis com CRLV, mas a imagem não permitiu confirmar todos os campos. Confira os dados ou toque em “Tentar outra leitura”.','warning');
+    }else if(found.length){
+      notice('Alguns campos foram identificados, mas o documento ainda não pôde ser reconhecido com segurança. Confira os dados ou tente outra leitura.','warning');
+    }else{
+      notice('Não foi possível ler informações suficientes. Tente uma foto mais nítida, use “Tentar outra leitura” ou preencha os campos manualmente.','warning');
+    }
+  }
+  const loadScript=url=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=url;s.onload=res;s.onerror=()=>rej(Error('Não foi possível carregar a biblioteca pela internet.'));document.head.append(s);});
+  let pdfLibLoading=null;
+  async function pdfLib(){
+    if(!window.pdfjsLib){
+      if(!pdfLibLoading)pdfLibLoading=loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js').finally(()=>{pdfLibLoading=null;});
+      await pdfLibLoading;
+    }
+    if(!window.pdfjsLib)throw Error('PDF.js indisponível.');
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    return window.pdfjsLib;
+  }
+  // Reutiliza um único worker Tesseract: evita carregar o idioma para cada CRLV.
+  async function ocr(input){
+    if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+    if(!window.Tesseract)throw Error('Motor OCR indisponível. Conecte-se à internet e recarregue.');
+    if(!ocrWorkerPromise){
+      ocrWorkerPromise=window.Tesseract.createWorker('por',1,{
+        logger:p=>{if(p.status==='recognizing text')notice('Reconhecendo caracteres... '+Math.round(p.progress*100)+'%');}
+      }).catch(err=>{ocrWorkerPromise=null;throw err;});
+    }
+    const worker=await ocrWorkerPromise;
+    const r=await worker.recognize(input);
+    return r?.data?.text||'';
+  }
+  // OpenCV é carregado apenas quando necessário. Se falhar, a melhoria local continua.
+  async function opencvLib(){
+    if(opencvReadyPromise)return opencvReadyPromise;
+    opencvReadyPromise=(async()=>{
+      if(!window.cv)await loadScript('https://docs.opencv.org/4.10.0/opencv.js');
+      let lib=window.cv;
+      if(lib&&typeof lib.then==='function')lib=await lib;
+      if(lib?.Mat&&typeof lib.imread==='function')return lib;
+      const start=Date.now();
+      while(Date.now()-start<14000){
+        await new Promise(resolve=>setTimeout(resolve,200));
+        lib=window.cv;
+        if(lib&&typeof lib.then==='function')lib=await lib;
+        if(lib?.Mat&&typeof lib.imread==='function')return lib;
+      }
+      throw Error('OpenCV.js não ficou disponível a tempo.');
+    })(); // A falha fica em cache nesta sessão para não tentar baixar repetidamente.
+    return opencvReadyPromise;
+  }
+  // Encontra um quadrilátero grande na fotografia. Não recorta quando a confiança é baixa.
+  // Reserva sem biblioteca: somente detecta folha clara sobre fundo distinto.
+  // Se não houver contraste suficiente, prefere não cortar nada.
+  function detectDocumentCornersLocal(source){
+    const w=source.width,h=source.height;
+    const ctx=source.getContext('2d',{willReadFrequently:true}),data=ctx.getImageData(0,0,w,h).data;
+    const light=(u,v)=>{const i=(Math.max(0,Math.min(h-1,Math.round(v*(h-1))))*w+Math.max(0,Math.min(w-1,Math.round(u*(w-1)))))*4;
+      return .299*data[i]+.587*data[i+1]+.114*data[i+2];};
+    const bg=[light(.02,.02),light(.98,.02),light(.98,.98),light(.02,.98)];
+    const range=Math.max(...bg)-Math.min(...bg);
+    if(range>28)return null;
+    const meanBg=bg.reduce((a,b)=>a+b,0)/4;
+    const center=[light(.36,.36),light(.64,.36),light(.5,.5),light(.36,.64),light(.64,.64)].sort((a,b)=>a-b)[2];
+    const dir=Math.sign(center-meanBg);
+    if(Math.abs(center-meanBg)<27)return null;
+    const points=[];
+    for(let y=0;y<100;y++)for(let x=0;x<100;x++){
+      const u=(x+.5)/100,v=(y+.5)/100;
+      const lum=light(u,v);
+      if((lum-meanBg)*dir>24)points.push({x:u,y:v});
+    }
+    if(points.length<3200||points.length>9800)return null;
+    const limits=[points.reduce((a,b)=>a.x+a.y<b.x+b.y?a:b),points.reduce((a,b)=>a.x-a.y>b.x-b.y?a:b),points.reduce((a,b)=>a.x+a.y>b.x+b.y?a:b),points.reduce((a,b)=>a.y-a.x>b.y-b.x?a:b)];
+    const q=orderScanCorners(limits);
+    const area=Math.abs(q.reduce((sum,p,i)=>sum+p.x*q[(i+1)%4].y-q[(i+1)%4].x*p.y,0)/2);
+    if(area<.32||area>.985||q.some((p,i)=>dist(p,q[(i+1)%4])<.14))return null;
+    return {corners:q,score:area,fraction:area,fallback:true};
+  }
+  async function detectDocumentCorners(source){
+    let cv;
+    try{cv=await opencvLib();}catch(_){return detectDocumentCornersLocal(source);}
+    let src,gray,blur,edges,closed,kernel,contours,hierarchy;
+    const width=source.width,height=source.height;
+    const factor=Math.min(1,900/Math.max(width,height));
+    const small=document.createElement('canvas');small.width=Math.max(1,Math.round(width*factor));small.height=Math.max(1,Math.round(height*factor));
+    small.getContext('2d').drawImage(source,0,0,small.width,small.height);
+    const candidates=[];
+    try{
+      src=cv.imread(small);gray=new cv.Mat();blur=new cv.Mat();edges=new cv.Mat();closed=new cv.Mat();
+      cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY);
+      cv.GaussianBlur(gray,blur,new cv.Size(5,5),0);
+      cv.Canny(blur,edges,40,130);
+      kernel=cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(5,5));
+      cv.morphologyEx(edges,closed,cv.MORPH_CLOSE,kernel);
+      contours=new cv.MatVector();hierarchy=new cv.Mat();
+      cv.findContours(closed,contours,hierarchy,cv.RETR_LIST,cv.CHAIN_APPROX_SIMPLE);
+      const total=small.width*small.height;
+      for(let i=0;i<contours.size();i++){
+        const contour=contours.get(i),poly=new cv.Mat();
+        try{
+          const perimeter=cv.arcLength(contour,true);
+          cv.approxPolyDP(contour,poly,.025*perimeter,true);
+          const area=cv.contourArea(poly),fraction=area/total;
+          if(poly.rows!==4||!cv.isContourConvex(poly)||fraction<.32||fraction>.985)continue;
+          const raw=Array.from(poly.data32S),points=[];
+          for(let k=0;k<4;k++)points.push({x:raw[k*2]/small.width,y:raw[k*2+1]/small.height});
+          const q=orderScanCorners(points);
+          const top=dist(q[0],q[1]),bottom=dist(q[3],q[2]),left=dist(q[0],q[3]),right=dist(q[1],q[2]);
+          const aspect=Math.max(top,bottom)/Math.max(left,right,.001);
+          if(aspect<.28||aspect>3.8)continue;
+          // Penaliza retângulos internos sem nenhuma borda perto das extremidades.
+          const extrema=q.flatMap(p=>[p.x,p.y]);
+          const xMin=Math.min(...q.map(p=>p.x)),xMax=Math.max(...q.map(p=>p.x));
+          const yMin=Math.min(...q.map(p=>p.y)),yMax=Math.max(...q.map(p=>p.y));
+          const borderScore=(xMin<.22?1:0)+(yMin<.22?1:0)+(xMax>.78?1:0)+(yMax>.78?1:0);
+          const score=fraction+.025*borderScore;
+          candidates.push({corners:q,score,fraction});
+        }finally{contour.delete();poly.delete();}
+      }
+      candidates.sort((a,b)=>b.score-a.score);
+      return candidates[0]||detectDocumentCornersLocal(source);
+    }catch(e){return detectDocumentCornersLocal(source);}
+    finally{[src,gray,blur,edges,closed,kernel,contours,hierarchy].forEach(x=>{try{x?.delete?.();}catch(_){}});}
+  }
+  function orderScanCorners(points){
+    const p=points.map(q=>({...q}));
+    // Ordena pela posição esquerda/direita, tolerante a fotografias inclinadas.
+    p.sort((a,b)=>a.x-b.x);
+    const left=p.slice(0,2).sort((a,b)=>a.y-b.y);
+    const right=p.slice(2).sort((a,b)=>a.y-b.y);
+    return [left[0],right[0],right[1],left[1]];
+  }
+  function normalizedScanCorners(corners){return corners.map(p=>({x:clip01(p.x),y:clip01(p.y)}));}
+  // Correção geométrica local mesmo sem OpenCV: homografia 3x3 com interpolação bilinear.
+  function warpDocumentFallback(source,q,w,h){
+    const pts=[[0,0,q[0].x,q[0].y],[1,0,q[1].x,q[1].y],[1,1,q[2].x,q[2].y],[0,1,q[3].x,q[3].y]];
+    const rows=[];
+    for(const [u,v,x,y] of pts){
+      rows.push([u,v,1,0,0,0,-u*x,-v*x,x]);
+      rows.push([0,0,0,u,v,1,-u*y,-v*y,y]);
+    }
+    for(let i=0;i<8;i++){
+      let max=i;
+      for(let k=i+1;k<8;k++)if(Math.abs(rows[k][i])>Math.abs(rows[max][i]))max=k;
+      [rows[i],rows[max]]=[rows[max],rows[i]];
+      if(Math.abs(rows[i][i])<1e-10)return source;
+      const d=rows[i][i];for(let j=i;j<=8;j++)rows[i][j]/=d;
+      for(let k=0;k<8;k++)if(k!==i){const f=rows[k][i];for(let j=i;j<=8;j++)rows[k][j]-=f*rows[i][j];}
+    }
+    const v=rows.map(r=>r[8]);
+    // Reduz imagem no iPhone para limitar memória e duração do processamento.
+    const maxPixels=2900000;
+    if(w*h>maxPixels){const f=Math.sqrt(maxPixels/(w*h));w=Math.round(w*f);h=Math.round(h*f);}
+    const src=source.getContext('2d',{willReadFrequently:true}).getImageData(0,0,source.width,source.height);
+    const out=document.createElement('canvas');out.width=w;out.height=h;
+    const ctx=out.getContext('2d',{willReadFrequently:true});const dst=ctx.createImageData(w,h);
+    const a=src.data,b=dst.data,sw=source.width,sh=source.height;
+    let k=0;
+    for(let y=0;y<h;y++){
+      const vv=y/Math.max(1,h-1);
+      for(let x=0;x<w;x++,k+=4){
+        const uu=x/Math.max(1,w-1),d=v[6]*uu+v[7]*vv+1;
+        const sx=Math.max(0,Math.min(sw-1.001,(v[0]*uu+v[1]*vv+v[2])/d));
+        const sy=Math.max(0,Math.min(sh-1.001,(v[3]*uu+v[4]*vv+v[5])/d));
+        if(!isFinite(sx)||!isFinite(sy)){b[k]=b[k+1]=b[k+2]=255;b[k+3]=255;continue;}
+        const x0=Math.floor(sx),y0=Math.floor(sy),dx=sx-x0,dy=sy-y0;
+        const j=(y0*sw+x0)*4,jj=(Math.min(sh-1,y0+1)*sw+x0)*4;
+        for(let c=0;c<3;c++)b[k+c]=a[j+c]*(1-dx)*(1-dy)+a[j+4+c]*dx*(1-dy)+a[jj+c]*(1-dx)*dy+a[jj+4+c]*dx*dy;
+        b[k+3]=255;
+      }
+    }
+    ctx.putImageData(dst,0,0);return out;
+  }
+  async function warpDocument(source,corners){
+    if(!corners)return source;
+    let cv=null;
+    try{cv=await opencvLib();}catch(_){} // sem OpenCV, homografia em JavaScript local
+    const q=normalizedScanCorners(corners).map(p=>({x:p.x*source.width,y:p.y*source.height}));
+    const width=Math.round(Math.max(dist(q[0],q[1]),dist(q[3],q[2])));
+    const height=Math.round(Math.max(dist(q[0],q[3]),dist(q[1],q[2])));
+    if(width<140||height<140)return source;
+    const factor=Math.min(1,2400/Math.max(width,height),Math.sqrt(5500000/(width*height)));
+    const w=Math.max(1,Math.round(width*factor)),h=Math.max(1,Math.round(height*factor));
+    if(!cv)return warpDocumentFallback(source,q,w,h);
+    let src,warped,srcPoints,dstPoints,transform;
+    try{
+      src=cv.imread(source);warped=new cv.Mat();
+      srcPoints=cv.matFromArray(4,1,cv.CV_32FC2,q.flatMap(p=>[p.x,p.y]));
+      dstPoints=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,w-1,0,w-1,h-1,0,h-1]);
+      transform=cv.getPerspectiveTransform(srcPoints,dstPoints);
+      cv.warpPerspective(src,warped,transform,new cv.Size(w,h),cv.INTER_LINEAR,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
+      const result=document.createElement('canvas');result.width=w;result.height=h;cv.imshow(result,warped);
+      return result;
+    }catch(_){return warpDocumentFallback(source,q,w,h);}
+    finally{[src,warped,srcPoints,dstPoints,transform].forEach(x=>{try{x?.delete?.();}catch(_){}});}
+  }
+  // Aplicar o quadrilátero escolhido à primeira página; nas demais, procurar a folha individualmente.
+  async function scanCanvas(source,{isPDF=false,page=0}={}){
+    const mode=$('crop-mode').value;
+    if(mode==='none')return source;
+    let corners=null;
+    if(mode==='manual'&&page===0){corners=manualCorners;}
+    else if(!isPDF&&mode==='auto'){
+      if(page===0&&scanOriginal===source&&autoCorners)corners=autoCorners;
+      else corners=(await detectDocumentCorners(source))?.corners||null;
+    }
+    // Para PDF já exportado, não arriscar recortar tabelas internas automaticamente.
+    if(!corners)return source;
+    return warpDocument(source,corners);
+  }
+  function drawCropEditor(){
+    if(!scanOriginal)return;
+    const src=scanOriginal,dest=$('crop-editor');
+    const ratio=Math.min(1,900/Math.max(src.width,src.height));
+    dest.width=Math.max(1,Math.round(src.width*ratio));dest.height=Math.max(1,Math.round(src.height*ratio));
+    const ctx=dest.getContext('2d');ctx.drawImage(src,0,0,dest.width,dest.height);
+    const mode=$('crop-mode').value;
+    const q=mode==='manual'?manualCorners:mode==='auto'?autoCorners:null;
+    if(q){
+      ctx.lineWidth=3;ctx.strokeStyle='#d40511';ctx.fillStyle='rgba(255,204,0,.11)';
+      ctx.beginPath();q.forEach((p,i)=>{const x=p.x*dest.width,y=p.y*dest.height;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();ctx.fill();ctx.stroke();
+      q.forEach((p,i)=>{ctx.beginPath();ctx.fillStyle='#ffcc00';ctx.strokeStyle='#a9000b';ctx.lineWidth=2;ctx.arc(p.x*dest.width,p.y*dest.height,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#3b2500';ctx.font='bold 11px sans-serif';ctx.fillText(String(i+1),p.x*dest.width+12,p.y*dest.height+4);});
+    }
+  }
+  function cropStatus(){
+    const mode=$('crop-mode').value;
+    $('crop-message').textContent=mode==='none'?'Sem recorte: foto original inteira.':mode==='manual'?'Arraste os quatro pontos amarelos até os cantos reais do papel.':autoCorners?'Bordas detectadas: confira o contorno vermelho antes de gerar o PDF.':'Bordas não detectadas com confiança. Sem recorte automático; escolha ajuste manual se necessário.';
+  }
+  async function setupCropEditor(file){
+    if(!file)return;
+    const [original]=await getCanvasForDocument(file,1200,true);
+    if(file!==lastFile)return;
+    scanOriginal=original;
+    const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name);
+    autoCorners=isPDF?null:(await detectDocumentCorners(original))?.corners||null;
+    manualCorners=autoCorners?autoCorners.map(p=>({...p})):defaultScanCorners();
+    $('scan-crop').hidden=false;drawCropEditor();cropStatus();
+  }
+  async function refreshCropResults(){
+    drawCropEditor();cropStatus();
+    if(lastFile)await refreshEnhancementPreview();
+  }
+  async function enhanceCanvasSmart(source,mode='color'){
+    let cv;
+    try{cv=await opencvLib();}
+    catch(error){lastEnhancementEngine='Ajuste local (OpenCV indisponível)';return enhanceCanvas(source,mode);}
+    let src,gray,balanced,blurred,output,clahe;
+    try{
+      src=cv.imread(source);gray=new cv.Mat();balanced=new cv.Mat();
+      cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY);
+      if(typeof cv.createCLAHE==='function'){
+        clahe=cv.createCLAHE(2.2,new cv.Size(8,8));clahe.apply(gray,balanced);
+      }else cv.equalizeHist(gray,balanced);
+      const out=document.createElement('canvas');out.width=source.width;out.height=source.height;
+      if(mode==='mono'){
+        blurred=new cv.Mat();output=new cv.Mat();
+        cv.GaussianBlur(balanced,blurred,new cv.Size(3,3),0,0,cv.BORDER_DEFAULT);
+        cv.adaptiveThreshold(blurred,output,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,cv.THRESH_BINARY,35,12);
+        cv.imshow(out,output);
+      }else if(mode==='gray')cv.imshow(out,balanced);
+      else{
+        // Mantém o selo e os detalhes coloridos, corrigindo a luminância pixel a pixel.
+        const ctx=out.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(source,0,0);
+        const pixels=ctx.getImageData(0,0,out.width,out.height),data=pixels.data;
+        const y=gray.data,enhanced=balanced.data;
+        for(let i=0;i<y.length;i++){
+          const k=i*4,base=Math.max(12,y[i]);
+          const target=Math.max(0,Math.min(255,y[i]*.24+enhanced[i]*.76));
+          const factor=Math.max(.45,Math.min(2.3,target/base));
+          data[k]=Math.min(255,data[k]*factor);
+          data[k+1]=Math.min(255,data[k+1]*factor);
+          data[k+2]=Math.min(255,data[k+2]*factor);
+        }
+        ctx.putImageData(pixels,0,0);
+      }
+      lastEnhancementEngine='OpenCV.js';
+      return out;
+    }catch(error){
+      lastEnhancementEngine='Ajuste local (falha no OpenCV)';
+      return enhanceCanvas(source,mode);
+    }finally{
+      [src,gray,balanced,blurred,output,clahe].forEach(x=>{try{x?.delete?.();}catch(e){}});
+    }
+  }
+  /* Melhoria local de reserva: normalização de contraste, escala de cinza
+     e limiar adaptativo para variações de iluminação. Não é autenticação. */
+  const clamp8=x=>x<0?0:x>255?255:Math.round(x);
+  function enhanceCanvas(source,mode='color'){
+    const w=source.width,h=source.height;
+    const out=document.createElement('canvas');out.width=w;out.height=h;
+    const ctx=out.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(source,0,0);
+    const img=ctx.getImageData(0,0,w,h),a=img.data;
+    const hist=new Uint32Array(256);
+    const sampleStride=Math.max(1,Math.floor((w*h)/400000));
+    for(let pos=0;pos<w*h;pos+=sampleStride){
+      const i=pos*4;
+      hist[clamp8(a[i]*.299+a[i+1]*.587+a[i+2]*.114)]++;
+    }
+    const sampleCount=Math.ceil(w*h/sampleStride);
+    function percentile(q){const n=Math.max(1,Math.floor(sampleCount*q));let tot=0;for(let k=0;k<256;k++){tot+=hist[k];if(tot>=n)return k;}return 255;}
+    const hi=percentile(.99);
+    // Em imagens muito apagadas, o fundo ocupa quase todos os pixels.
+    // Garantir faixa mínima evita transformar a folha inteira em preto.
+    const lo=Math.min(percentile(.012),Math.max(0,hi-115));
+    const widthRange=Math.max(55,hi-lo);
+    const scale=255/widthRange;
+    let lum=null;
+    if(mode==='mono'){
+      lum=new Uint8Array(w*h);
+      for(let pos=0;pos<w*h;pos++){
+        const i=pos*4;lum[pos]=clamp8((a[i]*.299+a[i+1]*.587+a[i+2]*.114-lo)*scale);
+      }
+      const stride=w+1;
+      const sums=new Float64Array((w+1)*(h+1));
+      for(let y=1;y<=h;y++){
+        let row=0;
+        for(let x=1;x<=w;x++){
+          row+=lum[(y-1)*w+x-1];
+          sums[y*stride+x]=sums[(y-1)*stride+x]+row;
+        }
+      }
+      const radius=Math.max(10,Math.min(36,Math.round(Math.min(w,h)/75)));
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const left=Math.max(0,x-radius),right=Math.min(w-1,x+radius);
+        const top=Math.max(0,y-radius),bottom=Math.min(h-1,y+radius);
+        const area=(right-left+1)*(bottom-top+1);
+        const avg=(sums[(bottom+1)*stride+right+1]-sums[top*stride+right+1]-sums[(bottom+1)*stride+left]+sums[top*stride+left])/area;
+        const v=lum[y*w+x]<(avg-12)?0:255;
+        const i=(y*w+x)*4;a[i]=a[i+1]=a[i+2]=v;
+      }
+    }else{
+      const gray=mode==='gray';
+      for(let i=0;i<a.length;i+=4){
+        const l=a[i]*.299+a[i+1]*.587+a[i+2]*.114;
+        const target=clamp8((l-lo)*scale);
+        if(gray){a[i]=a[i+1]=a[i+2]=target;}
+        else {
+          // Correção de luz mantendo cores do selo e QR code.
+          const factor=l>3?target/l:1;
+          const blend=.82;
+          a[i]=clamp8(a[i]*(1-blend)+a[i]*factor*blend);
+          a[i+1]=clamp8(a[i+1]*(1-blend)+a[i+1]*factor*blend);
+          a[i+2]=clamp8(a[i+2]*(1-blend)+a[i+2]*factor*blend);
+        }
+      }
+    }
+    ctx.putImageData(img,0,0);
+    return out;
+  }
+  function copyCanvasPreview(from,target){
+    const ratio=Math.min(1,520/Math.max(from.width,from.height));
+    target.width=Math.max(1,Math.round(from.width*ratio));
+    target.height=Math.max(1,Math.round(from.height*ratio));
+    target.getContext('2d').drawImage(from,0,0,target.width,target.height);
+  }
+  const enhanceMode=()=>$('enhance-mode').value;
+  const improveMessage=(message,type='')=>{
+    const el=$('enhance-feedback');el.textContent=message;el.className='enhance-result '+type;
+  };
+  function rotationAngle(){return Number($('rotation').value)||0;}
+  async function renderPdfPage(pdf,index,maxSide=2000){
+    const page=await pdf.getPage(index);
+    const view=page.getViewport({scale:1});
+    const scale=Math.min(2.6,maxSide/Math.max(view.width,view.height));
+    const viewport=page.getViewport({scale});
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(viewport.width));c.height=Math.max(1,Math.round(viewport.height));
+    await page.render({canvasContext:c.getContext('2d'),viewport}).promise;
+    return c;
+  }
+  async function getCanvasForDocument(file,maxSide=2000,firstOnly=false){
+    const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name);
+    if(isPDF){
+      const pdf=await(await pdfLib()).getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+      if(pdf.numPages>6&&!firstOnly)throw Error('Este PDF possui mais de 6 páginas. Separe o arquivo antes de gerar o PDF melhorado no celular.');
+      if(firstOnly)return [await renderPdfPage(pdf,1,maxSide)];
+      const pages=[];
+      for(let i=1;i<=pdf.numPages;i++)pages.push(await renderPdfPage(pdf,i,maxSide));
+      return pages;
+    }
+    return [await drawSourceCanvas(file,rotationAngle(),maxSide)];
+  }
+  async function drawSourceCanvas(input,rotation=0,maxSide=2200){
+    if(input instanceof HTMLCanvasElement){
+      // Rasterização já recebida do PDF.js.
+      const c=document.createElement('canvas');c.width=input.width;c.height=input.height;
+      c.getContext('2d').drawImage(input,0,0);return c;
+    }
+    const owned=typeof input!=='string';
+    const url=owned?URL.createObjectURL(input):input;
+    try{
+      const img=new Image();img.src=url;await img.decode();
+      const ratio=Math.min(2.0,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+      const w=Math.max(1,Math.round(img.naturalWidth*ratio)),h=Math.max(1,Math.round(img.naturalHeight*ratio));
+      const sideways=rotation===90||rotation===270;
+      const c=document.createElement('canvas');c.width=sideways?h:w;c.height=sideways?w:h;
+      const cx=c.getContext('2d');cx.translate(c.width/2,c.height/2);cx.rotate(rotation*Math.PI/180);
+      cx.drawImage(img,-w/2,-h/2,w,h);
+      return c;
+    }finally{if(owned)URL.revokeObjectURL(url);}
+  }
+  async function refreshEnhancementPreview(file=lastFile){
+    if(!file)return;
+    const token=++previewToken;
+    $('enhance-previews').hidden=true;
+    improveMessage('Preparando prévia do documento...');
+    try{
+      const [original]=await getCanvasForDocument(file,1100,true);
+      if(token!==previewToken)return;
+      const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name);
+      const scanned=await scanCanvas(original,{isPDF,page:0});
+      const processed=await enhanceCanvasSmart(scanned,enhanceMode());
+      if(token!==previewToken)return;
+      copyCanvasPreview(original,$('preview-before'));
+      copyCanvasPreview(processed,$('preview-after'));
+      $('enhance-previews').hidden=false;
+      improveMessage('Prévia pronta com '+lastEnhancementEngine+'. Confira a legibilidade e baixe o PDF.','success');
+    }catch(e){if(token===previewToken)improveMessage('Não foi possível mostrar a prévia: '+(e.message||String(e)),'error');}
+  }
+  // PDF mínimo em imagem, feito localmente: exportação sem contratar API e sem
+  // depender de biblioteca extra além das necessárias para ler PDFs de entrada.
+  function makeEnhancedPdf(canvases){
+    const encoder=new TextEncoder();
+    const chunks=[];let count=0;
+    const write=data=>{const b=typeof data==='string'?encoder.encode(data):data;chunks.push(b);count+=b.length;};
+    const offsets=[0];
+    const startObject=id=>{offsets[id]=count;write(id+' 0 obj\n');};
+    const endObject=()=>write('\nendobj\n');
+    const pageW=595.28,pageH=841.89;
+    const kids=canvases.map((_,i)=>`${3+i*3} 0 R`).join(' ');
+    write('%PDF-1.4\n%FrotaCheck\n');
+    startObject(1);write('<< /Type /Catalog /Pages 2 0 R >>');endObject();
+    startObject(2);write(`<< /Type /Pages /Kids [ ${kids} ] /Count ${canvases.length} >>`);endObject();
+    for(let i=0;i<canvases.length;i++){
+      const c=canvases[i],pageId=3+i*3,imgId=4+i*3,contentId=5+i*3;
+      const base64=c.toDataURL('image/jpeg',.87).split(',')[1];
+      const decoded=atob(base64),bytes=new Uint8Array(decoded.length);
+      for(let j=0;j<decoded.length;j++)bytes[j]=decoded.charCodeAt(j);
+      const maxW=pageW-30,maxH=pageH-48;
+      const scale=Math.min(maxW/c.width,maxH/c.height);
+      const width=c.width*scale,height=c.height*scale;
+      const x=(pageW-width)/2,y=(pageH-height)/2+6;
+      const stream=`q\n${width.toFixed(3)} 0 0 ${height.toFixed(3)} ${x.toFixed(3)} ${y.toFixed(3)} cm\n/Im0 Do\nQ\n`;
+      const streamBytes=encoder.encode(stream);
+      startObject(pageId);
+      write(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im0 ${imgId} 0 R >> >> /Contents ${contentId} 0 R >>`);
+      endObject();
+      startObject(imgId);
+      write(`<< /Type /XObject /Subtype /Image /Width ${c.width} /Height ${c.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bytes.length} >>\nstream\n`);
+      write(bytes);write('\nendstream');endObject();
+      startObject(contentId);
+      write(`<< /Length ${streamBytes.length} >>\nstream\n`);
+      write(streamBytes);write('endstream');endObject();
+    }
+    const xref=count,numObjects=canvases.length*3+3;
+    write(`xref\n0 ${numObjects}\n0000000000 65535 f \n`);
+    for(let i=1;i<numObjects;i++)write(String(offsets[i]).padStart(10,'0')+' 00000 n \n');
+    write(`trailer\n<< /Size ${numObjects} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+    return new Blob(chunks,{type:'application/pdf'});
+  }
+  // Geração local usando o Scanner 5.2 aprovado, sem API externa.
+  function createEnhancedPDF(){return createLocalPDF(true);}
+  async function imageCanvas(input,rotation=0){
+    return await enhanceCanvasSmart(await drawSourceCanvas(input,rotation,2400),'gray');
+  }
+  async function handleFile(file){
+    if(!file)return;
+    // OCR e tratamento de documentos feitos no próprio navegador.
+    lastFile=file;
+    resetProcessedPDF();
+    return processFile(file);
+  }
+  async function processFile(file,forceOCR=false){
+    if(!file)return;if(file.size>15*1024*1024){notice('Tamanho máximo: 15 MB.','danger');return;}
+    const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name),isImage=/^image\/(png|jpeg|webp)$/.test(file.type)||/\.(png|jpe?g|webp)$/i.test(file.name);
+    if(!isPDF&&!isImage){notice('Apenas PDF, PNG, JPG e WebP.','danger');return;}
+    if(pending)return;pending=true;lastFile=file;documentLooksRight=false;
+    $('retry-reading').disabled=false;
+    if(!forceOCR){fields.forEach(k=>$(k).value='');extraction={};conflicts=[];rawText='';$('rawtext').textContent='Aguardando leitura...';renderExtraction();analyze();}$('select-file').disabled=$('force-ocr').disabled=true;
+    notice(forceOCR?'Reprocessando com OCR forçado...':'Lendo arquivo e identificando campos...');
+    try{
+      let content='',map={},source='Texto do PDF';conflicts=[];
+      const angle=Number($('rotation').value);
+      if(isPDF){
+        const pdf=await(await pdfLib()).getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+        const total=Math.min(pdf.numPages,2);let ocrNeeded=forceOCR;
+        for(let i=1;i<=total;i++){
+          const page=await pdf.getPage(i);
+          if(!forceOCR){
+            const text=await page.getTextContent();const rows=makeRows(text.items);parseCoordinates(rows,map);
+            const t=rows.map(r=>r.parts.map(p=>p.text).join('  ')).join('\n');content+='\n'+t;parseText(t,map,2,'Texto do PDF');
+          }
+          if(forceOCR||(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed')){
+            ocrNeeded=true;
+            const v=page.getViewport({scale:2});const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);await page.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;
+            let target=canvas;if(angle!==0){target=await drawSourceCanvas(canvas.toDataURL('image/png'),angle,2400);}
+            target=await scanCanvas(target,{isPDF:true,page:i-1});
+            const ocrText=await ocr(await enhanceCanvasSmart(target,'gray'));content+='\n--- OCR PÁGINA '+i+' ---\n'+ocrText;parseText(ocrText,map,2,'OCR cinza');source='PDF + OCR';
+            if(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed'){
+              const second=await ocr(await enhanceCanvasSmart(target,'mono'));
+              content+='\n--- OCR P&B PÁGINA '+i+' ---\n'+second;
+              parseText(second,map,2,'OCR P&B');
+            }
+            if(!map.placa||!map.exercicio||documentEvidence(content,map).level==='unconfirmed'){
+              const third=await ocr(target); // Alguns selos e fontes ficam ilegíveis após o filtro.
+              content+='\n--- OCR ORIGINAL PÁGINA '+i+' ---\n'+third;
+              parseText(third,map,2,'OCR original');
+            }
+          }
+        }
+        if(forceOCR)source='OCR forçado de PDF';else if(!ocrNeeded)source='Texto estruturado do PDF';
+      }else{
+        const rawCanvas=await drawSourceCanvas(file,angle,2400);
+        const canvas=await scanCanvas(rawCanvas,{isPDF:false,page:0});
+        content=await ocr(await enhanceCanvasSmart(canvas,'gray'));
+        parseText(content,map,2,'OCR cinza');source='Imagem + OCR';
+        if(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed'){
+          const second=await ocr(await enhanceCanvasSmart(canvas,'mono'));
+          content+='\n--- OCR P&B ---\n'+second;
+          parseText(second,map,2,'OCR P&B');
+        }
+        if(!map.placa||!map.exercicio||documentEvidence(content,map).level==='unconfirmed'){
+          const third=await ocr(canvas);
+          content+='\n--- OCR ORIGINAL ---\n'+third;
+          parseText(third,map,2,'OCR original');
+        }
+      }
+      // Se dois métodos discordaram, mantém o valor de maior score e expõe a divergência.
+      conflicts=[...new Set(conflicts)];setExtracted(map,source,content.trim());
+    }catch(e){notice('Falha na leitura automática: '+(e.message||String(e))+'. Tente “Leitura com imagem melhorada” ou confira os campos manualmente. O PDF melhorado continua disponível.','danger');$('rawtext').textContent='Não foi possível processar o arquivo.';}
+    finally{pending=false;$('select-file').disabled=$('force-ocr').disabled=false;}
+  }
+  // QR com câmera: reconhecimento óptico é diferente da decodificação/validação VIO.
+  // QR VIO é criptografado; apenas a API autorizada do Serpro permitiria extrair os campos oficiais.
+  let qrReader=null,qrActive=false,qrStarting=false,qrResolved=false;
+  const qrMsg=(message)=>{$('qr-feedback').textContent=message;$('qr-feedback').hidden=false;};
+  function qrResetView(){
+    $('qr-feedback').hidden=true;$('qr-feedback').textContent='';
+    $('qr-retry').hidden=true;$('qr-reader').textContent='Preparando câmera...';
+  }
+  async function qrStop(){
+    qrResolved=true;
+    if(qrReader){
+      try{if(qrActive || qrStarting)await qrReader.stop();}catch(e){}
+      try{qrReader.clear();}catch(e){}
+      qrReader=null;
+    }
+    qrActive=false;qrStarting=false;
+  }
+  async function qrClose(){
+    $('qr-modal').hidden=true;
+    document.body.style.overflow='';
+    await qrStop();
+  }
+  // Apenas QR em texto legível com rótulos explícitos pode abastecer os campos.
+  // Nunca tenta inferir dados de cargas criptografadas/strings aleatórias.
+  function parsePlainQr(payload){
+    if(typeof payload!=='string'||payload.length>7000)return null;
+    const body=payload.trim();
+    if(!/(?:^|[\s;,|{])(?:PLACA|EXERC[IÍ]CIO|UF|ESPECIE|ESPÉCIE)[\s:=\"']/i.test(body))return null;
+    const prepared=body.replace(/<[^>]*>/g,' ').replace(/[;,|]+/g,'\n').replace(/\\n/g,'\n').replace(/\\r/g,'\n').replace(/\"\s*,\s*\"/g,'\n').replace(/\"\s*:\s*\"/g,': ').replace(/[{}\"]/g,'').trim();
+    const mapping={};const pairs=[
+      ['placa',/(?:^|\n)\s*PLACA\s*[:=]\s*([A-Z0-9]{7})\b/im],
+      ['exercicio',/(?:^|\n)\s*EXERC[IÍ]CIO\s*[:=]\s*(20\d{2})\b/im],
+      ['uf',/(?:^|\n)\s*UF(?: DE REGISTRO)?\s*[:=]\s*([A-Z]{2})\b/im],
+      ['especie',/(?:^|\n)\s*ESP[EÉ]CIE\s*\/?\s*TIPO\s*[:=]\s*([^\n]+)/im],
+      ['modelo',/(?:^|\n)\s*(?:MARCA\s*\/?\s*MODELO)\s*[:=]\s*([^\n]+)/im],
+      ['eixos',/(?:^|\n)\s*EIXOS\s*[:=]\s*(\d{1,2})\b/im],
+      ['pbt',/(?:^|\n)\s*(?:PBT|PESO BRUTO TOTAL)\s*[:=]\s*([\d,.]+)/im]
+    ];
+    for(const [key,re] of pairs){const value=prepared.match(re)?.[1];const normalized=parseValue(key,value||'',false);if(normalized)mapping[key]={value:normalized,score:2,origin:'QR em texto aberto (não autenticado)'};}
+    return mapping.placa&&mapping.exercicio&&mapping.uf&&mapping.especie?{mapping,text:prepared}:null;
+  }
+  async function qrReadResult(content){
+    if(qrResolved)return;
+    qrResolved=true;
+    $('qr-retry').hidden=false;
+    qrMsg('Código reconhecido. Verificando se possui dados legíveis...');
+    await qrStop();
+    const plain=parsePlainQr(content);
+    if(plain){
+      conflicts=[];
+      setExtracted(plain.mapping,'QR em texto aberto',plain.text);
+      notice('QR em texto aberto: dados preenchidos para conferência. Não é uma autenticação oficial.','warning');
+      qrMsg('Dados legíveis identificados e inseridos no FrotaCheck. Confira a placa, o tipo e o exercício. O QR não foi autenticado.');
+      return;
+    }
+    qrMsg('QR detectado, mas os dados do CRLV-e não estão acessíveis a este leitor. O QR Seguro VIO precisa do decodificador autorizado do Serpro. Use “Fotografar CRLV completo” para obter tipo e prazo por OCR, ou envie o PDF.');
+    notice('QR reconhecido, porém o conteúdo oficial não pode ser decodificado sem a integração VIO. Fotografe o CRLV completo ou envie o PDF.','warning');
+  }
+  async function qrStart(){
+    if(qrStarting||qrActive)return;
+    qrResetView();qrResolved=false;
+    if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia){
+      qrMsg('Para usar a câmera, abra o site em HTTPS (ex.: GitHub Pages) ou localhost no navegador compatível. A visualização local por arquivo pode bloquear a câmera.');
+      $('qr-retry').hidden=false;
+      return;
+    }
+    qrStarting=true;
+    try{
+      if(!window.Html5Qrcode)await loadScript('https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js');
+      if(!window.Html5Qrcode)throw Error('Biblioteca do leitor indisponível.');
+      if($('qr-modal').hidden){qrStarting=false;return;}
+      qrReader=new window.Html5Qrcode('qr-reader',{verbose:false,formatsToSupport:[window.Html5QrcodeSupportedFormats.QR_CODE]});
+      await qrReader.start({facingMode:'environment'},{fps:8,qrbox:(w,h)=>{const side=Math.max(130,Math.floor(Math.min(w,h)*.78));return{width:side,height:side};},aspectRatio:1},decoded=>{void qrReadResult(decoded);},()=>{});
+      qrActive=true;
+    }catch(e){
+      qrMsg('Não foi possível abrir o leitor. Autorize a câmera no Safari, use HTTPS e tente novamente. Se preferir, fotografe o documento completo.');
+      $('qr-retry').hidden=false;
+      try{if(qrReader)await qrReader.clear();}catch(e){}
+      qrReader=null;
+    }finally{qrStarting=false;}
+  }
+  $('open-qr').addEventListener('click',()=>{
+    $('qr-modal').hidden=false;document.body.style.overflow='hidden';void qrStart();
+  });
+  $('qr-close').addEventListener('click',()=>{void qrClose();});
+  $('qr-modal').addEventListener('click',e=>{if(e.target===$('qr-modal'))void qrClose();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('qr-modal').hidden)void qrClose();});
+  $('qr-retry').addEventListener('click',async()=>{await qrStop();await qrStart();});
+  $('take-photo').addEventListener('click',()=>{$('photo-file').click();});
+  $('qr-photo').addEventListener('click',()=>{void qrClose();$('photo-file').click();});
+  $('photo-file').addEventListener('change',e=>{const file=e.target.files?.[0];if(file)void handleFile(file);e.target.value='';});
+  fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
+  $('placa').addEventListener('input',e=>{const p=plateFmt(e.target.value).slice(0,7);if(p!==e.target.value)e.target.value=p;});
+  $('file').addEventListener('change',e=>{void handleFile(e.target.files?.[0]);e.target.value='';});
+  $('select-file').addEventListener('click',e=>{e.stopPropagation();$('file').click();});
+  const drop=$('dropzone');drop.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click();});drop.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();$('file').click();}});
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+  drop.addEventListener('drop',e=>{void handleFile(e.dataTransfer.files?.[0]);});
+  $('retry-enhanced-ocr').addEventListener('click',()=>{if(lastFile)void processFile(lastFile,true);});
+  $('retry-reading').addEventListener('click',()=>{if(lastFile)void processFile(lastFile,true);});
+  $('force-ocr').addEventListener('click',()=>{if(lastFile)processFile(lastFile,true);else notice('Selecione um arquivo primeiro.','warning');});
+  $('enhance-preview-button').addEventListener('click',()=>{if(lastFile)void refreshEnhancementPreview();});
+  $('enhance-mode').addEventListener('change',()=>{if(lastFile)void refreshEnhancementPreview();});
+  $('crop-mode').addEventListener('change',()=>{if($('crop-mode').value==='manual'&&!manualCorners)manualCorners=autoCorners?.map(p=>({...p}))||defaultScanCorners();void refreshCropResults();});
+  $('detect-crop').addEventListener('click',async()=>{
+    if(!scanOriginal)return;
+    $('crop-message').textContent='Procurando as bordas do documento...';
+    const detected=await detectDocumentCorners(scanOriginal);
+    autoCorners=detected?.corners||null;
+    if(autoCorners){manualCorners=autoCorners.map(p=>({...p}));$('crop-mode').value='auto';}
+    drawCropEditor();cropStatus();void refreshEnhancementPreview();
+  });
+  $('reset-crop').addEventListener('click',()=>{manualCorners=autoCorners?.map(p=>({...p}))||defaultScanCorners();void refreshCropResults();});
+  const editor=$('crop-editor');
+  editor.addEventListener('pointerdown',e=>{
+    if($('crop-mode').value!=='manual'||!manualCorners)return;
+    const rect=editor.getBoundingClientRect();
+    const pos={x:(e.clientX-rect.left)/rect.width,y:(e.clientY-rect.top)/rect.height};
+    let best=-1,d=.085;
+    manualCorners.forEach((p,i)=>{const dd=dist(p,pos);if(dd<d){d=dd;best=i;}});
+    if(best<0)return;cropDrag=best;editor.setPointerCapture(e.pointerId);e.preventDefault();
+  });
+  editor.addEventListener('pointermove',e=>{
+    if(cropDrag<0||!manualCorners)return;
+    const rect=editor.getBoundingClientRect();
+    manualCorners[cropDrag]={x:clip01((e.clientX-rect.left)/rect.width),y:clip01((e.clientY-rect.top)/rect.height)};
+    drawCropEditor();e.preventDefault();
+  });
+  function endCornerDrag(){if(cropDrag<0)return;cropDrag=-1;void refreshEnhancementPreview();}
+  editor.addEventListener('pointerup',endCornerDrag);
+  editor.addEventListener('pointercancel',endCornerDrag);
+
+
+  // FrotaCheck 5.3 - motor local aprovado do Scanner 5.2 em Web Worker.
+  // Nenhum documento é enviado ao Cloudflare ou a serviços terceiros.
+  let pdfReady=null,pdfBusy=null,pdfGeneration=0,scannerWorker=null,scannerSeq=0;
+  const scannerJobs=new Map();
+  function pdfMessage(message,kind=''){
+    const el=$('pdf-only-status');el.textContent=message;el.className='pdf-status '+kind;
+  }
+  function pdfButton(label='↓ Baixar PDF melhorado',disabled=false){
+    const b=$('download-pdf');b.textContent=label;b.disabled=disabled;
+  }
+  function resetProcessedPDF(){
+    pdfGeneration++;
+    pdfReady=null;pdfBusy=null;
+    pdfButton('↓ Baixar PDF melhorado',!lastFile);
+    pdfMessage(lastFile?'Documento recebido. Digitalização automática disponível.':'Envie um documento para iniciar.');
+  }
+  function savePdf(blob,file){
+    const title=(file.name.replace(/\.[^.]+$/,'').replace(/[^a-z0-9áàâãéêíóôõúç_-]/gi,'_').slice(0,65)||'CRLV');
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=title+'-melhorado-2026.pdf';document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }
+  function initScannerWorker(){
+    if(scannerWorker)return;
+    const script=$('scanner52-worker-source').textContent;
+    const url=URL.createObjectURL(new Blob([script],{type:'text/javascript'}));
+    scannerWorker=new Worker(url);URL.revokeObjectURL(url);
+    scannerWorker.onmessage=event=>{
+      const r=event.data,j=scannerJobs.get(r.id);
+      if(!j)return;
+      scannerJobs.delete(r.id);clearTimeout(j.timeout);
+      r.ok?j.resolve(r):j.reject(Error(r.error||'Falha na digitalização.'));
+    };
+    scannerWorker.onerror=()=>{
+      for(const job of scannerJobs.values()){clearTimeout(job.timeout);job.reject(Error('Falha no motor de digitalização.'));}
+      scannerJobs.clear();scannerWorker?.terminate();scannerWorker=null;
+    };
+  }
+  function scanWith52(canvas){
+    return new Promise((resolve,reject)=>{
+      initScannerWorker();
+      const id=++scannerSeq;
+      const buffer=canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,canvas.width,canvas.height).data.buffer;
+      const timeout=setTimeout(()=>{
+        if(scannerJobs.has(id)){
+          scannerJobs.delete(id);scannerWorker?.terminate();scannerWorker=null;
+          reject(Error('A digitalização demorou demais. Tente outra imagem.'));
+        }
+      },25000);
+      scannerJobs.set(id,{resolve,reject,timeout});
+      scannerWorker.postMessage({id,buffer,w:canvas.width,h:canvas.height},[buffer]);
+    });
+  }
+  async function createLocalPDF(download=false){
+    const file=lastFile;
+    if(!file)return null;
+    if(pdfReady){if(download)savePdf(pdfReady,file);return pdfReady;}
+    if(pdfBusy){const result=await pdfBusy;if(download&&result&&file===lastFile)savePdf(result,file);return result;}
+    const version=pdfGeneration;
+    pdfBusy=(async()=>{
+      pdfButton('Digitalizando documento...',true);
+      pdfMessage('Endireitando, recortando e clareando o CRLV no navegador...');
+      const pages=await getCanvasForDocument(file,1850,false);
+      const processed=[];
+      let count=0;
+      for(let i=0;i<pages.length;i++){
+        if(version!==pdfGeneration||file!==lastFile)throw Error('Arquivo substituído durante a leitura.');
+        pdfMessage('Digitalizando página '+(i+1)+' de '+pages.length+'...');
+        try{
+          const r=await scanWith52(pages[i]);
+          const c=document.createElement('canvas');c.width=r.w;c.height=r.h;
+          c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(r.buffer),r.w,r.h),0,0);
+          processed.push(c);count++;
+        }catch(err){
+          // Nunca perder uma página original se o scanner falhar.
+          processed.push(pages[i]);
+        }
+        await new Promise(resolve=>setTimeout(resolve,0));
+      }
+      if(!count)throw Error('O scanner não conseguiu melhorar nenhuma página. Nenhum PDF foi alterado.');
+      const pdf=makeEnhancedPdf(processed);
+      if(version===pdfGeneration&&file===lastFile){
+        pdfReady=pdf;
+        pdfMessage(count===processed.length?'PDF melhorado pronto. Confira a cópia antes de utilizar.':'PDF parcialmente tratado: algumas páginas foram preservadas sem alterações.','ok');
+      }
+      return pdf;
+    })();
+    try{
+      const ready=await pdfBusy;
+      if(download&&ready&&version===pdfGeneration&&file===lastFile)savePdf(ready,file);
+      return ready;
+    }catch(err){if(version===pdfGeneration)pdfMessage('Não foi possível digitalizar: '+String(err.message||err),'error');return null;}
+    finally{if(version===pdfGeneration){pdfBusy=null;pdfButton('↓ Baixar PDF melhorado',false);}}
+  }
+  $('download-pdf').addEventListener('click',()=>{void createEnhancedPDF();});
+  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;resetProcessedPDF();previewToken++;scanOriginal=null;autoCorners=null;manualCorners=null;cropDrag=-1;$('scan-crop').hidden=true;$('crop-mode').value='auto';$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
+  $('copy-summary').addEventListener('click',async()=>{
+    const r=analyze();
+    const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário consultado: 2026\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
+    try{await navigator.clipboard.writeText(s);notice('Resultado copiado.','success');}
+    catch(e){notice('Não foi possível copiar automaticamente.','warning');}
+  });
+  renderExtraction();analyze();
+  // Funções de diagnóstico local, sem envio de documentos.
+  window.__FrotaCheckTest={calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,makeEnhancedPdf,setExtracted};
 })();
-</script></body></html>
+
+</script>
+</body>
+</html>
