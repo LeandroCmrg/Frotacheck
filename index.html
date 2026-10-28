@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck | Leitor de CRLV-e</title>
+<title>FrotaCheck | Leitor de CRLV-e · OCR aprimorado</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -106,9 +106,9 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.3</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.4</div></div></div></div></header>
 <main>
-<div class="intro"><span class="eyebrow">Leitor de CRLV-e</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie uma foto ou PDF para identificar a categoria do veículo e consultar o calendário estadual de 2026.</p></div>
+<div class="intro"><span class="eyebrow">Leitor de CRLV-e · OCR aprimorado</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie uma foto ou PDF para identificar a categoria do veículo e consultar o calendário estadual de 2026.</p></div>
 <div class="layout">
 <section class="panel" aria-labelledby="upload-title">
   <div class="panel-head"><h2 class="panel-title" id="upload-title"><span class="number">1</span>Enviar documento</h2><p>CRLV-e em PDF ou imagem</p></div>
@@ -644,7 +644,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.3',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.4',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -717,6 +717,16 @@ self.onmessage=e=>{
       m=line.match(/^EIXOS\s*[:\-]?\s+(\d{1,2})\b/);if(m)register(map,'eixos',parseValue('eixos',m[1],true),score,origin);
       m=line.match(/^(?:ESPECIE\s*\/\s*TIPO)\s*[:\-]?\s+(.+)$/);if(m)register(map,'especie',parseValue('especie',m[1],true),score,origin);
       m=line.match(/^(?:MARCA\s*\/\s*MODELO(?:\s*\/\s*VERSAO)?)\s*[:\-]?\s+(.+)$/);if(m)register(map,'modelo',parseValue('modelo',m[1],true),score,origin);
+      // OCR pode juntar campos de colunas diferentes numa única linha.
+      // Usa âncoras apenas próximas, sem transformar ano do modelo em exercício.
+      m=line.match(/\bPLACA\s*[:\-]?\s+([A-Z0-9]{7})\s+(?:EXERCICIO|EXERC[I1L]C[I1L]O)\s*[:\-]?\s*(20\d{2})/);
+      if(m){register(map,'placa',parseValue('placa',m[1],true),score,origin);register(map,'exercicio',m[2],score,origin);}
+      m=line.match(/\bEXERC[I1L]C[I1L]O\s*[:\-]?\s*(20\d{2})\b/);
+      if(m)register(map,'exercicio',m[1],score,origin);
+      m=line.match(/\bPESO\s*BRUTO\s*TOTAL\s*[:\-]?\s*(\d{1,5}(?:[.,]\d{1,3})?)/);
+      if(m)register(map,'pbt',parseValue('pbt',m[1],true),score,origin);
+      m=line.match(/\bEIXOS\s*[:\-]?\s*(\d{1,2})\b/);
+      if(m)register(map,'eixos',parseValue('eixos',m[1],true),score,origin);
       // Exemplo: CODIGO RENAVAM   PLACA   EXERCICIO, depois 123... ABC1D23 2025.
       if(/\bPLACA\b/.test(line)&&/\bEXERCICIO\b/.test(line)&&i+1<lines.length){
         const next=lines[i+1],paired=next.match(/\b[A-Z0-9]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2}\b\s+(20\d{2})\b/);
@@ -728,7 +738,14 @@ self.onmessage=e=>{
     const loc=txt.match(/\bUF DE REGISTRO\s*[:\-]?\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
     if(loc)register(map,'uf',loc[1],score,'UF registrada');
     // Busca isolada de placa somente se não existe âncora mais confiável.
-    if(!map.placa){const candidates=txt.match(/\b[A-Z]{3}[0-9][A-Z0-9][0-9]{2}\b/g);if(candidates?.length===1)register(map,'placa',candidates[0],1,'Busca livre (revisar)');}
+    // Uma mesma placa costuma aparecer duas vezes (PLACA e PLACA ANTERIOR).
+    // Apenas recupera por busca livre quando todos os candidatos concordam.
+    if(!map.placa){
+      const candidates=[...new Set((txt.match(/\b[A-Z]{3}[0-9][A-Z0-9][0-9]{2}\b/g)||[]).map(repairPlate).filter(Boolean))];
+      if(candidates.length===1)register(map,'placa',candidates[0],1,'Placa repetida (conferir)');
+    }
+    const plateUF=txt.match(/\b[A-Z0-9]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2}\s*\/\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
+    if(plateUF){register(map,'placa',repairPlate(plateUF[0]),2,'Placa anterior/UF (conferir)');register(map,'uf',plateUF[1],2,'Placa anterior/UF');}
     if(!map.especie){const m=txt.match(species);if(m)register(map,'especie',m[0],1,'Busca livre (revisar)');}
   }
   // A identificação OCR usa evidências independentes em vez de exigir que três
@@ -779,7 +796,7 @@ self.onmessage=e=>{
     }else if(found.length){
       notice('Alguns campos foram identificados, mas o documento ainda não pôde ser reconhecido com segurança. Confira os dados ou tente outra leitura.','warning');
     }else{
-      notice('Não foi possível ler informações suficientes. Tente uma foto mais nítida, use “Tentar outra leitura” ou preencha os campos manualmente.','warning');
+      notice('A leitura automática não identificou os campos essenciais com segurança. Confira a prévia ou use “Tentar outra leitura”. Você pode conferir ou corrigir os campos manualmente.','warning');
     }
   }
   const loadScript=url=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=url;s.onload=res;s.onerror=()=>rej(Error('Não foi possível carregar a biblioteca pela internet.'));document.head.append(s);});
@@ -794,7 +811,7 @@ self.onmessage=e=>{
     return window.pdfjsLib;
   }
   // Reutiliza um único worker Tesseract: evita carregar o idioma para cada CRLV.
-  async function ocr(input){
+  async function ocr(input,psm=null){
     if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
     if(!window.Tesseract)throw Error('Motor OCR indisponível. Conecte-se à internet e recarregue.');
     if(!ocrWorkerPromise){
@@ -803,8 +820,62 @@ self.onmessage=e=>{
       }).catch(err=>{ocrWorkerPromise=null;throw err;});
     }
     const worker=await ocrWorkerPromise;
+    // PSM 11 = texto esparso, útil para CRLV em várias colunas.
+    await worker.setParameters({tessedit_pageseg_mode:psm===11?'11':'3'});
     const r=await worker.recognize(input);
     return r?.data?.text||'';
+  }
+  function missingImportant(map){return !map.placa||!map.exercicio||!map.uf||!map.especie;}
+  function canvasRegion(source,x,y,w,h,maxSide=2200){
+    const sx=Math.round(source.width*x),sy=Math.round(source.height*y);
+    const sw=Math.max(1,Math.round(source.width*w)),sh=Math.max(1,Math.round(source.height*h));
+    const ratio=Math.min(2.3,maxSide/Math.max(sw,sh));
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(sw*ratio));c.height=Math.max(1,Math.round(sh*ratio));
+    c.getContext('2d').drawImage(source,sx,sy,sw,sh,0,0,c.width,c.height);
+    return c;
+  }
+  async function scanner52ForOCR(source){
+    // A leitura utiliza a mesma orientação automática da cópia PDF aprovada.
+    try{
+      const r=await scanWith52(source);
+      const canvas=document.createElement('canvas');canvas.width=r.w;canvas.height=r.h;
+      canvas.getContext('2d',{willReadFrequently:true}).putImageData(
+        new ImageData(new Uint8ClampedArray(r.buffer),r.w,r.h),0,0);
+      return {canvas,used:true};
+    }catch(_){
+      // Preserva o documento original se a digitalização não ficar disponível.
+      return {canvas:source,used:false};
+    }
+  }
+  async function readDocumentImage(source,map,parts,tag){
+    const corrected=await scanner52ForOCR(source);
+    const c=corrected.canvas;
+    let text=await ocr(c,11);
+    parts.push('--- '+tag+' ORIENTADO ---\n'+text);
+    parseText(text,map,2,'Scanner 5.2 / OCR');
+    // Reconhecimento por regiões evita que campos pequenos se percam na página inteira.
+    if(missingImportant(map)||!map.pbt||!map.eixos||!map.modelo){
+      // Colunas superiores do CRLV, onde ficam placa, exercício, espécie e PBT.
+      const windows=[
+        [0,.015,.57,.56,'coluna 1'],
+        [.43,.015,.57,.56,'coluna 2']
+      ];
+      for(const [x,y,w,h,label] of windows){
+        if(!missingImportant(map)&&map.pbt&&map.eixos&&map.modelo)break;
+        const region=canvasRegion(c,x,y,w,h);
+        text=await ocr(region,11);
+        parts.push('--- '+tag+' '+label+' ---\n'+text);
+        parseText(text,map,2,'OCR em região');
+      }
+    }
+    // Segunda fonte: original, pois alguns dígitos e QR codes sofrem com o filtro.
+    if(missingImportant(map)){
+      const original=await ocr(source,11);
+      parts.push('--- '+tag+' ORIGINAL ---\n'+original);
+      parseText(original,map,2,'OCR original');
+    }
+    return corrected.used;
   }
   // OpenCV é carregado apenas quando necessário. Se falhar, a melhoria local continua.
   async function opencvLib(){
@@ -1269,40 +1340,24 @@ self.onmessage=e=>{
             const text=await page.getTextContent();const rows=makeRows(text.items);parseCoordinates(rows,map);
             const t=rows.map(r=>r.parts.map(p=>p.text).join('  ')).join('\n');content+='\n'+t;parseText(t,map,2,'Texto do PDF');
           }
-          if(forceOCR||(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed')){
+          if(forceOCR||missingImportant(map)||documentEvidence(content,map).level==='unconfirmed'){
             ocrNeeded=true;
-            const v=page.getViewport({scale:2});const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);await page.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;
-            let target=canvas;if(angle!==0){target=await drawSourceCanvas(canvas.toDataURL('image/png'),angle,2400);}
-            target=await scanCanvas(target,{isPDF:true,page:i-1});
-            const ocrText=await ocr(await enhanceCanvasSmart(target,'gray'));content+='\n--- OCR PÁGINA '+i+' ---\n'+ocrText;parseText(ocrText,map,2,'OCR cinza');source='PDF + OCR';
-            if(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed'){
-              const second=await ocr(await enhanceCanvasSmart(target,'mono'));
-              content+='\n--- OCR P&B PÁGINA '+i+' ---\n'+second;
-              parseText(second,map,2,'OCR P&B');
-            }
-            if(!map.placa||!map.exercicio||documentEvidence(content,map).level==='unconfirmed'){
-              const third=await ocr(target); // Alguns selos e fontes ficam ilegíveis após o filtro.
-              content+='\n--- OCR ORIGINAL PÁGINA '+i+' ---\n'+third;
-              parseText(third,map,2,'OCR original');
-            }
+            const v=page.getViewport({scale:Math.min(3,2400/Math.max(page.view[2]-page.view[0],page.view[3]-page.view[1]))});
+            const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);
+            await page.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;
+            const target=angle===0?canvas:await drawSourceCanvas(canvas.toDataURL('image/png'),angle,2400);
+            const parts=[];
+            await readDocumentImage(target,map,parts,'PDF PÁGINA '+i);
+            content+='\n'+parts.join('\n');source='PDF + OCR orientado';
           }
         }
         if(forceOCR)source='OCR forçado de PDF';else if(!ocrNeeded)source='Texto estruturado do PDF';
       }else{
         const rawCanvas=await drawSourceCanvas(file,angle,2400);
-        const canvas=await scanCanvas(rawCanvas,{isPDF:false,page:0});
-        content=await ocr(await enhanceCanvasSmart(canvas,'gray'));
-        parseText(content,map,2,'OCR cinza');source='Imagem + OCR';
-        if(!map.placa||!map.exercicio||!map.uf||!map.especie||documentEvidence(content,map).level==='unconfirmed'){
-          const second=await ocr(await enhanceCanvasSmart(canvas,'mono'));
-          content+='\n--- OCR P&B ---\n'+second;
-          parseText(second,map,2,'OCR P&B');
-        }
-        if(!map.placa||!map.exercicio||documentEvidence(content,map).level==='unconfirmed'){
-          const third=await ocr(canvas);
-          content+='\n--- OCR ORIGINAL ---\n'+third;
-          parseText(third,map,2,'OCR original');
-        }
+        const parts=[];
+        await readDocumentImage(rawCanvas,map,parts,'IMAGEM');
+        content=parts.join('\n');source='Imagem + Scanner 5.2 + OCR por regiões';
+
       }
       // Se dois métodos discordaram, mantém o valor de maior score e expõe a divergência.
       conflicts=[...new Set(conflicts)];setExtracted(map,source,content.trim());
