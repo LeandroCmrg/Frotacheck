@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck | Leitor de CRLV-e · OCR aprimorado</title>
+<title>FrotaCheck | FrotaCheck · Leitura por etapas</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -102,13 +102,28 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
 .pdf-status.error{color:#ad1420}.pdf-status.ok{color:#16753b}
 .enhance-card[hidden]{display:none!important}
+/* FrotaCheck 5.5: etapas automaticas visiveis; tratamento continua invisivel */
+.stage-area{border-top:1px solid var(--line);padding:17px 22px 4px}
+.stage-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
+.stage-heading strong{font-size:13px}.stage-heading span{font-size:11px;font-weight:750;color:var(--muted)}
+.stage-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.stage-steps li{border:1px solid #e9e6df;background:#f8f7f3;border-radius:11px;padding:11px 9px;display:flex;gap:9px;align-items:flex-start;font-size:12px;font-weight:800;color:#6c6962;min-width:0;transition:background .15s ease}
+.stage-steps li small{font-size:10px;font-weight:500;line-height:1.4;color:inherit;opacity:.85;display:block;margin-top:3px}
+.stage-dot{width:23px;height:23px;border-radius:50%;flex:0 0 23px;background:#e9e5dc;color:#777;display:grid;place-items:center;font-size:11px;font-weight:900}
+.stage-steps li.running{background:#fff8dc;border-color:#f2d26f;color:#473d18}.stage-steps li.running .stage-dot{background:var(--yellow);color:#271900}
+.stage-steps li.done{background:#ecf7ed;border-color:#b9dfc2;color:#1c5830}.stage-steps li.done .stage-dot{background:#247e42;color:white}
+.stage-steps li.failed{background:#fff0ef;border-color:#efb8b3;color:#92242a}.stage-steps li.failed .stage-dot{background:#d40511;color:white}
+.stage-caption{margin:11px 0 8px;font-size:12px;color:var(--muted);line-height:1.5}
+.model-summary{border:1px solid #e8dfcd;border-radius:11px;padding:12px 14px;margin:12px 0;background:#fffdf6;display:flex;flex-direction:column;gap:4px}
+.model-summary small{color:#786b56;font-size:11px}.model-summary strong{font-size:15px;word-break:break-word}
+@media(max-width:520px){.stage-area{padding:15px 17px 5px}.stage-steps{grid-template-columns:1fr}.stage-steps li{padding:9px 12px}.stage-steps li small{display:inline;margin-left:6px}}
 </style>
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.4</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.5</div></div></div></div></header>
 <main>
-<div class="intro"><span class="eyebrow">Leitor de CRLV-e · OCR aprimorado</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie uma foto ou PDF para identificar a categoria do veículo e consultar o calendário estadual de 2026.</p></div>
+<div class="intro"><span class="eyebrow">FrotaCheck · Leitura por etapas</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck melhora a imagem, lê os dados e verifica o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
 <section class="panel" aria-labelledby="upload-title">
   <div class="panel-head"><h2 class="panel-title" id="upload-title"><span class="number">1</span>Enviar documento</h2><p>CRLV-e em PDF ou imagem</p></div>
@@ -121,6 +136,16 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div id="file-notice" class="notice" role="status" aria-live="polite">Leitura automática. Revise as informações antes de usar o resultado.</div>
   <p class="file-hint">Até 15 MB. Leitura e PDF melhorado processados no navegador, sem envio a serviços externos.</p>
   </div>
+  <section class="stage-area" aria-label="Etapas da análise do CRLV">
+    <div class="stage-heading"><strong>Análise automática</strong><span id="stage-count">Aguardando documento</span></div>
+    <ol class="stage-steps" id="stage-steps">
+      <li data-phase="0"><span class="stage-dot">1</span><span>Digitalizar CRLV<small>Recorte, orientação e limpeza</small></span></li>
+      <li data-phase="1"><span class="stage-dot">2</span><span>Ler a cópia tratada<small>OCR dos campos do documento</small></span></li>
+      <li data-phase="2"><span class="stage-dot">3</span><span>Identificar veículo<small>Modelo, espécie, PBT e eixos</small></span></li>
+      <li data-phase="3"><span class="stage-dot">4</span><span>Consultar prazo 2026<small>UF, placa e tipo de veículo</small></span></li>
+    </ol>
+    <p class="stage-caption" id="stage-caption" role="status" aria-live="polite">Selecione um CRLV para começar.</p>
+  </section>
   <div class="pdf-only" id="pdf-only">
     <button class="button primary enhance-download" id="download-pdf" type="button" disabled>↓ Baixar PDF melhorado</button>
     <p class="pdf-status" id="pdf-only-status" role="status" aria-live="polite">Envie um documento para preparar a cópia melhorada.</p>
@@ -162,7 +187,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
       <div class="field"><label for="largura">Largura (m)</label><input id="largura" inputmode="decimal" placeholder="Ex.: 2,5" /></div>
       <div class="field full"><label for="override">Tipo confirmado pelo analista</label><select id="override"><option value="">Usar classificação automática</option><option>Passeio</option><option>Van</option><option>VUC</option><option>Médio</option><option>Toco</option><option>Truck</option><option>Carreta</option><option>Outro / a confirmar</option></select></div>
     </div>
-    <details class="inner-details"><summary>Opções avançadas de leitura</summary>
+    <details class="inner-details" hidden aria-hidden="true"><summary>Opções avançadas de leitura</summary>
       <div class="advanced-layout"><div class="field"><label for="rotation">Rotação da imagem / OCR</label><select id="rotation"><option value="0">0° · original</option><option value="90">90°</option><option value="180">180°</option><option value="270">270°</option></select></div><button class="button" type="button" id="force-ocr">↻ Reprocessar com OCR</button></div>
       <details class="debug"><summary>Detalhes técnicos da extração</summary><div id="extract-audit"></div><pre id="rawtext">Nenhum arquivo analisado.</pre></details>
     </details>
@@ -172,12 +197,13 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="result-head"><h2 id="result-title">Resultado do CRLV-e</h2><span class="result-tag">CONSULTA DE APOIO</span></div>
   <div class="result-tile red"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7zM7.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>Tipo do veículo</div><div class="big" id="category">Aguardando dados</div><span class="type-confidence" id="confidence">—</span><p class="detail-note" id="category-note">O tipo aparecerá após a leitura ou o preenchimento.</p></div>
   <div class="result-tile yellow"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>Licenciamento • calendário 2026</div><div class="big deadline-date" id="deadline">—</div><div class="year" id="renewal-year">Calendário de 2026</div><span class="status neutral" id="status">Aguardando documento</span><p class="detail-note" id="deadline-kind"></p></div>
+  <div class="model-summary"><small>Marca / modelo identificado</small><strong id="result-model">Aguardando leitura</strong></div>
   <div class="meta"><div class="meta-item"><small>Placa</small><b id="summary-placa">—</b></div><div class="meta-item"><small>UF</small><b id="summary-uf">—</b></div><div class="meta-item"><small>Exercício</small><b id="summary-exercicio">—</b></div></div>
   <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário de 2026.</p>
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
 </section>
 </div>
-<div class="footer-note">Calendários de 2026 para as 27 UFs, sem projeções para outros anos. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. Categorias como VUC, toco e truck são sugestões operacionais e podem exigir conferência técnica.</div>
+<div class="footer-note">O prazo do calendário não é, por si só, prova de que um CRLV do exercício 2026 esteja vencido. A situação oficial depende de consulta ao Detran. Calendários de 2026 para as 27 UFs, sem projeções para outros anos. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. Categorias como VUC, toco e truck são sugestões operacionais e podem exigir conferência técnica.</div>
 </main>
 <div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
   <div class="scanner-box">
@@ -497,6 +523,26 @@ self.onmessage=e=>{
   const plateFinal=s=>validPlate(s)?Number(plateFmt(s).slice(-1)):null;
   const fmt=d=>d.toLocaleDateString('pt-BR');
   let lastFile=null,rawText='',extraction={}, conflicts=[],extractionMode='manual',pending=false;
+  let processedCache=null;
+  let activeProcessId=0;
+  const phaseStates=['idle','idle','idle','idle'];
+  function setStage(index,status,caption){
+    if(index<0){for(let i=0;i<4;i++)phaseStates[i]='idle';}
+    else if(index<4)phaseStates[index]=status;
+    document.querySelectorAll('#stage-steps li').forEach((li,i)=>{
+      li.classList.toggle('done',phaseStates[i]==='done');
+      li.classList.toggle('running',phaseStates[i]==='running');
+      li.classList.toggle('failed',phaseStates[i]==='failed');
+      li.querySelector('.stage-dot').textContent=phaseStates[i]==='done'?'✓':String(i+1);
+    });
+    const allDone=phaseStates.every(s=>s==='done');
+    $('stage-count').textContent=allDone?'Concluído':index<0?'Aguardando documento':
+      status==='failed'?'Conferência necessária':`Etapa ${Math.min(index+1,4)} de 4`;
+    if(caption)$('stage-caption').textContent=caption;
+  }
+  function resetStages(){setStage(-1,'idle','Selecione um CRLV para começar.');}
+  const yieldScreen=()=>new Promise(resolve=>setTimeout(resolve,0));
+
   let enhancementBusy=false,previewToken=0;
   let documentLooksRight=false;
   let opencvReadyPromise=null,ocrWorkerPromise=null,lastEnhancementEngine="Ajuste local";
@@ -596,6 +642,7 @@ self.onmessage=e=>{
     const final=plateFinal(v.placa),exc=Number(v.exercicio),validYear=/^20\d{2}$/.test(v.exercicio);
     const cat=classify(v);
     $('category').textContent=cat.name;
+    $('result-model').textContent=v.modelo||'Não identificado — conferir o CRLV';
     $('category-note').textContent=cat.note;
     $('confidence').textContent=cat.confidence;
     $('summary-placa').textContent=plateFmt(v.placa)||'—';
@@ -622,15 +669,20 @@ self.onmessage=e=>{
           title='Prazo de 2026';css='neutral';
           msg='Confira o exercício do CRLV para interpretar o prazo: a data é da tabela de 2026.';
         }else if(exc===2026){
-          title='CRLV exercício 2026';css='ok';$('deadline').classList.add('on-time');
-          msg='O CRLV apresentado já é do exercício de 2026. A data exibida é o prazo do calendário 2026, NÃO o vencimento deste documento. A situação oficial deve ser consultada no Detran.';
+          title='CRLV 2026 apresentado';css='ok';$('deadline').classList.add('on-time');
+          msg='O documento apresentado informa exercício 2026. A data é apenas o prazo da tabela de 2026, não a data de vencimento do CRLV já emitido. Regularidade oficial: consulte o Detran.';
         }else if(exc===2025){
-          if(delta<0){title='Prazo 2026 encerrado';css='bad';$('deadline').classList.add('overdue');msg='O documento está no exercício 2025 e o prazo de licenciamento 2026 já passou. Verifique se foi emitido um CRLV 2026 atualizado.';}
+          if(delta<0){
+            const onlyPayment=/pagamento|IPVA|emiss[aã]o/i.test(dl.kind||'')&&!/circula[cç][aã]o|validade|exig[eê]ncia|fiscaliza[cç][aã]o/i.test(dl.kind||'');
+            title=onlyPayment?'Prazo de pagamento passou':'Prazo de 2026 vencido';css=onlyPayment?'warn':'bad';
+            if(!onlyPayment)$('deadline').classList.add('overdue');
+            msg=onlyPayment?'O prazo de pagamento de 2026 já passou. Isso não comprova, por si só, que o CRLV está vencido; confirme a situação no Detran.':'O CRLV apresentado é do exercício 2025 e o prazo da tabela de 2026 já passou. Verifique se foi emitido o documento atualizado no Detran.';
+          }
           else if(delta<=30){title=delta===0?'Prazo termina hoje':'Prazo próximo';css='warn';$('deadline').classList.add('on-time');msg=delta===0?'O prazo do calendário 2026 termina hoje.':'Faltam '+delta+' dias para o prazo da tabela 2026.';}
           else{title='Dentro do prazo 2026';css='ok';$('deadline').classList.add('on-time');msg='O prazo de licenciamento 2026 ainda não terminou no calendário consultado.';}
         }else if(exc<2025){
-          title='Exercício antigo — verificar';css='bad';
-          msg='O CRLV apresentado é anterior a 2025. A tabela de 2026, isoladamente, não comprova a situação; consulte o Detran.';
+          title='Exercício antigo — verificar';css='neutral';
+          msg='O documento apresentado é anterior a 2025; confirme o exercício atualizado no Detran. O calendário 2026 sozinho não comprova vencimento oficial.';
         }else{
           title='Exercício fora da tabela';css='neutral';
           msg='Este site apresenta apenas os prazos de 2026. Confirme a data e o exercício do documento.';
@@ -644,7 +696,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.4',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.5',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -848,8 +900,8 @@ self.onmessage=e=>{
       return {canvas:source,used:false};
     }
   }
-  async function readDocumentImage(source,map,parts,tag){
-    const corrected=await scanner52ForOCR(source);
+  async function readDocumentImage(source,map,parts,tag,alreadyScanned=false,originalSource=null){
+    const corrected=alreadyScanned?{canvas:source,used:true}:await scanner52ForOCR(source);
     const c=corrected.canvas;
     let text=await ocr(c,11);
     parts.push('--- '+tag+' ORIENTADO ---\n'+text);
@@ -871,7 +923,7 @@ self.onmessage=e=>{
     }
     // Segunda fonte: original, pois alguns dígitos e QR codes sofrem com o filtro.
     if(missingImportant(map)){
-      const original=await ocr(source,11);
+      const original=await ocr(originalSource||source,11);
       parts.push('--- '+tag+' ORIGINAL ---\n'+original);
       parseText(original,map,2,'OCR original');
     }
@@ -1315,54 +1367,124 @@ self.onmessage=e=>{
   }
   async function handleFile(file){
     if(!file)return;
+    if(pending){notice('Aguarde a análise atual terminar antes de enviar outro arquivo.','warning');return;}
     // OCR e tratamento de documentos feitos no próprio navegador.
     lastFile=file;
+    processedCache=null;
     resetProcessedPDF();
+    resetStages();
     return processFile(file);
   }
   async function processFile(file,forceOCR=false){
-    if(!file)return;if(file.size>15*1024*1024){notice('Tamanho máximo: 15 MB.','danger');return;}
-    const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name),isImage=/^image\/(png|jpeg|webp)$/.test(file.type)||/\.(png|jpe?g|webp)$/i.test(file.name);
+    if(!file)return;
+    if(file.size>15*1024*1024){notice('Tamanho máximo: 15 MB.','danger');return;}
+    const isPDF=file.type==='application/pdf'||/\.pdf$/i.test(file.name);
+    const isImage=/^image\/(png|jpeg|webp)$/.test(file.type)||/\.(png|jpe?g|webp)$/i.test(file.name);
     if(!isPDF&&!isImage){notice('Apenas PDF, PNG, JPG e WebP.','danger');return;}
-    if(pending)return;pending=true;lastFile=file;documentLooksRight=false;
-    $('retry-reading').disabled=false;
-    if(!forceOCR){fields.forEach(k=>$(k).value='');extraction={};conflicts=[];rawText='';$('rawtext').textContent='Aguardando leitura...';renderExtraction();analyze();}$('select-file').disabled=$('force-ocr').disabled=true;
-    notice(forceOCR?'Reprocessando com OCR forçado...':'Lendo arquivo e identificando campos...');
+    if(pending)return;
+    pending=true;
+    const taskId=++activeProcessId;
+    lastFile=file;documentLooksRight=false;
+    $('retry-reading').disabled=true;
+    $('select-file').disabled=$('force-ocr').disabled=true;
+    let currentStage=0;
+    if(!forceOCR){
+      fields.forEach(k=>$(k).value='');extraction={};rawText='';conflicts=[];
+      $('rawtext').textContent='Aguardando leitura...';renderExtraction();analyze();
+    }
     try{
-      let content='',map={},source='Texto do PDF';conflicts=[];
-      const angle=Number($('rotation').value);
-      if(isPDF){
-        const pdf=await(await pdfLib()).getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
-        const total=Math.min(pdf.numPages,2);let ocrNeeded=forceOCR;
-        for(let i=1;i<=total;i++){
-          const page=await pdf.getPage(i);
-          if(!forceOCR){
-            const text=await page.getTextContent();const rows=makeRows(text.items);parseCoordinates(rows,map);
-            const t=rows.map(r=>r.parts.map(p=>p.text).join('  ')).join('\n');content+='\n'+t;parseText(t,map,2,'Texto do PDF');
-          }
-          if(forceOCR||missingImportant(map)||documentEvidence(content,map).level==='unconfirmed'){
-            ocrNeeded=true;
-            const v=page.getViewport({scale:Math.min(3,2400/Math.max(page.view[2]-page.view[0],page.view[3]-page.view[1]))});
-            const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);
-            await page.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;
-            const target=angle===0?canvas:await drawSourceCanvas(canvas.toDataURL('image/png'),angle,2400);
-            const parts=[];
-            await readDocumentImage(target,map,parts,'PDF PÁGINA '+i);
-            content+='\n'+parts.join('\n');source='PDF + OCR orientado';
-          }
+      setStage(0,'running','Preparando uma cópia legível e corrigindo a orientação do documento...');
+      notice('Etapa 1/4 • Digitalizando o CRLV...');
+      await yieldScreen();
+      let batch=processedCache?.file===file?processedCache:null;
+      if(!batch){
+        // Sempre digitalizar antes de começar o OCR. O processamento é local.
+        const originals=await getCanvasForDocument(file,1850,false);
+        if(!originals.length)throw Error('Nenhuma página legível foi encontrada.');
+        const scanned=[];
+        let improvements=0;
+        for(let i=0;i<originals.length;i++){
+          setStage(0,'running',`Digitalizando página ${i+1} de ${originals.length}...`);
+          try{
+            const r=await scanWith52(originals[i]);
+            const canvas=document.createElement('canvas');canvas.width=r.w;canvas.height=r.h;
+            canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(r.buffer),r.w,r.h),0,0);
+            scanned.push(canvas);improvements++;
+          }catch(err){scanned.push(originals[i]);}
+          await yieldScreen();
         }
-        if(forceOCR)source='OCR forçado de PDF';else if(!ocrNeeded)source='Texto estruturado do PDF';
-      }else{
-        const rawCanvas=await drawSourceCanvas(file,angle,2400);
-        const parts=[];
-        await readDocumentImage(rawCanvas,map,parts,'IMAGEM');
-        content=parts.join('\n');source='Imagem + Scanner 5.2 + OCR por regiões';
-
+        if(!improvements)throw Error('Não foi possível melhorar o documento. Tente uma fotografia mais nítida.');
+        batch={file,originals,scanned,improvements};
+        if(taskId!==activeProcessId||file!==lastFile)return;
+        processedCache=batch;
       }
-      // Se dois métodos discordaram, mantém o valor de maior score e expõe a divergência.
-      conflicts=[...new Set(conflicts)];setExtracted(map,source,content.trim());
-    }catch(e){notice('Falha na leitura automática: '+(e.message||String(e))+'. Tente “Leitura com imagem melhorada” ou confira os campos manualmente. O PDF melhorado continua disponível.','danger');$('rawtext').textContent='Não foi possível processar o arquivo.';}
-    finally{pending=false;$('select-file').disabled=$('force-ocr').disabled=false;}
+      if(!pdfReady){
+        pdfReady=makeEnhancedPdf(batch.scanned);
+        pdfButton('↓ Baixar PDF melhorado',false);
+        pdfMessage(batch.improvements===batch.scanned.length?'Cópia melhorada pronta para baixar.':'Cópia parcialmente tratada. Algumas páginas foram preservadas.','ok');
+      }
+      setStage(0,'done','Cópia digitalizada pronta. Iniciando leitura dos dados.');
+      currentStage=1;setStage(1,'running','O OCR está lendo a cópia tratada, não a fotografia original.');
+      notice('Etapa 2/4 • Extraindo os campos do CRLV tratado...');
+      await yieldScreen();
+      const map={},parts=[];conflicts=[];
+      // O documento tratado é a fonte principal. Em PDFs com texto pesquisável,
+      // o texto original só entra como apoio quando os dados ainda estão incompletos.
+      for(let i=0;i<Math.min(2,batch.scanned.length);i++){
+        setStage(1,'running',`Lendo página tratada ${i+1} de ${Math.min(2,batch.scanned.length)}...`);
+        await readDocumentImage(batch.scanned[i],map,parts,'CÓPIA TRATADA PÁGINA '+(i+1),true,batch.originals[i]);
+        await yieldScreen();
+      }
+      if(isPDF&&(missingImportant(map)||!map.modelo||!map.pbt||!map.eixos)){
+        const pdf=await(await pdfLib()).getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+        for(let i=1;i<=Math.min(2,pdf.numPages);i++){
+          const page=await pdf.getPage(i);
+          const items=(await page.getTextContent()).items;
+          const rows=makeRows(items);
+          parseCoordinates(rows,map);
+          const txt=rows.map(r=>r.parts.map(p=>p.text).join('  ')).join('\n');
+          if(txt.trim()){parts.push('--- TEXTO EMBUTIDO PDF '+i+' (APOIO) ---\n'+txt);parseText(txt,map,2,'Texto embutido de apoio');}
+        }
+      }
+      setStage(1,'done','Leitura concluída. Conferindo modelo e categoria.');
+      currentStage=2;setStage(2,'running','Identificando modelo, espécie, quantidade de eixos e PBT...');
+      notice('Etapa 3/4 • Identificando o veículo...');
+      await yieldScreen();
+      const text=parts.join('\n').trim();
+      setExtracted(map,'Scanner 5.2 → OCR por regiões'+(isPDF?' + PDF de apoio':''),text);
+      const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));
+      const cat=classify(v);
+      if(!v.modelo||cat.name==='Aguardando dados'||cat.name==='A confirmar'){
+        setStage(2,'failed','Não foi possível confirmar toda a tipologia. Confira modelo, espécie, PBT e eixos no documento.');
+      }else{setStage(2,'done',`Veículo identificado: ${cat.name}. Consultando a tabela estadual de 2026...`);}
+      currentStage=3;setStage(3,'running','Consultando UF, placa, espécie/tipo e exercício no calendário de 2026...');
+      notice('Etapa 4/4 • Consultando prazo do licenciamento 2026...');
+      await yieldScreen();
+      const r=analyze();
+      if(!r.calendar?.deadline||r.calendar.needsConfirmation||!v.exercicio){
+        setStage(3,'failed','A data ou a situação exige conferência. Confira placa, UF, exercício e fonte do Detran.');
+      }else{
+        setStage(3,'done','Análise concluída. Confira tipo, modelo, situação e prazo do calendário 2026.');
+        $('stage-count').textContent=phaseStates.every(s=>s==='done')?'Concluído':'Concluído com conferência';
+      }
+      const ev=documentEvidence(text,map);
+      if(!map.placa||!map.uf||!map.exercicio){
+        notice('Cópia melhorada e OCR concluídos, mas faltam placa, UF ou exercício para confirmar a situação. Confira os campos identificados.','warning');
+      }else if(ev.level!=='identified'){
+        notice('Leitura parcial concluída. Tipo e prazo são sugestões baseadas nos campos encontrados; confira no documento original.','warning');
+      }else{
+        notice('CRLV lido a partir da cópia melhorada. Confira o resultado antes de utilizá-lo.','success');
+      }
+    }catch(err){
+      setStage(currentStage,'failed','Não foi possível concluir a análise. '+String(err?.message||err));
+      notice('Não foi possível concluir a leitura: '+String(err?.message||err)+'. Confira o arquivo ou tente novamente.','danger');
+      $('rawtext').textContent='Falha na análise automática.';
+    }finally{
+      pending=false;
+      $('retry-reading').disabled=!lastFile;
+      $('select-file').disabled=$('force-ocr').disabled=false;
+      if(pdfReady)pdfButton('↓ Baixar PDF melhorado',false);
+    }
   }
   // QR com câmera: reconhecimento óptico é diferente da decodificação/validação VIO.
   // QR VIO é criptografado; apenas a API autorizada do Serpro permitiria extrair os campos oficiais.
@@ -1593,14 +1715,14 @@ self.onmessage=e=>{
     finally{if(version===pdfGeneration){pdfBusy=null;pdfButton('↓ Baixar PDF melhorado',false);}}
   }
   $('download-pdf').addEventListener('click',()=>{void createEnhancedPDF();});
-  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;resetProcessedPDF();previewToken++;scanOriginal=null;autoCorners=null;manualCorners=null;cropDrag=-1;$('scan-crop').hidden=true;$('crop-mode').value='auto';$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
+  $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;processedCache=null;activeProcessId++;resetProcessedPDF();resetStages();previewToken++;scanOriginal=null;autoCorners=null;manualCorners=null;cropDrag=-1;$('scan-crop').hidden=true;$('crop-mode').value='auto';$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
   $('copy-summary').addEventListener('click',async()=>{
     const r=analyze();
     const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário consultado: 2026\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
     try{await navigator.clipboard.writeText(s);notice('Resultado copiado.','success');}
     catch(e){notice('Não foi possível copiar automaticamente.','warning');}
   });
-  renderExtraction();analyze();
+  renderExtraction();analyze();resetStages();
   // Funções de diagnóstico local, sem envio de documentos.
   window.__FrotaCheckTest={calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,makeEnhancedPdf,setExtracted};
 })();
