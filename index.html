@@ -51,7 +51,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 <div class="topstripe"></div>
 <header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS</div></div></div></div></header>
 <main>
-<div class="intro"><span class="eyebrow">Leitor de CRLV-e</span><h1>Tipo do veículo e vencimento.</h1><p>Envie o CRLV-e e confira o tipo do veículo e a data de renovação de 2026 para as 27 UFs.</p></div>
+<div class="intro"><span class="eyebrow">Leitor de CRLV-e</span><h1>Tipo do veículo e vencimento.</h1><p>Envie o CRLV-e e confira o tipo do veículo e o prazo de renovação.</p></div>
 <div class="layout">
 <section class="panel" aria-labelledby="upload-title">
   <div class="panel-head"><h2 class="panel-title" id="upload-title"><span class="number">1</span>Enviar documento</h2><p>CRLV-e em PDF ou imagem</p></div>
@@ -263,6 +263,15 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     if(!validYear){title='Informe o exercício';msg='Precisamos do ano de exercício do CRLV para identificar o calendário seguinte.';}
     else if(final===null){title='Informe a placa';msg='É preciso identificar o final da placa.';}
     else if(!v.uf){title='Informe a UF';msg='É preciso informar o estado de registro do veículo.';}
+    else if(targetYear===2027 && today().getFullYear()===2026){
+      // O documento do exercício corrente tem renovação prevista para o ano seguinte.
+      // Não afirmar dia/mês, nem regularidade oficial, sem calendário de 2027 e consulta ao Detran.
+      $('deadline').textContent='Em 2027';
+      $('deadline').classList.add('on-time');
+      title='Não vencido pelo exercício';
+      css='ok';
+      msg='CRLV do exercício 2026: o licenciamento não está vencido pelo critério do ano de exercício. A próxima renovação será em 2027. O dia e o mês dependem do calendário oficial de '+v.uf+', ainda não cadastrado. Esta indicação não substitui a consulta de regularidade ao Detran.';
+    }
     else if(targetYear!==2026){title='Calendário não disponível';msg='O CRLV de exercício '+exc+' deve ser comparado com o calendário de '+targetYear+'. A base atual contempla o calendário de 2026; para outros anos, consulte o Detran.';}
     else if(!dates[v.uf]){title='UF não mapeada';msg='O calendário 2026 de '+v.uf+' precisa de conferência. Consulte o Detran da UF.';}
     else {
@@ -285,7 +294,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'3.3',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
+    return {version:'3.4',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:targetYear,disclaimer:'Triagem interna. Não autentica o CRLV, nem consulta situação, restrições ou débitos no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
