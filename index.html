@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck 5.12 | Tipologia e carroceria</title>
+<title>FrotaCheck 5.13 | Tipologia e carroceria</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -120,7 +120,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.processing-strip{margin:10px 17px 4px}}
 
-/* FrotaCheck 5.12 — validação visual de carroceria */
+/* FrotaCheck 5.13 — validação visual de carroceria */
 .body-check{margin:14px 0 15px;border:1px solid #e4d8ad;background:linear-gradient(145deg,#fffdf3,#fff9e5);border-radius:17px;padding:18px;box-shadow:0 5px 16px #45310e0b}
 .body-check .check-overline{display:flex;align-items:center;gap:8px;color:#8d111b;font-size:11px;letter-spacing:.7px;font-weight:850;text-transform:uppercase}
 .body-check .check-icon{height:29px;width:29px;border-radius:9px;display:grid;place-items:center;background:#ffeab1;font-size:16px}
@@ -147,7 +147,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.12</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.13</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura inteligente</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck preserva PDFs digitais, melhora fotos e confere o prazo do calendário estadual de 2026.</p></div>
 <div class="layout">
@@ -809,7 +809,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.12',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.13',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -1929,7 +1929,7 @@ self.onmessage=e=>{
     return sendGeminiPayload({mime:'application/pdf',base64:await fileToBase64(file)});
   }
   async function sendGeminiPayload(body){
-    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),110000);
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),42000);
     try{
       const response=await fetch(GEMINI_WORKER_URL+'/ocr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal,cache:'no-store'});
       const data=await response.json().catch(()=>null);
@@ -1942,13 +1942,9 @@ self.onmessage=e=>{
   async function geminiRead(scanned,original){
     if(!consentimentoGemini())throw Error('Envio à IA não autorizado. O PDF local permanece disponível.');
     const base64=jpegBase64(scanned,.91);
-    const original64=original?jpegBase64(original,.79):'';
-    const body={mime:'image/jpeg',base64};
-    // Usar o original apenas como verificação de caracteres ambíguos.
-    if(original64 && base64.length+original64.length<=21000000){
-      body.originalMime='image/jpeg';body.originalBase64=original64;
-    }
-    return sendGeminiPayload(body);
+    // No fluxo rapido, enviar apenas a digitalizacao aprimorada.
+    // O original permanece em processedCache para conferencias e OCR local.
+    return sendGeminiPayload({mime:'image/jpeg',base64});
   }
   function tonnesFromGemini(value){
     const raw=String(value||'').trim().toUpperCase();
@@ -1997,6 +1993,16 @@ self.onmessage=e=>{
     resetStages();
     return processFile(file);
   }
+  // PDF digital com campos suficientes nao necessita de chamada ao Gemini.
+  // Nunca tratar PBT como capacidade; para cavalos e semirreboques a especie basta.
+  function nativeFieldsSufficient(map){
+    const complete=['placa','uf','exercicio','modelo','especie','eixos']
+      .every(k=>!!map[k]?.value);
+    if(!complete)return false;
+    const speciesNorm=norm(map.especie.value);
+    return !!map.capacidade?.value ||
+      /(?:CAMINHAO\s*[- ]?TRATOR|SEMI\s*[- ]?REBOQUE)/.test(speciesNorm);
+  }
   async function processFile(file,forceOCR=false){
     if(!file)return;
     if(file.size>15*1024*1024){notice('Tamanho máximo: 15 MB.','danger');return;}
@@ -2039,19 +2045,24 @@ self.onmessage=e=>{
         parseText(native.text,map,3,'Texto nativo do PDF');
         parts.push('--- TEXTO ORIGINAL DO PDF ---\n'+native.text);
         currentStage=1;setStage(1,'running','Leitura direta do PDF digital...');
-        try{
-          aiData=await geminiReadNativePdf(file);
-          if(taskId!==activeProcessId||file!==lastFile)return;
-          aiUsed=true;aiCrlv=aiData.is_crlv===true;
-          const aiMap=mapFromGemini(aiData);
-          for(const [key,value] of Object.entries(aiMap)){
-            if(map[key]?.value&&map[key].value!==value.value)conflicts.push(`${names[key]||key}: PDF ${map[key].value} × Gemini ${value.value}`);
-            // Local nativo tem prioridade quando já capturou claramente a posição do campo.
-            if(!map[key]||map[key].score<3)map[key]=value;
-          }
-          parts.push(summaryFromGemini(aiMap));
-        }catch(err){aiError=String(err?.message||err);}
-        extractionMode='PDF digital nativo → Gemini / extração local';
+        if(!forceOCR && nativeFieldsSufficient(map)){
+          extractionMode='PDF digital → leitura direta (Gemini dispensado)';
+          setStage(1,'done','Todos os campos essenciais identificados no PDF original.');
+        }else{
+          try{
+            aiData=await geminiReadNativePdf(file);
+            if(taskId!==activeProcessId||file!==lastFile)return;
+            aiUsed=true;aiCrlv=aiData.is_crlv===true;
+            const aiMap=mapFromGemini(aiData);
+            for(const [key,value] of Object.entries(aiMap)){
+              if(map[key]?.value&&map[key].value!==value.value)conflicts.push(`${names[key]||key}: PDF ${map[key].value} × Gemini ${value.value}`);
+              // O texto nativo mantem prioridade se lido com boa confianca.
+              if(!map[key]||map[key].score<3)map[key]=value;
+            }
+            parts.push(summaryFromGemini(aiMap));
+          }catch(err){aiError=String(err?.message||err);}
+          extractionMode='PDF digital nativo → Gemini / extração local';
+        }
       }else{
         if(!batch){
           const originals=await getCanvasForDocument(file,2150,false);
@@ -2065,7 +2076,7 @@ self.onmessage=e=>{
           if(!improvements)throw Error('Não foi possível melhorar a imagem.');
           batch={file,originals,scanned,improvements};processedCache=batch;
         }
-        if(!pdfReady){pdfReady=makeEnhancedPdf(batch.scanned);pdfButton('↓ Baixar PDF melhorado',false);pdfMessage('Cópia melhorada pronta.','ok');}
+        if(!pdfReady){pdfButton('↓ Baixar PDF melhorado',false);pdfMessage('Leitura pronta. A cópia em PDF será gerada apenas ao baixar.','ok');}
         setStage(0,'done','Imagem adaptada para leitura.');
         currentStage=1;setStage(1,'running','Gemini lendo imagem...');
         try{
@@ -2118,7 +2129,7 @@ self.onmessage=e=>{
         notice(native?.native?'CRLV digital lido sem alterações no PDF original. Confira os campos extraídos.':aiUsed?'CRLV interpretado pelo Gemini IA a partir da imagem melhorada. Confira os campos.':'CRLV lido pelo OCR local de reserva. Confira os dados.','success');
       }
       if(aiError){
-        notice('Gemini não concluiu a leitura ('+aiError+'). O OCR local foi usado como alternativa; confira os dados.','warning');
+        notice('Gemini não concluiu a leitura ('+aiError+'). '+(native?.native?'O texto nativo do PDF foi utilizado.':'O OCR local foi usado como alternativa.')+' Confira os dados.','warning');
         $('ai-diagnostic').hidden=false;
       }
     }catch(err){
@@ -2430,21 +2441,27 @@ self.onmessage=e=>{
     pdfBusy=(async()=>{
       pdfButton('Digitalizando documento...',true);
       pdfMessage('Endireitando, recortando e clareando o CRLV no navegador...');
-      const pages=await getCanvasForDocument(file,2150,false);
+      const cached=processedCache?.file===file ? processedCache : null;
       const processed=[];
       let count=0;
-      for(let i=0;i<pages.length;i++){
-        if(version!==pdfGeneration||file!==lastFile)throw Error('Arquivo substituído durante a leitura.');
-        pdfMessage('Digitalizando página '+(i+1)+' de '+pages.length+'...');
-        try{
-          const upright=prepareUprightCrlv(pages[i]);
-          const r=await scanWith52(upright.canvas,upright.corrected);
-          processed.push(canvasFromScanResult(r));count++;
-        }catch(err){
-          // Nunca perder uma página original se o scanner falhar.
-          processed.push(pages[i]);
+      if(cached?.scanned?.length){
+        processed.push(...cached.scanned);
+        count=cached.improvements||processed.length;
+        pdfMessage('Reutilizando a digitalização já realizada.');
+      }else{
+        const pages=await getCanvasForDocument(file,2150,false);
+        for(let i=0;i<pages.length;i++){
+          if(version!==pdfGeneration||file!==lastFile)throw Error('Arquivo substituído durante a leitura.');
+          pdfMessage('Digitalizando página '+(i+1)+' de '+pages.length+'...');
+          try{
+            const upright=prepareUprightCrlv(pages[i]);
+            const r=await scanWith52(upright.canvas,upright.corrected);
+            processed.push(canvasFromScanResult(r));count++;
+          }catch(err){
+            processed.push(pages[i]);
+          }
+          await new Promise(resolve=>setTimeout(resolve,0));
         }
-        await new Promise(resolve=>setTimeout(resolve,0));
       }
       if(!count)throw Error('O scanner não conseguiu melhorar nenhuma página. Nenhum PDF foi alterado.');
       const pdf=makeEnhancedPdf(processed);
