@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck 5.18 | Calendários históricos ampliados</title>
+<title>FrotaCheck 5.19 | RBM — faixas de carga corrigidas</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -120,7 +120,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.processing-strip{margin:10px 17px 4px}}
 
-/* FrotaCheck 5.18 — cabine estendida / PTC / carroceria aberta */
+/* FrotaCheck 5.19 — RBM por faixas inferiores + PTC */
 .body-check{margin:14px 0 15px;border:1px solid #e4d8ad;background:linear-gradient(145deg,#fffdf3,#fff9e5);border-radius:17px;padding:18px;box-shadow:0 5px 16px #45310e0b}
 .body-check .check-overline{display:flex;align-items:center;gap:8px;color:#8d111b;font-size:11px;letter-spacing:.7px;font-weight:850;text-transform:uppercase}
 .body-check .check-icon{height:29px;width:29px;border-radius:9px;display:grid;place-items:center;background:#ffeab1;font-size:16px}
@@ -150,7 +150,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .uf-rescue p{font-size:12px;color:#765c40;margin:0 0 9px;line-height:1.4}
 .uf-rescue select{background:white;border:1px solid #d9b686;color:#312e28;font-weight:700;padding:10px 12px;width:100%;min-height:44px;border-radius:9px;font-size:16px}
 
-/* v5.18 - PTC e escolha visual compacta e responsiva */
+/* v5.19 - PTC e escolha visual compacta e responsiva */
 .ptc-alert{display:flex;flex-direction:column;gap:3px;border-left:4px solid #b90d20;background:#fff1ed;border-radius:9px;padding:10px 12px;margin:10px 0 9px;color:#92201d;font-size:12px}
 .ptc-alert strong{font-size:13px;line-height:1.4}
 .ptc-alert span{font-size:11px;color:#69534c}
@@ -278,13 +278,13 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário correspondente ao exercício (2024–2026).</p>
   <details class="rbm-reference"><summary>▤ Consultar referência de tipologias RBM</summary>
     <table><thead><tr><th>Tipologia</th><th>Carga de referência</th><th>Volume</th></tr></thead>
-      <tbody><tr><td>Utilitário</td><td>500 kg</td><td>2 m³</td></tr><tr><td>Van</td><td>1.500 kg</td><td>6 ou 8 m³</td></tr><tr><td>HR</td><td>1.800 kg</td><td>12 m³</td></tr><tr><td>VUC</td><td>2.200 kg</td><td>16 m³</td></tr><tr><td>Médio</td><td>3.500 kg</td><td>25 m³</td></tr><tr><td>Toco</td><td>6.000 kg</td><td>40 m³</td></tr><tr><td>Truck</td><td>12.000 kg</td><td>50 m³</td></tr><tr><td>Carreta</td><td>24.000 kg</td><td>90 m³</td></tr></tbody>
-    </table><p>Referências operacionais da tabela enviada. Não confunda PBT com capacidade útil e não deduza o volume apenas pelo CRLV.</p>
+      <tbody><tr><td>Utilitário / Fiorino</td><td>500 até &lt; 1.500 kg</td><td>2 m³</td></tr><tr><td>Van</td><td>1.500 até &lt; 1.800 kg</td><td>6 ou 8 m³</td></tr><tr><td>HR</td><td>1.800 até &lt; 2.200 kg</td><td>12 m³</td></tr><tr><td>VUC</td><td>2.200 até &lt; 3.500 kg</td><td>16 m³</td></tr><tr><td>Médio</td><td>3.500 até &lt; 6.000 kg</td><td>25 m³</td></tr><tr><td>Toco</td><td>6.000 até &lt; 12.000 kg</td><td>40 m³</td></tr><tr><td>Truck</td><td>12.000 até &lt; 24.000 kg</td><td>50 m³</td></tr><tr><td>Carreta</td><td>A partir de 24.000 kg*</td><td>90 m³</td></tr></tbody>
+    </table><p>O valor inicial entra na faixa; o final já pertence à próxima. *Carreta exige espécie/tipo semirreboque; Cavalo exige caminhão-trator. Para Toco/Truck, eixos prevalecem em conflito de peso. É sempre carga útil, nunca PBT. Volumes da RBM são ilustrativos e não são extraídos do CRLV.</p>
   </details>
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
 </section>
 </div>
-<div class="footer-note">A data exibida corresponde ao calendário do exercício do CRLV (2024, 2025 ou 2026), e não necessariamente à data de expiração do próprio CRLV. A versão usa a tabela Fleet fornecida para 2026 nas 27 UFs (incluindo preenchimento oficial para AP e correções de prorrogações e divergências verificadas). Dados da tabela Fleet sem correspondência oficial conferida são apenas referência interna; o Pará continua usando dois dígitos. Mantém tabelas históricas de 2024 e 2025 para SP, RJ, MG, PR, RS, SC, DF, ES e GO, além de MS com cobertura parcial em 2024; demais UFs históricas exigem confirmação e ficam em amarelo, sem data inventada. Vermelho significa que a data da tabela passou, não que a irregularidade esteja confirmada no Detran. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. As tipologias RBM, inclusive Passeio e Fiorino, são classificações operacionais. Para carroceria aberta em veículo leve, abrir PTC e solicitar foto; cabine estendida identificada no documento é Passeio automaticamente. A cobertura alta é confirmada pela foto e não modifica o CRLV; PBT não equivale à carga útil.</div>
+<div class="footer-note">A data exibida corresponde ao calendário do exercício do CRLV (2024, 2025 ou 2026), e não necessariamente à data de expiração do próprio CRLV. A versão usa a tabela Fleet fornecida para 2026 nas 27 UFs (incluindo preenchimento oficial para AP e correções de prorrogações e divergências verificadas). Dados da tabela Fleet sem correspondência oficial conferida são apenas referência interna; o Pará continua usando dois dígitos. Mantém tabelas históricas de 2024 e 2025 para SP, RJ, MG, PR, RS, SC, DF, ES e GO, além de MS com cobertura parcial em 2024; demais UFs históricas exigem confirmação e ficam em amarelo, sem data inventada. Vermelho significa que a data da tabela passou, não que a irregularidade esteja confirmada no Detran. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. A tabela de pesos RBM foi reinterpretada em intervalos (início inclusivo, fim exclusivo) nesta versão 5.19. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. As faixas RBM usam o peso como início inclusivo da categoria seguinte (500–1.500 kg: Fiorino; 1.500–1.800 kg: Van; 1.800–2.200 kg: HR). Espécie/tipo e eixos prevalecem nas exceções (Cavalo, Carreta, Toco e Truck). As tipologias RBM, inclusive Passeio e Fiorino, são classificações operacionais. Para carroceria aberta em veículo leve, abrir PTC e solicitar foto; cabine estendida identificada no documento é Passeio automaticamente. A cobertura alta é confirmada pela foto e não modifica o CRLV; PBT não equivale à carga útil.</div>
 </main>
 <div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
   <div class="scanner-box">
@@ -639,7 +639,7 @@ self.onmessage=e=>{
     }
   };
 
-  // 5.18: Calendários históricos complementares. Lista indexada por último dígito (0..9).
+  // 5.19: Calendários históricos complementares (base 5.18, sem alterações). Lista indexada por último dígito (0..9).
   // Datas MM-DD são vigentes somente para o ano informado e para a fonte identificada.
   const historicExtra={
     2024:{AC:["10-31", "03-27", "03-27", "04-30", "04-30", "05-29", "06-28", "07-31", "08-30", "09-30"],AL:["06-28", "02-29", "02-29", "03-28", "03-28", "04-30", "04-30", "05-31", "05-31", "06-28"],AM:["12-27", "03-28", "04-30", "05-31", "06-28", "07-31", "08-30", "09-30", "10-31", "11-29"],MT:["10-31", "03-31", "03-31", "03-31", "04-30", "05-31", "06-30", "07-31", "08-31", "09-30"],PB:["12-30", "03-28", "04-30", "05-31", "06-28", "07-31", "08-30", "09-30", "10-31", "11-29"],RO:["10-31", "03-28", "03-28", "03-28", null, null, null, "07-31", "08-30", "09-30"]},
@@ -847,54 +847,82 @@ self.onmessage=e=>{
     message.textContent=v.cobertura_alta==='sim'?'✓ Cobertura alta confirmada na foto · tipologia operacional Fiorino.':
       v.cobertura_alta==='nao'?'✓ Sem cobertura alta na foto · tipologia operacional Passeio.':'';
   }
-  // DHL Peso Meli (referência operacional) + RBM (visual). Capacidade é carga útil em toneladas.
+  // FrotaCheck 5.19: os valores RBM são INÍCIOS de faixas de carga útil,
+  // e não capacidades máximas. Início inclusivo; fim exclusivo.
+  // Espécie/tipo prevalece para Cavalo e Carreta; eixos prevalecem entre Toco/Truck.
+  const RBM_FAIXAS=[
+    {name:'Fiorino',min:.5,max:1.5,range:'500 a menos de 1.500 kg'},
+    {name:'Van',min:1.5,max:1.8,range:'1.500 a menos de 1.800 kg'},
+    {name:'HR',min:1.8,max:2.2,range:'1.800 a menos de 2.200 kg'},
+    {name:'VUC',min:2.2,max:3.5,range:'2.200 a menos de 3.500 kg'},
+    {name:'Médio',min:3.5,max:6,range:'3.500 a menos de 6.000 kg'},
+    {name:'Toco',min:6,max:12,range:'6.000 a menos de 12.000 kg'},
+    {name:'Truck',min:12,max:24,range:'12.000 a menos de 24.000 kg'},
+    {name:'Carreta',min:24,max:Infinity,range:'24.000 kg ou mais'}
+  ];
+  function rbmPorCapacidade(toneladas){
+    if(toneladas===null||!Number.isFinite(toneladas))return null;
+    return RBM_FAIXAS.find(f=>toneladas>=f.min&&toneladas<f.max)||null;
+  }
   function classify(v){
     const type=norm(v.especie).replace(/\s*[-/]\s*/g,' '),model=norm(v.modelo);
     const axes=num(v.eixos),cargo=num(v.capacidade),pbt=num(v.pbt);
+    const row=rbmPorCapacidade(cargo);
     const modelIsHr=/(?:\bHYUNDAI\s*H\s*R\b|\bKIA\s*BONGO\b|\bK2500\b|\bH100\b)/.test(model);
+    const vanPattern=/SPRINTER|DUCATO|MASTER|TRANSIT|BOXER|JUMPER|\bVAN\b|\bVITO\b|EXPERT|JUMPY|SCUDO/;
     const truck=/\bCAMINHAO\b/.test(type);
+    const isLightCargo=/CAMINHONETE|UTILITARIO|FURGAO|CAMIONETA/.test(type);
     if(v.override)return {name:v.override,confidence:'Confirmado pelo analista',note:'Classificação operacional revista pelo responsável.'};
-    // A espécie manda antes dos eixos: trator não é truck; semirreboque não é truck.
-    if(/CAMINHAO\s*TRATOR|CAVALO\s*MECANICO/.test(type))return {name:'Cavalo',confidence:'Espécie/tipo do CRLV',note:'Caminhão-trator, com 2 ou 3 eixos. A capacidade pode estar vazia; não confundir com Carreta.'};
-    if(/\bSEMI\s*REBOQUE\b/.test(type))return {name:'Carreta',confidence:'Espécie/tipo do CRLV',note:'Semirreboque com 2 ou 3 eixos. Classificação própria, mesmo quando a capacidade diverge.'};
-    if(/\bREBOQUE\b/.test(type))return {name:'Outro / a confirmar',confidence:'Tipo reboque',note:'O documento indica reboque, não necessariamente semirreboque.'};
-    if(hasExtendedCab(v))return {name:'Passeio',confidence:'Cabine estendida no CRLV',note:'O documento identifica cabine estendida: classificação operacional Passeio automática, sem solicitar PTC. Não se aplica a caminhões.'};
+    // A espécie tem prioridade sobre qualquer número de eixos/peso.
+    if(/CAMINHAO\s*TRATOR|CAVALO\s*MECANICO/.test(type))return {name:'Cavalo',confidence:'Espécie/tipo do CRLV',note:'Caminhão-trator de 2 ou 3 eixos. Capacidade pode estar vazia; não confundir com Carreta.'};
+    if(/\bSEMI\s*REBOQUE\b/.test(type))return {name:'Carreta',confidence:'Espécie/tipo do CRLV',note:'Semirreboque: classificação Carreta, mesmo que eixos ou carga não coincidam com o exemplo visual RBM. Conferir discrepâncias.'};
+    if(/\bREBOQUE\b/.test(type))return {name:'Outro / a confirmar',confidence:'Tipo reboque',note:'O CRLV indica reboque, não semirreboque; não presumir Carreta.'};
+    if(hasExtendedCab(v))return {name:'Passeio',confidence:'Cabine estendida no CRLV',note:'Veículo leve com cabine estendida: classificação operacional Passeio automática, sem PTC.'};
     if(isLightOpenBody(v)){
-      if(v.cobertura_alta==='sim')return {name:'Fiorino',confidence:'Verificação visual',note:'Cobertura alta rígida e fechada confirmada pela foto; classificação interna.'};
-      if(v.cobertura_alta==='nao')return {name:'Passeio',confidence:'Verificação visual',note:'Caçamba aberta sem cobertura alta, ou apenas capota marítima baixa; classificação interna.'};
-      return {name:'Confirmar carroceria',confidence:'PTC • foto necessária',note:'Abra um PTC solicitando foto do veículo; após receber a foto, confirme se a carroceria é fechada (Fiorino) ou aberta (Passeio).'};
+      if(v.cobertura_alta==='sim')return {name:'Fiorino',confidence:'Verificação visual',note:'Cobertura alta rígida fechada confirmada por foto; classificação operacional interna.'};
+      if(v.cobertura_alta==='nao')return {name:'Passeio',confidence:'Verificação visual',note:'Sem cobertura alta, ou só lona/capota marítima baixa; classificação operacional interna.'};
+      return {name:'Confirmar carroceria',confidence:'PTC • foto necessária',note:'Abra um PTC solicitando foto do veículo; depois confirme Fechada (Fiorino) ou Aberta (Passeio).'};
     }
     if(truck){
-      // Prioridade de eixos sobre peso para diferenciar Truck e Toco.
-      if(axes===3)return {name:'Truck',confidence:'3 eixos + Carga/Caminhão',note:cargo&&cargo<6?'A capacidade de '+cargo+' t está abaixo da faixa Truck (6–12 t), mas o número de eixos prevalece na regra DHL. Confirmar o dado de carga.':'Truck de 3 eixos; referência DHL 6–12 t. A capacidade deve ser conferida.'};
-      if(axes>3)return {name:'Outro / a confirmar',confidence:'Configuração especial',note:'Caminhão com mais de 3 eixos: classificar à parte para não confundir com Truck comum.'};
+      if(axes>3)return {name:'Outro / a confirmar',confidence:'Configuração de eixos especial',note:'Mais de 3 eixos: conferir a composição antes de classificar.'};
+      // Regra aprovada: 3 eixos = Truck mesmo quando capacidade sugere Toco/Médio.
+      if(axes===3){
+        const diverge=row?.name!=='Truck';
+        return {name:'Truck',confidence:'3 eixos + Carga/Caminhão',note:diverge
+          ?'Eixos prevalecem: 3 eixos → Truck. A carga útil '+(cargo===null?'não foi identificada':('de '+cargo+' t sugere '+(row?.name||'faixa fora da RBM')))+'. Conferir divergência no CRLV.'
+          :'Faixa RBM de 12.000 a menos de 24.000 kg e 3 eixos: Truck.'};
+      }
       if(axes===2){
-        if(modelIsHr)return {name:'HR',confidence:'Modelo + 2 eixos',note:'Modelo HR/Bongo identificado, conferindo espécie/tipo e capacidade de carga.'};
-        if(cargo!==null){
-          if(cargo>3.5&&cargo<=6)return {name:'Toco',confidence:'Carga útil + 2 eixos',note:'Faixa DHL 3.500–6.000 kg de capacidade.'};
-          if(cargo>2.2&&cargo<=3.5)return {name:'Médio',confidence:'Carga útil + 2 eixos',note:'Faixa DHL 2.200–3.500 kg de capacidade.'};
-          return {name:'A confirmar',confidence:'Fora da faixa caminhão',note:'Caminhão de 2 eixos e capacidade '+cargo+' t não se encaixa com segurança nas faixas Médio/Toco. Não usar o PBT como carga útil.'};
+        if(cargo===null){
+          if(modelIsHr)return {name:'HR',confidence:'Modelo + 2 eixos (carga não lida)',note:'Modelo HR/Bongo identificado; confirmar capacidade (faixa RBM HR: 1.800–2.200 kg).'};
+          return {name:'A confirmar',confidence:'Carga útil ausente',note:'Caminhão com 2 eixos: informe CAPACIDADE (t), não PBT ('+(pbt===null?'ausente':pbt+' t')+').'};
         }
-        return {name:'A confirmar',confidence:'Capacidade ausente',note:'Caminhão com 2 eixos: informe CAPACIDADE (t) para diferenciar Médio e Toco. PBT '+(pbt??'não informado')+' t é insuficiente.'};
+        if(!row)return {name:'A confirmar',confidence:'Fora das faixas RBM',note:'Carga útil de '+cargo+' t fora das faixas RBM: conferir valor/unidade.'};
+        if(row.name==='Carreta')return {name:'A confirmar',confidence:'Espécie incompatível',note:'Carga útil na faixa de Carreta, mas o CRLV indica Caminhão (não semirreboque). Conferir dados.'};
+        if(row.name==='Truck')return {name:'Toco',confidence:'2 eixos prevalecem sobre carga',note:'A capacidade de '+cargo+' t sugeriria Truck, mas caminhão rígido com 2 eixos segue Toco. Conferir valor de carga e configuração.'};
+        if(row.name==='Van'||row.name==='Fiorino')return {name:'A confirmar',confidence:'Espécie/carga divergentes',note:'Capacidade sugere '+row.name+', mas espécie/tipo é Caminhão. Confirme o documento antes de classificar.'};
+        const modelNote=modelIsHr&&row.name!=='HR'?' O modelo sugere HR, mas a capacidade indica outra faixa. Conferir.':'';
+        return {name:row.name,confidence:'Carga útil RBM + 2 eixos',note:'Faixa RBM: '+row.range+'. Espécie Carga/Caminhão e 2 eixos.'+modelNote};
       }
-      return {name:'A confirmar',confidence:'Eixos ausentes',note:'Caminhão sem quantidade de eixos: confirme no CRLV antes de classificar.'};
+      return {name:'A confirmar',confidence:'Eixos ausentes',note:'Caminhão sem quantidade de eixos: confirme os eixos no CRLV antes de classificar.'};
     }
-    if(/\bAUTOMOVEL\b/.test(type))return {name:'Passeio',confidence:'Espécie/tipo do CRLV',note:'Tipo de veículo de passeio registrado no CRLV.'};
-    if(modelIsHr)return {name:'HR',confidence:'Modelo identificado',note:'Referência visual RBM HR; confirme carga útil e carroceria.'};
-    const vanPattern=/SPRINTER|DUCATO|MASTER|TRANSIT|BOXER|JUMPER|\bVAN\b|\bVITO\b|EXPERT|JUMPY|SCUDO/;
-    const isLightCargo=/CAMINHONETE|UTILITARIO|FURGAO|CAMIONETA/.test(type);
+    if(/\bAUTOMOVEL\b/.test(type))return {name:'Passeio',confidence:'Espécie/tipo do CRLV',note:'Automóvel de passeio conforme a espécie/tipo no CRLV.'};
     if(isLightCargo){
-      if(axes&&axes!==2)return {name:'A confirmar',confidence:'Eixos divergentes',note:'Espécie leve com '+axes+' eixos: revisar a documentação antes de aplicar as faixas da DHL.'};
+      if(axes!==null&&axes!==2)return {name:'A confirmar',confidence:'Eixos divergentes',note:'Veículo leve com '+axes+' eixos: confira espécie, eixos e modelo.'};
       if(cargo!==null){
-        if(cargo<=.5)return {name:'Fiorino',confidence:'Capacidade + espécie',note:'Até 500 kg; enquadramento DHL. Conferir referência visual RBM.'};
-        if(cargo<=1.5)return {name:'Van',confidence:'Capacidade + espécie',note:'Faixa DHL de mais de 500 até 1.500 kg, 2 eixos. Conferir referência visual RBM.'};
-        if(cargo<=2.2)return {name:'VUC',confidence:'Capacidade + espécie',note:'Faixa DHL de mais de 1.500 até 2.200 kg, 2 eixos. Conferir versão e dimensões.'};
+        if(!row)return {name:'A confirmar',confidence:'Fora das faixas RBM',note:'Capacidade de '+cargo+' t fora das faixas RBM; confirmar se é carga útil (e não PBT).'};
+        if(row.name==='Carreta')return {name:'A confirmar',confidence:'Espécie incompatível',note:'Carreta exige semirreboque; não classificar apenas por capacidade.'};
+        if(['Médio','Toco','Truck'].includes(row.name))return {name:'A confirmar',confidence:'Espécie/carga divergentes',note:'Capacidade sugere '+row.name+' ('+row.range+'), mas o CRLV indica veículo leve. Confira espécie e carga.'};
+        const modelNote=modelIsHr&&row.name!=='HR'?' Modelo parece HR/Bongo; confira a capacidade.':vanPattern.test(model)&&row.name!=='Van'?' Modelo de van, mas faixa operacional de carga diferente; confira.':'';
+        return {name:row.name,confidence:'Carga útil RBM + espécie',note:'Faixa RBM '+(row.name==='Fiorino'?'Utilitário/Fiorino':row.name)+': '+row.range+'. O limite superior pertence à próxima faixa.'+modelNote};
       }
-      if(vanPattern.test(model))return {name:'Van',confidence:'Modelo / RBM',note:'Modelo compatível com van, mas a capacidade não foi confirmada.'};
-      if(/\bFIORINO\b/.test(model))return {name:'Fiorino',confidence:'Modelo / RBM',note:'Modelo Fiorino identificado; conferir capacidade.'};
-      return {name:'A confirmar',confidence:'Capacidade a conferir',note:'Informe a capacidade de carga (não o PBT) e confira os 2 eixos.'};
+      if(modelIsHr)return {name:'HR',confidence:'Modelo / RBM (provisório)',note:'Modelo HR/Bongo; confirmar carga útil de 1.800 a menos de 2.200 kg.'};
+      if(vanPattern.test(model))return {name:'Van',confidence:'Modelo / RBM (provisório)',note:'Modelo de van; sem carga útil não é possível confirmar a faixa de 1.500 a menos de 1.800 kg.'};
+      if(/\bFIORINO\b/.test(model))return {name:'Fiorino',confidence:'Modelo / RBM (provisório)',note:'Modelo Fiorino; confirmar carga útil de 500 a menos de 1.500 kg.'};
+      return {name:'A confirmar',confidence:'Capacidade ausente',note:'Informe a capacidade de carga útil (não PBT) para aplicar as faixas RBM.'};
     }
-    if(vanPattern.test(model))return {name:'Van',confidence:'Referência visual RBM',note:'Modelo usual de van, mas confirmar espécie e carga para classificação definitiva.'};
+    if(modelIsHr)return {name:'HR',confidence:'Modelo / RBM (provisório)',note:'Confirme a espécie/tipo e a carga útil.'};
+    if(vanPattern.test(model))return {name:'Van',confidence:'Modelo / RBM (provisório)',note:'Confirme a espécie/tipo e a capacidade da Van.'};
     return {name:'Aguardando dados',confidence:'Dados insuficientes',note:'Confirme espécie/tipo, eixos, capacidade de carga e carroceria no CRLV.'};
   }
   function notice(t,kind=''){
@@ -998,7 +1026,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual '+(dl.calendarYear||exc)+': '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.18',processedAt:new Date().toISOString(),data:v,classification:cat,
+    return {version:'5.19',processedAt:new Date().toISOString(),data:v,classification:cat,
       calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain,year:exc}:null,
       summary:{title,msg},renewalYear:supportedYear?exc:null,
       disclaimer:'A cor mostra a comparação com o calendário do exercício '+shownYear+'. A data do calendário não comprova, por si só, a regularidade do veículo ou a validade individual do documento; consulte o Detran.'};
