@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck 5.19 | RBM — faixas de carga corrigidas</title>
+<title>FrotaCheck | Leitura de CRLV e licenciamento</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -96,7 +96,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .cs-status.error{color:#a40817}.cs-status.ok{color:#167c40}
 @media(max-width:520px){.cs-ag{padding:0 17px 18px}.cs-quick .scan-actions{flex-direction:column;align-items:stretch}.cs-quick .button{width:100%}}
 
-/* Versão 4.4: PDF via processamento externo, sem código de acesso e sem filtros expostos. */
+/* PDF processado sem codigo de acesso ou filtros expostos. */
 .pdf-only{margin:12px 0 0;display:flex;flex-direction:column;gap:8px}
 .pdf-only .enhance-download{width:100%;min-height:48px;font-size:14px}
 .pdf-status{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
@@ -106,7 +106,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .ai-diagnostic{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:7px;font-size:12px;color:#655f56}
 .ai-diagnostic .button{font-size:12px;min-height:30px}
 .ai-diagnostic #ai-test-result{overflow-wrap:anywhere}
-/* FrotaCheck 5.10: processamento discreto em vez de quatro baloes de etapas. */
+/* Processamento discreto, sem quatro baloes de etapas. */
 .processing-strip{display:flex;align-items:center;gap:12px;margin:12px 22px 4px;padding:13px 15px;background:#fff9e8;border:1px solid #f1dfab;border-radius:12px;color:#463b1d}
 .processing-spinner{flex:0 0 23px;width:23px;height:23px;border-radius:50%;border:3px solid #efd68c;border-top-color:var(--red);animation:spinDoc .8s linear infinite}
 @keyframes spinDoc{to{transform:rotate(360deg)}}
@@ -120,7 +120,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.processing-strip{margin:10px 17px 4px}}
 
-/* FrotaCheck 5.19 — RBM por faixas inferiores + PTC */
+/* RBM por faixas inferiores + PTC */
 .body-check{margin:14px 0 15px;border:1px solid #e4d8ad;background:linear-gradient(145deg,#fffdf3,#fff9e5);border-radius:17px;padding:18px;box-shadow:0 5px 16px #45310e0b}
 .body-check .check-overline{display:flex;align-items:center;gap:8px;color:#8d111b;font-size:11px;letter-spacing:.7px;font-weight:850;text-transform:uppercase}
 .body-check .check-icon{height:29px;width:29px;border-radius:9px;display:grid;place-items:center;background:#ffeab1;font-size:16px}
@@ -143,14 +143,14 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .rbm-reference td,.rbm-reference th{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left}
 .rbm-reference p{margin:0 0 12px;color:var(--muted);font-size:11px}
 @media(max-width:560px){.body-options{grid-template-columns:1fr}.body-option{display:grid;grid-template-columns:110px 1fr;align-items:center}.body-option .draw{grid-row:span 2}.body-option svg{height:78px}.body-check{padding:15px}}
-/* v5.15: alternativa clara SOMENTE quando o campo UF não foi reconhecido. */
+/* Alternativa de UF somente quando a leitura falhou. */
 .uf-rescue{margin-top:15px;border:1px solid #edc17e;background:#fffdf8;padding:13px 14px;border-radius:12px}
 .uf-rescue[hidden]{display:none!important}
 .uf-rescue label{display:block;font-size:13px;font-weight:850;margin:0 0 6px;color:#513b25}
 .uf-rescue p{font-size:12px;color:#765c40;margin:0 0 9px;line-height:1.4}
 .uf-rescue select{background:white;border:1px solid #d9b686;color:#312e28;font-weight:700;padding:10px 12px;width:100%;min-height:44px;border-radius:9px;font-size:16px}
 
-/* v5.19 - PTC e escolha visual compacta e responsiva */
+/* PTC e escolha visual compacta e responsiva */
 .ptc-alert{display:flex;flex-direction:column;gap:3px;border-left:4px solid #b90d20;background:#fff1ed;border-radius:9px;padding:10px 12px;margin:10px 0 9px;color:#92201d;font-size:12px}
 .ptc-alert strong{font-size:13px;line-height:1.4}
 .ptc-alert span{font-size:11px;color:#69534c}
@@ -169,7 +169,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.15</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS</div></div></div></div></header>
 <main>
 <div class="intro"><span class="eyebrow">FrotaCheck · Leitura inteligente</span><h1>Tipo do veículo e licenciamento 2024–2026.</h1><p>Envie o CRLV. O FrotaCheck preserva PDFs digitais, melhora fotos e consulta o calendário estadual do exercício identificado no documento (2024 a 2026).</p></div>
 <div class="layout">
@@ -284,7 +284,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
 </section>
 </div>
-<div class="footer-note">A data exibida corresponde ao calendário do exercício do CRLV (2024, 2025 ou 2026), e não necessariamente à data de expiração do próprio CRLV. A versão usa a tabela Fleet fornecida para 2026 nas 27 UFs (incluindo preenchimento oficial para AP e correções de prorrogações e divergências verificadas). Dados da tabela Fleet sem correspondência oficial conferida são apenas referência interna; o Pará continua usando dois dígitos. Mantém tabelas históricas de 2024 e 2025 para SP, RJ, MG, PR, RS, SC, DF, ES e GO, além de MS com cobertura parcial em 2024; demais UFs históricas exigem confirmação e ficam em amarelo, sem data inventada. Vermelho significa que a data da tabela passou, não que a irregularidade esteja confirmada no Detran. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. A tabela de pesos RBM foi reinterpretada em intervalos (início inclusivo, fim exclusivo) nesta versão 5.19. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. As faixas RBM usam o peso como início inclusivo da categoria seguinte (500–1.500 kg: Fiorino; 1.500–1.800 kg: Van; 1.800–2.200 kg: HR). Espécie/tipo e eixos prevalecem nas exceções (Cavalo, Carreta, Toco e Truck). As tipologias RBM, inclusive Passeio e Fiorino, são classificações operacionais. Para carroceria aberta em veículo leve, abrir PTC e solicitar foto; cabine estendida identificada no documento é Passeio automaticamente. A cobertura alta é confirmada pela foto e não modifica o CRLV; PBT não equivale à carga útil.</div>
+<div class="footer-note">As datas exibidas são referências de calendários estaduais dos exercícios 2024, 2025 e 2026, conforme a UF e a placa. Algumas datas podem corresponder a pagamento, licenciamento ou exigência para circulação; a confirmação oficial depende do Detran. A cobertura histórica de 2024 é parcial e datas não verificadas exigem conferência. As tipologias usam a tabela RBM por faixas de carga útil, com validação de espécie/tipo e eixos. O FrotaCheck não autentica o CRLV-e nem consulta débitos ou restrições.</div>
 </main>
 <div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
   <div class="scanner-box">
@@ -297,7 +297,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </div>
 <script id="scanner52-worker-source" type="text/plain">
 'use strict';
-/* FrotaCheck Scanner 5.2 | executado no navegador em Web Worker.
+/* Scanner CRLV | executado no navegador em Web Worker.
    Nao recria texto, nao apaga dados e nao envia documentos. */
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function luminance(p){const n=p.length/4,g=new Uint8Array(n);for(let i=0,k=0;i<n;i++,k+=4)g[i]=Math.round(.299*p[k]+.587*p[k+1]+.114*p[k+2]);return g;}
@@ -825,7 +825,7 @@ self.onmessage=e=>{
   function hasOpenBody(v){return /\bABERT[AO]\b/.test(norm(v.carroceria));}
   function isLightVehicle(v){
     const t=norm(v.especie),m=norm(v.modelo);
-    if(/CAMINHAO|SEMI\s*REBOQUE|REBOQUE|CAVALO|TRATOR|ONIBUS|MICRO\s*ONIBUS/.test(t))return false;
+    if(/CAMINHAO|SEMI\s*R?REBOQUE|REBOQUE|CAVALO|TRATOR|ONIBUS|MICRO\s*ONIBUS/.test(t))return false;
     return /CAMINHONETE|CAMIONETA|AUTOMOVEL|UTILITARIO|FURGAO|PASSEIO|PICAPE/.test(t)
       || /\b(STRADA|SAVEIRO|MONTANA|OROCH|RANGER|HILUX|AMAROK|FRONTIER|TORO|S10|D20|RAMPAGE|RAM\s*1500)\b/.test(m);
   }
@@ -847,7 +847,7 @@ self.onmessage=e=>{
     message.textContent=v.cobertura_alta==='sim'?'✓ Cobertura alta confirmada na foto · tipologia operacional Fiorino.':
       v.cobertura_alta==='nao'?'✓ Sem cobertura alta na foto · tipologia operacional Passeio.':'';
   }
-  // FrotaCheck 5.19: os valores RBM são INÍCIOS de faixas de carga útil,
+  // Os valores RBM são INÍCIOS de faixas de carga útil,
   // e não capacidades máximas. Início inclusivo; fim exclusivo.
   // Espécie/tipo prevalece para Cavalo e Carreta; eixos prevalecem entre Toco/Truck.
   const RBM_FAIXAS=[
@@ -875,7 +875,7 @@ self.onmessage=e=>{
     if(v.override)return {name:v.override,confidence:'Confirmado pelo analista',note:'Classificação operacional revista pelo responsável.'};
     // A espécie tem prioridade sobre qualquer número de eixos/peso.
     if(/CAMINHAO\s*TRATOR|CAVALO\s*MECANICO/.test(type))return {name:'Cavalo',confidence:'Espécie/tipo do CRLV',note:'Caminhão-trator de 2 ou 3 eixos. Capacidade pode estar vazia; não confundir com Carreta.'};
-    if(/\bSEMI\s*REBOQUE\b/.test(type))return {name:'Carreta',confidence:'Espécie/tipo do CRLV',note:'Semirreboque: classificação Carreta, mesmo que eixos ou carga não coincidam com o exemplo visual RBM. Conferir discrepâncias.'};
+    if(/\bSEMI\s*R?REBOQUE\b/.test(type))return {name:'Carreta',confidence:'Espécie/tipo do CRLV',note:'Semirreboque: classificação Carreta, mesmo que eixos ou carga não coincidam com o exemplo visual RBM. Conferir discrepâncias.'};
     if(/\bREBOQUE\b/.test(type))return {name:'Outro / a confirmar',confidence:'Tipo reboque',note:'O CRLV indica reboque, não semirreboque; não presumir Carreta.'};
     if(hasExtendedCab(v))return {name:'Passeio',confidence:'Cabine estendida no CRLV',note:'Veículo leve com cabine estendida: classificação operacional Passeio automática, sem PTC.'};
     if(isLightOpenBody(v)){
@@ -1026,7 +1026,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual '+(dl.calendarYear||exc)+': '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.19',processedAt:new Date().toISOString(),data:v,classification:cat,
+    return {processedAt:new Date().toISOString(),data:v,classification:cat,
       calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain,year:exc}:null,
       summary:{title,msg},renewalYear:supportedYear?exc:null,
       disclaimer:'A cor mostra a comparação com o calendário do exercício '+shownYear+'. A data do calendário não comprova, por si só, a regularidade do veículo ou a validade individual do documento; consulte o Detran.'};
@@ -1143,7 +1143,7 @@ self.onmessage=e=>{
     }
   }
   const isLabel=t=>Object.values(aliases).flat().some(re=>re.test(norm(t).replace(/\s*:\s*$/,'')));
-  const species=/(?:CARGA|PASSAGEIRO|PASSAGEIROS|MISTO|ESPECIAL|TRACAO)\s+(?:CAMINHAO(?:\s*-\s*TRATOR)?|AUTOMOVEL|CAMINHONETE|CAMIONETA|FURGAO|MICRO\s*-?\s*ONIBUS|ONIBUS|UTILITARIO|SEMI\s*-?\s*REBOQUE|REBOQUE|MOTOCICLETA)/;
+  const species=/(?:CARGA|PASSAGEIRO|PASSAGEIROS|MISTO|ESPECIAL|TRACAO)\s+(?:CAMINHAO(?:\s*-\s*TRATOR)?|AUTOMOVEL|CAMINHONETE|CAMIONETA|FURGAO|MICRO\s*-?\s*ONIBUS|ONIBUS|UTILITARIO|SEMI\s*-?\s*R?REBOQUE|REBOQUE|MOTOCICLETA)/;
   function repairPlate(s){const parts=norm(s).replace(/[^A-Z0-9]/g,'').slice(0,7).split('');if(parts.length!==7)return null;
     // Substituições restritas ao formato conhecido, apenas em leitura contextualizada.
     for(let i of [0,1,2]){if(parts[i]==='0')parts[i]='O';if(parts[i]==='1')parts[i]='I';if(parts[i]==='5')parts[i]='S';}
@@ -1270,7 +1270,7 @@ self.onmessage=e=>{
   }
   function docCheck(t,map={}){return documentEvidence(t,map).level==='identified';}
   function scoreMap(m){return ['placa','exercicio','uf','especie','modelo','pbt','eixos'].reduce((acc,k)=>acc+(m[k]?.score||0),0);}
-  // FrotaCheck 5.7.2.1: a rotina havia sido removida por engano na versão 5.7.
+  // Rotina de verificação do ano do CRLV.
   // O mapa armazena objetos {value, score, origin}; não basta existir a chave.
   function missingImportant(map){
     return ['placa','exercicio','uf','especie'].some(k=>!map?.[k]?.value);
@@ -1338,7 +1338,7 @@ self.onmessage=e=>{
   // CRLV-e em A4 retrato: regiões dos VALORES, não dos rótulos.
   // O layout varia conforme a emissão; por isso há duas leituras complementares
   // (PDF original e cópia tratada). Nunca preencher campos sem texto reconhecido.
-  // Bug da versão 5.6: as regiões incluíam linhas e rótulos que confundiam o PSM 7.
+  // Regiões restritas para evitar linhas e rotulos que confundem o OCR.
   const CRLV_FIELD_ZONES=[
     {key:'placa',    box:[.087,.180,.095,.017], psm:7, label:'Placa principal'},
     {key:'placaUf',  box:[.085,.418,.110,.014], psm:7, label:'Placa anterior / UF'},
@@ -1502,7 +1502,7 @@ self.onmessage=e=>{
     if(failed){
       // Não mostrar o conteúdo completo do CRLV no diagnóstico.
       const last=exerciseAttempts.slice(-9).map(a=>a.source+' · '+a.mode+': '+(a.reading||'[sem números legíveis]')).join('\n');
-      $('exercise-diag-text').textContent='Foram testadas '+exerciseAttempts.length+' leituras do campo.\n'+last+'\n\nO ano não será presumido. Confira se a versão exibida é V5.8 e use “Tentar outra leitura” caso necessário.';
+      $('exercise-diag-text').textContent='Foram testadas '+exerciseAttempts.length+' leituras do campo.\n'+last+'\n\nO ano não será presumido. Confira o CRLV e use “Tentar outra leitura” caso necessário.';
     }
   }
   async function recoverExercise(scanned,original,map,parts){
@@ -2327,7 +2327,7 @@ self.onmessage=e=>{
     if(!complete)return false;
     const speciesNorm=norm(map.especie.value);
     return !!map.capacidade?.value ||
-      /(?:CAMINHAO\s*[- ]?TRATOR|SEMI\s*[- ]?REBOQUE)/.test(speciesNorm);
+      /(?:CAMINHAO\s*[- ]?TRATOR|SEMI\s*[- ]?R?REBOQUE)/.test(speciesNorm);
   }
   async function processFile(file,forceOCR=false){
     if(!file)return;
@@ -2570,7 +2570,7 @@ self.onmessage=e=>{
     $('uf').value=$('uf-rescue-select').value;
     $('uf').dispatchEvent(new Event('change',{bubbles:true}));
   });
-  fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(['especie','modelo','carroceria'].includes(id)){$('cobertura_alta').value='';$('cabine_estendida').value='';}if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
+  fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(['especie','modelo','carroceria'].includes(id)){$('cobertura_alta').value='';}if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
   for(const [button,value] of [['body-answer-yes','sim'],['body-answer-no','nao']]){
     $(button).addEventListener('click',()=>{
       $('cobertura_alta').value=value;
