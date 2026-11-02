@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck 5.13 | Tipologia e carroceria</title>
+<title>FrotaCheck 5.14 | Tipologia e carroceria</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -120,7 +120,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.processing-strip{margin:10px 17px 4px}}
 
-/* FrotaCheck 5.13 — validação visual de carroceria */
+/* FrotaCheck 5.14 — validação visual de carroceria */
 .body-check{margin:14px 0 15px;border:1px solid #e4d8ad;background:linear-gradient(145deg,#fffdf3,#fff9e5);border-radius:17px;padding:18px;box-shadow:0 5px 16px #45310e0b}
 .body-check .check-overline{display:flex;align-items:center;gap:8px;color:#8d111b;font-size:11px;letter-spacing:.7px;font-weight:850;text-transform:uppercase}
 .body-check .check-icon{height:29px;width:29px;border-radius:9px;display:grid;place-items:center;background:#ffeab1;font-size:16px}
@@ -147,9 +147,9 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 </head>
 <body>
 <div class="topstripe"></div>
-<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.13</div></div></div></div></header>
+<header><div class="header-inner"><div class="brand"><div class="mark" aria-hidden="true">F</div><div><div class="brand-name">FrotaCheck</div><div class="brand-sub">CADASTRO DE VEÍCULOS · V5.14</div></div></div></div></header>
 <main>
-<div class="intro"><span class="eyebrow">FrotaCheck · Leitura inteligente</span><h1>Tipo do veículo e licenciamento 2026.</h1><p>Envie o CRLV. O FrotaCheck preserva PDFs digitais, melhora fotos e confere o prazo do calendário estadual de 2026.</p></div>
+<div class="intro"><span class="eyebrow">FrotaCheck · Leitura inteligente</span><h1>Tipo do veículo e licenciamento 2024–2026.</h1><p>Envie o CRLV. O FrotaCheck preserva PDFs digitais, melhora fotos e consulta o calendário estadual do exercício identificado no documento (2024 a 2026).</p></div>
 <div class="layout">
 <section class="panel" aria-labelledby="upload-title">
   <div class="panel-head"><h2 class="panel-title" id="upload-title"><span class="number">1</span>Enviar documento</h2><p>CRLV-e em PDF ou imagem</p></div>
@@ -244,11 +244,11 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     <p class="body-small">ℹ️ Essa é uma classificação operacional interna. A espécie e a carroceria documentadas no CRLV permanecem as mesmas.</p>
     <div id="body-check-result" class="body-check-result" role="status" aria-live="polite" hidden></div>
   </section>
-  <div class="result-tile yellow" id="license-tile"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>Licenciamento • calendário 2026</div><div class="big deadline-date" id="deadline">—</div><div class="year" id="renewal-year">Calendário de 2026</div><span class="status neutral" id="status">Aguardando documento</span><p class="detail-note" id="deadline-kind"></p></div>
+  <div class="result-tile yellow" id="license-tile"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>Licenciamento • calendário 2024–2026</div><div class="big deadline-date" id="deadline">—</div><div class="year" id="renewal-year">Calendário de 2024–2026</div><span class="status neutral" id="status">Aguardando documento</span><p class="detail-note" id="deadline-kind"></p></div>
   <div class="model-summary"><small>Marca / modelo identificado</small><strong id="result-model">Aguardando leitura</strong></div>
   <div class="vehicle-specs" aria-label="Características extraídas do CRLV"><div><small>Espécie / tipo no CRLV</small><b id="result-especie">—</b></div><div><small>Carga útil</small><b id="result-capacidade">—</b></div><div><small>PBT</small><b id="result-pbt">—</b></div><div><small>Eixos</small><b id="result-eixos">—</b></div><div><small>Carroceria no CRLV</small><b id="result-carroceria">—</b></div></div>
   <div class="meta"><div class="meta-item"><small>Placa</small><b id="summary-placa">—</b></div><div class="meta-item"><small>UF</small><b id="summary-uf">—</b></div><div class="meta-item"><small>Exercício</small><b id="summary-exercicio">—</b></div></div>
-  <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário de 2026.</p>
+  <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário correspondente ao exercício (2024–2026).</p>
   <details class="rbm-reference"><summary>▤ Consultar referência de tipologias RBM</summary>
     <table><thead><tr><th>Tipologia</th><th>Carga de referência</th><th>Volume</th></tr></thead>
       <tbody><tr><td>Utilitário</td><td>500 kg</td><td>2 m³</td></tr><tr><td>Van</td><td>1.500 kg</td><td>6 ou 8 m³</td></tr><tr><td>HR</td><td>1.800 kg</td><td>12 m³</td></tr><tr><td>VUC</td><td>2.200 kg</td><td>16 m³</td></tr><tr><td>Médio</td><td>3.500 kg</td><td>25 m³</td></tr><tr><td>Toco</td><td>6.000 kg</td><td>40 m³</td></tr><tr><td>Truck</td><td>12.000 kg</td><td>50 m³</td></tr><tr><td>Carreta</td><td>24.000 kg</td><td>90 m³</td></tr></tbody>
@@ -257,7 +257,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
 </section>
 </div>
-<div class="footer-note">O prazo do calendário não é, por si só, prova de que um CRLV do exercício 2026 esteja vencido. A situação oficial depende de consulta ao Detran. Calendários de 2026 das 26 UFs e do DF, sem projeções para outros anos. Verde/vermelho indicam a situação do calendário e do exercício do CRLV apresentado, não a regularidade confirmada no Detran. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. As tipologias RBM, inclusive Passeio e Fiorino, são classificações operacionais. A cobertura alta é confirmada pela foto e não modifica o CRLV; PBT não equivale à carga útil.</div>
+<div class="footer-note">A data exibida corresponde ao calendário do exercício do CRLV (2024, 2025 ou 2026), e não necessariamente à data de expiração do próprio CRLV. A versão inclui 2026 para as 27 UFs e tabelas históricas verificadas de 2024 e 2025 para SP, RJ, MG, PR, RS, SC, DF e ES; outras UFs históricas exigem confirmação e ficam em amarelo, sem data inventada. Vermelho significa que a data da tabela passou, não que a irregularidade esteja confirmada no Detran. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. As tipologias RBM, inclusive Passeio e Fiorino, são classificações operacionais. A cobertura alta é confirmada pela foto e não modifica o CRLV; PBT não equivale à carga útil.</div>
 </main>
 <div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
   <div class="scanner-box">
@@ -553,6 +553,71 @@ self.onmessage=e=>{
     RR:{url:'https://www.sefaz.rr.gov.br/downloads?catid=1063&id=26354&m=0&task=download.send',note:'Portaria conjunta divulgada pela Sefaz/RR. Confirmar possíveis prorrogações.',kind:'prazo de pagamento do licenciamento'},
     TO:{url:'https://www.legisweb.com.br/legislacao/?id=490496',note:'Portaria GAB/PRES 26/2026.',kind:'prazo de pagamento do licenciamento'}
   };
+  // Referencias historicas verificadas, exercicios 2024 e 2025.
+  // NUNCA reutilizar a tabela de 2026 para anos anteriores.
+  // Sem fonte historica validada: retornar "conferencia necessaria" sem inventar uma data.
+  const historicSources={
+    2024:{
+      SP:{url:'https://www.bibliotecajuridica.sp.gov.br/licenciamento-2024-chega-as-placas-5-e-6-em-setembro-no-estado-de-sp/',kind:'renovação / circulação'},
+      RJ:{url:'https://www.detran.rj.gov.br/noticias/prazo-de-licenciamento-para-veiculos-com-finais-de-placa-0-e-9-termina-em-31-de-dezembro.html',kind:'prazo do licenciamento (calendário prorrogado)'},
+      MG:{url:'https://www.agenciaminas.mg.gov.br/noticia/governo-define-calendario-de-exigencia-do-crlv-e-realiza-mutirao-para-auxiliar-proprietarios-de-veiculos-na-regularizacao-do-licenciamento-122756',kind:'exigência do CRLV'},
+      PR:{url:'https://www.detran.pr.gov.br/sites/default/arquivos_restritos/files/documento/2024-08/tabela.pdf',kind:'renovação do licenciamento por dois dígitos da placa'},
+      RS:{url:'https://publicacoeslegais.detran.rs.gov.br/portaria-detran-rs-n-562-2023-65a18f5338451',kind:'validade do CRLV anterior'},
+      SC:{url:'https://www.sef.sc.gov.br/saiba-mais/prazos-do-ipva',kind:'prazo de licenciamento'},
+      DF:{url:'https://www.sinj.df.gov.br/sinj/Norma/3276ec29ea5848c99aa6617de2cb7632/detran_ins_543_2024.html',kind:'prazo de renovação'},
+      ES:{url:'https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/Calend%C3%A1rio%20de%20Licenciamento%202024.pdf',kind:'vencimento do licenciamento'}
+    },
+    2025:{
+      SP:{url:'https://servicos.sp.gov.br/fcarta/564F6C83-1A86-472E-AC79-3A7F5ABFE248',kind:'renovação / circulação'},
+      RJ:{url:'https://www.detran.rj.gov.br/noticias/detran-rj-prorroga-calendario-de-licenciamento-de-veiculos-de-2025-1.html',kind:'prazo do licenciamento (calendário prorrogado)'},
+      MG:{url:'https://www.mg.gov.br/planejamento/noticias/governo-de-minas-divulga-calendario-do-licenciamento-de-veiculos-de-2025',kind:'exigência do CRLV'},
+      PR:{url:'https://www.detran.pr.gov.br/sites/default/arquivos_restritos/files/documento/2024-11/portaria_no_2069-2024-dp-detran-pr.pdf',kind:'renovação do licenciamento'},
+      RS:{url:'https://publicacoeslegais.detran.rs.gov.br/portaria-detran-rs-n-486-2024',kind:'validade do CRLV anterior'},
+      SC:{url:'https://www.sef.sc.gov.br/noticias/secretaria-de-estado-da-fazenda-divulga-calendario-do-ipva-para-2025-em-santa-catarina',kind:'prazo de licenciamento'},
+      DF:{url:'https://www.sinj.df.gov.br/sinj/Norma/170075e3794a44f28874f90428a2f8dd/Instru_o_1188_01_09_2025.html',kind:'prazo de renovação'},
+      ES:{url:'https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/Calendario%20de%20Licenciamento%202025.pdf',kind:'vencimento do licenciamento'}
+    }
+  };
+  const pr2024ByTwoDigits={"06":"10-01","07":"10-01","09":"11-01","03":"09-02","04":"09-02","16":"10-02","17":"10-02","13":"09-03","14":"09-03","26":"10-03","27":"10-03","23":"09-04","24":"09-04","36":"10-04","37":"10-04","19":"11-04","01":"08-05","33":"09-05","34":"09-05","29":"11-05","11":"08-06","43":"09-06","44":"09-06","39":"11-06","21":"08-07","46":"10-07","47":"10-07","49":"11-07","31":"08-08","56":"10-08","57":"10-08","59":"11-08","41":"08-09","53":"09-09","54":"09-09","66":"10-09","67":"10-09","63":"09-10","64":"09-10","76":"10-10","77":"10-10","73":"09-11","74":"09-11","86":"10-11","87":"10-11","69":"11-11","51":"08-12","83":"09-12","84":"09-12","79":"11-12","61":"08-13","93":"09-13","94":"09-13","89":"11-13","71":"08-14","96":"10-14","97":"10-14","99":"11-14","81":"08-15","08":"10-15","91":"08-16","05":"09-16","18":"10-16","15":"09-17","28":"10-17","25":"09-18","38":"10-18","00":"11-18","02":"08-19","35":"09-19","10":"11-19","12":"08-20","45":"09-20","20":"11-20","22":"08-21","48":"10-21","30":"11-21","32":"08-22","58":"10-22","40":"11-22","42":"08-23","55":"09-23","68":"10-23","65":"09-24","78":"10-24","75":"09-25","88":"10-25","50":"11-25","52":"08-26","85":"09-26","60":"11-26","62":"08-27","95":"09-27","70":"11-27","72":"08-28","98":"10-28","80":"11-28","82":"08-29","90":"11-29","92":"08-30"};
+  const pr2025ByFinal={1:'08-15',2:'08-29',3:'09-10',4:'09-19',5:'09-30',6:'10-10',7:'10-20',8:'10-31',9:'11-14',0:'11-28'};
+  const scByFinal2024={1:'03-31',2:'04-30',3:'05-31',4:'06-30',5:'07-31',6:'08-31',7:'09-30',8:'10-31',9:'11-30',0:'12-31'};
+  const scByFinal2025={...scByFinal2024,0:'12-30'};
+  function historicCalendar(uf,final,year,type,placa){
+    const source=historicSources[year]?.[uf];
+    if(!source)return {notVerified:true,calendarYear:year,incomplete:'A data de '+year+' para '+uf+' ainda não foi validada em fonte histórica. Consulte o Detran; não foi usado o calendário de 2026.'};
+    let mmdd=null;
+    if(uf==='SP'){
+      const n=norm(type);
+      if(!n||!/(CAMINHAO|CAMINHONETE|AUTOMOVEL|CAMIONETA|ONIBUS|MICROONIBUS|SEMI.REBOQUE|REBOQUE|UTILITARIO|MOTOCICLETA|TRATOR|MOTONETA)/.test(n))return {incomplete:'Em SP, confirme a espécie/tipo, pois caminhões têm prazos diferentes.',calendarYear:year,...source};
+      const truck=/\bCAMINHAO(?:\s*-\s*TRATOR)?\b/.test(n);
+      const m=truck?([1,2].includes(final)?9:[3,4,5].includes(final)?10:[6,7,8].includes(final)?11:12):([1,2].includes(final)?7:[3,4].includes(final)?8:[5,6].includes(final)?9:[7,8].includes(final)?10:final===9?11:12);
+      mmdd=String(m).padStart(2,'0')+'-'+new Date(Date.UTC(year,m,0)).getUTCDate();
+    }else if(uf==='MG'){
+      mmdd=[1,2,3].includes(final)?'08-31':[4,5,6].includes(final)?'09-30':'10-31';
+    }else if(uf==='DF'){
+      mmdd=[1,2].includes(final)?'09-30':[3,4,5].includes(final)?'10-31':[6,7,8].includes(final)?'11-30':'12-31';
+    }else if(uf==='RJ'){
+      mmdd=year===2024?([1,2].includes(final)?'09-30':[3,4,5].includes(final)?'10-31':[6,7,8].includes(final)?'11-30':'12-31')
+        :([0,1,2].includes(final)?'08-31':[3,4,5].includes(final)?'09-30':'10-31');
+    }else if(uf==='RS'){
+      mmdd=year===2024?([1,2,3,4,5].includes(final)?'06-30':'07-31'):'07-31';
+    }else if(uf==='SC'){
+      mmdd=(year===2024?scByFinal2024:scByFinal2025)[final];
+    }else if(uf==='PR'){
+      if(year===2024){
+        if(!validPlate(placa))return {incomplete:'O Paraná em 2024 exige os dois últimos números da placa. Confirme a placa completa.',calendarYear:year,...source};
+        mmdd=pr2024ByTwoDigits[plateFmt(placa).slice(-2)];
+      }else mmdd=pr2025ByFinal[final];
+    }else if(uf==='ES'){
+      const grp=[1,2].includes(final)?0:[3,4].includes(final)?1:[5,6].includes(final)?2:[7,8].includes(final)?3:4;
+      mmdd=year===2024?['09-12','09-19','09-20','09-23','09-26'][grp]:['09-11','09-12','09-15','09-18','09-19'][grp];
+    }
+    if(!mmdd)return {notVerified:true,calendarYear:year,incomplete:'Não foi possível identificar um prazo histórico validado. Consulte o Detran.',...source};
+    const [m,d]=mmdd.split('-').map(Number);
+    const when=new Date(Date.UTC(year,m-1,d,12));
+    if(when.getUTCMonth()!==m-1)return {notVerified:true,calendarYear:year,incomplete:'Data histórica inconsistente; consulte o Detran.',...source};
+    return {date:when,calendarYear:year,uncertain:false,...source};
+  }
   const table={
     PR:{1:'08-14',2:'08-28',3:'09-09',4:'09-18',5:'09-28',6:'10-09',7:'10-20',8:'10-30',9:'11-13',0:'11-27'},
     ES:{1:'09-09',2:'09-09',3:'09-10',4:'09-10',5:'09-11',6:'09-11',7:'09-14',8:'09-14',9:'09-15',0:'09-15'},
@@ -618,7 +683,9 @@ self.onmessage=e=>{
     9:['09-25','10-02','10-16'], 0:['10-23','11-06','11-13']
   };
   function calendar(uf,final,year,type,placa){
-    if(year!==2026||final===null||!dates[uf])return null;
+    if(final===null||!dates[uf])return null;
+    if(year===2024||year===2025)return historicCalendar(uf,final,year,type,placa);
+    if(year!==2026)return null;
     let d=null;
     if(uf==='SP'){
       const n=norm(type);const truck=/\bCAMINHAO(?:\s*-\s*TRATOR)?\b/.test(n);
@@ -731,16 +798,16 @@ self.onmessage=e=>{
   }
   function showSource(uf,cal){
     const a=$('source-link');
-    if(!dates[uf] || !cal?.date){a.hidden=true;a.removeAttribute('href');return;}
-    a.href=cal.url||dates[uf].url;
+    if(!cal?.date || !cal.url){a.hidden=true;a.removeAttribute('href');return;}
+    a.href=cal.url;
     a.textContent='Ver referência do calendário de '+uf+' ↗';
     a.hidden=false;
   }
-  // Calendário fixo de 2026. O exercício do CRLV é usado apenas para
-  // interpretar a situação, sem inventar renovação/vencimento de anos futuros.
+  // A tabela aplicavel é SEMPRE a do exercicio lido. Nunca projetar data de outro ano.
   function analyze(){
     const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));
     const final=plateFinal(v.placa),exc=Number(v.exercicio),validYear=/^20\d{2}$/.test(v.exercicio);
+    const supportedYear=validYear&&[2024,2025,2026].includes(exc);
     updateBodyQuestion(v);
     const cat=classify(v);
     $('category').textContent=cat.name;
@@ -757,18 +824,27 @@ self.onmessage=e=>{
     $('summary-exercicio').textContent=v.exercicio||'—';
     $('deadline').textContent='—';
     $('deadline').className='big deadline-date';
-    $('renewal-year').textContent='Tabela estadual de licenciamento 2026';
+    const shownYear=supportedYear?exc:'2024–2026';
+    $('renewal-year').textContent='Calendário estadual do exercício '+shownYear;
+    $('license-tile').querySelector('.tile-head').lastChild.textContent='Licenciamento • calendário '+shownYear;
     let title='Aguardando dados',msg='Informe placa, UF e exercício do CRLV.';
     let css='neutral',dl=null;
     const licenseTile=$('license-tile');
     licenseTile.classList.remove('license-ok','license-bad','license-pending','yellow');
-    if(final===null){title='Informe a placa';msg='A placa válida é necessária para localizar o final.';}
-    else if(!v.uf){title='Informe a UF';msg='Informe a UF de registro do veículo.';}
-    else if(!dates[v.uf]){title='UF não mapeada';msg='Consulte o Detran para confirmar a data.';}
-    else{
-      dl=calendar(v.uf,final,2026,v.especie,v.placa);
-      if(dl?.incomplete){title='Confirme o tipo';msg=dl.incomplete;}
-      else if(dl?.date){
+    if(!supportedYear){
+      title='Confirme o exercício';
+      msg='Este módulo possui calendário de 2024, 2025 e 2026. Confira o exercício informado no CRLV.';
+    }else if(final===null){
+      title='Informe a placa';msg='A placa válida é necessária para localizar o prazo do exercício '+exc+'.';
+    }else if(!v.uf||!dates[v.uf]){
+      title='Confirme a UF';msg='Informe a UF de registro do veículo.';
+    }else{
+      dl=calendar(v.uf,final,exc,v.especie,v.placa);
+      if(dl?.notVerified){
+        title='Data histórica a conferir';css='warn';msg=dl.incomplete;
+      }else if(dl?.incomplete){
+        title='Dados para conferir';css='warn';msg=dl.incomplete;
+      }else if(dl?.date){
         $('deadline').textContent=fmt(dl.date);
         const deadlineDay=Date.UTC(dl.date.getUTCFullYear(),dl.date.getUTCMonth(),dl.date.getUTCDate())/86400000;
         const delta=deadlineDay-brazilDate();
@@ -777,39 +853,33 @@ self.onmessage=e=>{
         const extra=dl.note?' '+dl.note:'';
         if(dl.uncertain){
           title='Conferência necessária';css='warn';
-          msg='A data é apenas uma referência estimada/não confirmada para este estado. Confira no Detran.'+extra;
-        }else if(!validYear){
-          title='Confirme o exercício';css='neutral';
-          msg='A data do calendário foi encontrada, mas o exercício do CRLV não foi identificado.'+extra;
-        }else if(exc===2026){
-          title='CRLV 2026 apresentado';css='ok';$('deadline').classList.add('on-time');
-          msg='O documento apresentado já informa exercício 2026. A data exibida é o prazo de renovação do calendário, não a expiração desse CRLV. Confira a regularidade no Detran.'+extra;
-        }else if(exc===2025){
-          if(delta<0){
-            title=isPaymentOnly?'Prazo de pagamento vencido':'Prazo 2026 vencido';css='bad';$('deadline').classList.add('overdue');
-            msg=isPaymentOnly?'O prazo de pagamento informado para 2026 passou e o CRLV apresentado é de 2025. Isso NÃO comprova que o veículo esteja irregular; consulte o Detran.':'O prazo estadual de 2026 passou e o CRLV apresentado é de 2025. Confira a emissão do CRLV atualizado no Detran.';
-          }else{
-            title=delta===0?'No prazo — vence hoje':'No prazo';css='ok';$('deadline').classList.add('on-time');
-            msg=delta===0?'O prazo de 2026 termina hoje.':'O prazo estadual de 2026 ainda não terminou ('+delta+' dia'+(delta===1?'':'s')+' restante'+(delta===1?'':'s')+').';
-            if(isPaymentOnly)msg+=' A data refere-se a pagamento e pode diferir da exigência de circulação.';
-          }
-          msg+=extra;
-        }else if(exc<2025){
-          title='Exercício antigo — revisar';css='bad';$('deadline').classList.add('overdue');
-          msg='CRLV apresentado é de '+exc+', anterior ao exercício 2025. É necessária conferência imediata do licenciamento atualizado no Detran; o calendário de 2026 não substitui a consulta oficial.'+extra;
+          msg='A data de referência não está confirmada para este estado. Confira no Detran.'+extra;
+        }else if(delta<0){
+          title='Vencido';css='bad';$('deadline').classList.add('overdue');
+          msg='O prazo do calendário de '+exc+' terminou em '+fmt(dl.date)+'. Data anterior à de hoje: vencido pela regra operacional do FrotaCheck.'+extra;
+          if(isPaymentOnly)msg+=' O prazo indicado é de pagamento e não confirma, isoladamente, irregularidade para circulação.';
         }else{
-          title='Exercício fora da tabela';css='neutral';
-          msg='A tabela deste sistema é exclusivamente de 2026. Verifique o exercício informado e a validade na fonte oficial.'+extra;
+          title=delta===0?'No prazo — vence hoje':'No prazo';css='ok';$('deadline').classList.add('on-time');
+          msg=delta===0?'O prazo do calendário de '+exc+' termina hoje.':'O prazo estadual de '+exc+' ainda não terminou ('+delta+' dia'+(delta===1?'':'s')+' restante'+(delta===1?'':'s')+').';
+          if(isPaymentOnly)msg+=' Este prazo refere-se ao pagamento, que pode diferir da exigência do CRLV para circulação.';
+          msg+=extra;
         }
-      } else {title='Prazo não encontrado';msg='Não foi possível calcular a data deste estado com as informações apresentadas.';}
+        msg+=' Situação baseada na data da tabela do exercício, não é consulta à situação oficial do veículo no Detran.';
+      }else{
+        title='Prazo não encontrado';css='warn';
+        msg='Não foi possível localizar uma data confiável para '+v.uf+' no exercício '+exc+'. Consulte o Detran.';
+      }
     }
     licenseTile.classList.add(css==='ok'?'license-ok':css==='bad'?'license-bad':css==='warn'?'license-pending':'yellow');
     $('status').textContent=title;
     $('status').className='status '+css;
     $('status-explanation').textContent=msg;
-    $('deadline-kind').textContent=dl?.kind?'Referência estadual: '+dl.kind:'';
+    $('deadline-kind').textContent=dl?.kind?'Referência estadual '+(dl.calendarYear||exc)+': '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.13',processedAt:new Date().toISOString(),data:v,classification:cat,calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain}:null,summary:{title,msg},renewalYear:2026,disclaimer:'Calendário de referência 2026; não é consulta de regularidade, débitos ou autenticidade no Detran.'};
+    return {version:'5.14',processedAt:new Date().toISOString(),data:v,classification:cat,
+      calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain,year:exc}:null,
+      summary:{title,msg},renewalYear:supportedYear?exc:null,
+      disclaimer:'A cor mostra a comparação com o calendário do exercício '+shownYear+'. A data do calendário não comprova, por si só, a regularidade do veículo ou a validade individual do documento; consulte o Detran.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -2106,15 +2176,15 @@ self.onmessage=e=>{
       const cat=classify(v);
       if(!v.modelo||cat.name==='Aguardando dados'||cat.name==='A confirmar'||cat.name==='Confirmar carroceria'){
         setStage(2,'failed','Não foi possível confirmar toda a tipologia. Confira modelo, espécie, PBT e eixos no documento.');
-      }else{setStage(2,'done',`Veículo identificado: ${cat.name}. Consultando a tabela estadual de 2026...`);}
-      currentStage=3;setStage(3,'running','Consultando UF, placa, espécie/tipo e exercício no calendário de 2026...');
-      notice('Etapa 4/4 • Consultando prazo do licenciamento 2026...');
+      }else{setStage(2,'done',`Veículo identificado: ${cat.name}. Consultando o calendário do exercício ${v.exercicio||"informado"}...`);}
+      currentStage=3;setStage(3,'running','Consultando UF, placa, espécie/tipo e calendário do exercício informado...');
+      notice('Etapa 4/4 • Consultando prazo do exercício informado...');
       await yieldScreen();
       const r=analyze();
       if(!r.calendar?.deadline||r.calendar.needsConfirmation||!v.exercicio){
         setStage(3,'failed','A data ou a situação exige conferência. Confira placa, UF, exercício e fonte do Detran.');
       }else{
-        setStage(3,'done','Análise concluída. Confira tipo, modelo, situação e prazo do calendário 2026.');
+        setStage(3,'done','Análise concluída. Confira tipo, modelo e prazo do exercício do CRLV.');
         // Resultado final aparece nos campos, sem cartoes de etapa.
       }
       const ev=aiUsed?{level:aiCrlv?'identified':'unconfirmed'}:documentEvidence(text,map);
@@ -2482,7 +2552,7 @@ self.onmessage=e=>{
   $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;exerciseAttempts=[];$('exercise-diag').hidden=true;$('processing-strip').hidden=true;$('ai-diagnostic').hidden=true;processedCache=null;activeProcessId++;resetProcessedPDF();resetStages();previewToken++;scanOriginal=null;autoCorners=null;manualCorners=null;cropDrag=-1;$('scan-crop').hidden=true;$('crop-mode').value='auto';$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
   $('copy-summary').addEventListener('click',async()=>{
     const r=analyze();
-    const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nCapacidade: ${r.data.capacidade||'-'} t\nCarroceria no CRLV: ${r.data.carroceria||'-'}\nCobertura alta (foto): ${r.data.cobertura_alta==='sim'?'Sim':r.data.cobertura_alta==='nao'?'Não':'Não confirmada'}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário consultado: 2026\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
+    const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nCapacidade: ${r.data.capacidade||'-'} t\nCarroceria no CRLV: ${r.data.carroceria||'-'}\nCobertura alta (foto): ${r.data.cobertura_alta==='sim'?'Sim':r.data.cobertura_alta==='nao'?'Não':'Não confirmada'}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário consultado: ${r.renewalYear||"não identificado"}\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
     try{await navigator.clipboard.writeText(s);notice('Resultado copiado.','success');}
     catch(e){notice('Não foi possível copiar automaticamente.','warning');}
   });
