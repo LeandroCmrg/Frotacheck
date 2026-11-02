@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck 5.17 | Calendário Fleet 2026</title>
+<title>FrotaCheck 5.18 | Calendários históricos ampliados</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -120,7 +120,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.processing-strip{margin:10px 17px 4px}}
 
-/* FrotaCheck 5.17 — cabine estendida / PTC / carroceria aberta */
+/* FrotaCheck 5.18 — cabine estendida / PTC / carroceria aberta */
 .body-check{margin:14px 0 15px;border:1px solid #e4d8ad;background:linear-gradient(145deg,#fffdf3,#fff9e5);border-radius:17px;padding:18px;box-shadow:0 5px 16px #45310e0b}
 .body-check .check-overline{display:flex;align-items:center;gap:8px;color:#8d111b;font-size:11px;letter-spacing:.7px;font-weight:850;text-transform:uppercase}
 .body-check .check-icon{height:29px;width:29px;border-radius:9px;display:grid;place-items:center;background:#ffeab1;font-size:16px}
@@ -150,7 +150,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .uf-rescue p{font-size:12px;color:#765c40;margin:0 0 9px;line-height:1.4}
 .uf-rescue select{background:white;border:1px solid #d9b686;color:#312e28;font-weight:700;padding:10px 12px;width:100%;min-height:44px;border-radius:9px;font-size:16px}
 
-/* v5.17 - PTC e escolha visual compacta e responsiva */
+/* v5.18 - PTC e escolha visual compacta e responsiva */
 .ptc-alert{display:flex;flex-direction:column;gap:3px;border-left:4px solid #b90d20;background:#fff1ed;border-radius:9px;padding:10px 12px;margin:10px 0 9px;color:#92201d;font-size:12px}
 .ptc-alert strong{font-size:13px;line-height:1.4}
 .ptc-alert span{font-size:11px;color:#69534c}
@@ -586,6 +586,15 @@ self.onmessage=e=>{
   // Sem fonte historica validada: retornar "conferencia necessaria" sem inventar uma data.
   const historicSources={
     2024:{
+      PE:{url:"https://www.detran.pe.gov.br/duvidas-sobre-a-emissao-do-crlv-2024",kind:"validade do CRLV anterior para circulação"},
+
+      AC:{url:"https://www.informanet.com.br/Prodinfo/boletim/2023/ac/portaria_detran_1728_50_2023.html",kind:"prazo de renovação do licenciamento"},
+      AL:{url:"https://www.sefaz.al.gov.br/noticias/item/3551-ipva-2024-boletos-de-veiculos-com-placas-de-finais-1-e-2-deve-ser-pago-ate-o-dia-29-de-fevereiro",kind:"pagamento de IPVA/licenciamento"},
+      AM:{url:"https://portalamazonasdigital.com/wp-content/uploads/2024/01/Detran-AM_CalendarioLicenciamentoAnual2024.pdf",kind:"prazo final de pagamento IPVA/licenciamento (tabela Detran-AM)"},
+      MT:{url:"https://iomat.mt.gov.br/legislacao/diario_oficial/detalhes/764541",kind:"prazo de emissão do licenciamento"},
+      PB:{url:"https://detran.pb.gov.br/noticias/detran-pb-divulga-calendario-do-licenciamento-de-veiculos-para-2024/",kind:"pagamento de licenciamento"},
+      RO:{url:"https://rondonia.ro.gov.br/prazo-para-licenciamento-de-veiculos-com-placa-final-12-e-3-encerra-na-quinta-feira-dia-28/",kind:"prazo de licenciamento (verificações parciais por final)"},
+
       SP:{url:'https://www.bibliotecajuridica.sp.gov.br/licenciamento-2024-chega-as-placas-5-e-6-em-setembro-no-estado-de-sp/',kind:'renovação / circulação'},
       RJ:{url:'https://www.detran.rj.gov.br/noticias/prazo-de-licenciamento-para-veiculos-com-finais-de-placa-0-e-9-termina-em-31-de-dezembro.html',kind:'prazo do licenciamento (calendário prorrogado)'},
       MG:{url:'https://www.agenciaminas.mg.gov.br/noticia/governo-define-calendario-de-exigencia-do-crlv-e-realiza-mutirao-para-auxiliar-proprietarios-de-veiculos-na-regularizacao-do-licenciamento-122756',kind:'exigência do CRLV'},
@@ -598,6 +607,25 @@ self.onmessage=e=>{
       MS:{url:'https://www.detran.ms.gov.br/vence-hoje-licenciamento-veiculos-com-placas-de-final-1-e-2/',kind:'prazo de licenciamento (somente placas finais 1/2 e 0 verificados)'}
     },
     2025:{
+      AM:{url:"https://autopapo.com/noticia/crlv-2025-exigido-estado/",kind:"prazo de licenciamento, conforme calendário compilado por AutoPapo"},
+      BA:{url:"https://www.ba.gov.br/detran/noticias/2025-08/7503/ipva-de-veiculos-com-placas-de-final-4-deve-ser-quitado-ate-sexta-dia-29",kind:"prazo de quitação da última parcela para licenciamento"},
+      MA:{url:"https://www.legisweb.com.br/legislacao/?id=470641",kind:"terceira parcela IPVA; fiscalização inicia no mês seguinte"},
+      PE:{url:"https://www.legisweb.com.br/legislacao/?id=424210",kind:"validade do CRLV do exercício anterior para circulação"},
+      PI:{url:"https://www.normasbrasil.com.br/norma/instrucao-normativa-2-2024-pi_469580.html",kind:"prazo da taxa anual de licenciamento"},
+
+      AC:{url:"https://agazetadoacre.com/2024/12/noticias/geral/detran-divulga-calendario-de-licenciamento-anual-de-2025-veja-datas/",kind:"pagamento de licenciamento - publicado a partir do Detran-AC"},
+      AL:{url:"https://www.sefaz.al.gov.br/ipva/ipva-prazos-do-ipva",kind:"pagamento de IPVA/licenciamento (não equivale à validade do CRLV anterior)"},
+      AP:{url:"https://www.detran.ap.gov.br/detranap/detran-ap-taxa-de-licenciamento-de-2025-ja-esta-disponivel-para-pagamento/",kind:"prazo de licenciamento para todas as placas"},
+      CE:{url:"https://www.legisweb.com.br/legislacao/?id=471706",kind:"pagamento do licenciamento - Portaria DETRAN/CE 2728/2024"},
+      MT:{url:"https://www.detran.mt.gov.br/w/licenciamento-de-ve%C3%ADculos-placas-final-8-deve-ser-pago-at%C3%A9-dia-31-de-agosto",kind:"prazo de licenciamento"},
+      PA:{url:"https://www.legisweb.com.br/legislacao/?id=469940",kind:"prazo de licenciamento - Portaria 5543/2024, últimos DOIS dígitos"},
+      PB:{url:"https://pautapb.com.br/2024/12/18/detran-pb-divulga-calendario-do-licenciamento-de-veiculos-para-2025-veja/",kind:"pagamento de licenciamento - Portaria DETRAN/PB 693/2024"},
+      RN:{url:"https://webdisk.diariooficial.rn.gov.br/Jornal/12024-12-27.pdf",kind:"pagamento da taxa de licenciamento - Portaria 1763/2024"},
+      RO:{url:"https://rondonia.ro.gov.br/licenciamento-anual-de-veiculos-com-placa-final-6-encerra-em-30-de-junho/",kind:"prazo de licenciamento - Portaria 30/2017"},
+      RR:{url:"https://www.detran.rr.gov.br/wp-content/uploads/2025/05/SEI_GRR-16977335-Portaria-Conjunta-2-IPVA-e-LICENCIAMENTO-ANO-2025.pdf",kind:"pagamento de licenciamento; regra especial para veículos isentos de IPVA"},
+      SE:{url:"https://www.legisweb.com.br/legislacao/?id=469898",kind:"prazo de pagamento do licenciamento - Portaria SEFAZ 354/2024"},
+      TO:{url:"https://www.normasbrasil.com.br/norma/portaria-1214-2025-to_485126.html",kind:"prazo de pagamento licenciamento - Portaria 1214/2025"},
+
       SP:{url:'https://servicos.sp.gov.br/fcarta/564F6C83-1A86-472E-AC79-3A7F5ABFE248',kind:'renovação / circulação'},
       RJ:{url:'https://www.detran.rj.gov.br/noticias/detran-rj-prorroga-calendario-de-licenciamento-de-veiculos-de-2025-1.html',kind:'prazo do licenciamento (calendário prorrogado)'},
       MG:{url:'https://www.mg.gov.br/planejamento/noticias/governo-de-minas-divulga-calendario-do-licenciamento-de-veiculos-de-2025',kind:'exigência do CRLV'},
@@ -610,6 +638,17 @@ self.onmessage=e=>{
       MS:{url:'https://www.detran.ms.gov.br/detran-ms-publica-calendario-anual-de-licenciamento-para-2025/',kind:'licenciamento, último dia útil do mês; final 3 prorrogado até 30/09'}
     }
   };
+
+  // 5.18: Calendários históricos complementares. Lista indexada por último dígito (0..9).
+  // Datas MM-DD são vigentes somente para o ano informado e para a fonte identificada.
+  const historicExtra={
+    2024:{AC:["10-31", "03-27", "03-27", "04-30", "04-30", "05-29", "06-28", "07-31", "08-30", "09-30"],AL:["06-28", "02-29", "02-29", "03-28", "03-28", "04-30", "04-30", "05-31", "05-31", "06-28"],AM:["12-27", "03-28", "04-30", "05-31", "06-28", "07-31", "08-30", "09-30", "10-31", "11-29"],MT:["10-31", "03-31", "03-31", "03-31", "04-30", "05-31", "06-30", "07-31", "08-31", "09-30"],PB:["12-30", "03-28", "04-30", "05-31", "06-28", "07-31", "08-30", "09-30", "10-31", "11-29"],RO:["10-31", "03-28", "03-28", "03-28", null, null, null, "07-31", "08-30", "09-30"]},
+    2025:{AC:["10-31", "03-31", "03-31", "04-30", "04-30", "05-30", "06-30", "07-31", "08-29", "09-30"],AL:["06-30", "02-28", "02-28", "03-31", "03-31", "04-30", "04-30", "05-30", "05-30", "06-30"],AP:["08-31", "08-31", "08-31", "08-31", "08-31", "08-31", "08-31", "08-31", "08-31", "08-31"],CE:["12-10", "03-10", "04-10", "05-12", "06-10", "07-10", "08-11", "09-10", "10-10", "11-10"],MT:["10-31", "03-31", "03-31", "03-31", "04-30", "05-31", "06-30", "07-31", "08-31", "09-30"],PB:["12-30", "03-31", "04-30", "05-30", "06-30", "07-31", "08-29", "09-30", "10-31", "11-28"],RN:["06-10", "03-10", "03-10", "04-10", "04-10", "04-10", "05-12", "05-12", "05-12", "06-10"],RO:["10-31", "03-31", "03-31", "03-31", "04-30", "05-30", "06-30", "07-31", "08-29", "09-30"],RR:["08-29", "08-29", "08-29", "08-29", "08-29", "08-29", "08-29", "08-29", "08-29", "08-29"],SE:["11-28", "04-30", "04-30", "05-30", "05-30", "06-30", "07-31", "08-29", "09-30", "10-31"],TO:["12-15", "10-31", "10-31", "10-31", "10-31", "10-31", "11-30", "11-30", "11-30", "12-15"]}
+  };
+
+  const historicalMissing2024={"PE": ["12-31", "09-30", "09-30", "10-31", "10-31", "10-31", "11-30", "11-30", "11-30", "12-31"]};
+  const historicalMissing2025={"AM": ["12-29", "03-31", "04-30", "05-30", "06-30", "07-31", "08-29", "09-30", "10-31", "11-28"], "BA": ["11-28", "07-30", "07-31", "08-28", "08-29", "09-29", "09-30", "10-30", "10-31", "11-27"], "MA": ["05-30", "05-02", "05-02", "05-09", "05-09", "05-16", "05-16", "05-23", "05-23", "05-30"], "PE": ["12-31", "09-30", "09-30", "10-31", "10-31", "10-31", "11-30", "11-30", "11-30", "12-31"], "PI": ["03-31", "03-31", "03-31", "03-31", "03-31", "03-31", "03-31", "03-31", "03-31", "03-31"]};
+  const paHistoric2025={"1":["03-07","03-14","03-21"],"2":["03-28","04-04","04-11"],"3":["04-25","05-09","05-16"],"4":["05-23","05-30","06-06"],"5":["06-13","06-27","07-04"],"6":["07-11","07-18","08-01"],"7":["08-08","08-22","08-29"],"8":["09-05","09-12","09-19"],"9":["09-26","10-03","10-17"],"0":["10-24","11-07","11-14"]};
   const pr2024ByTwoDigits={"06":"10-01","07":"10-01","09":"11-01","03":"09-02","04":"09-02","16":"10-02","17":"10-02","13":"09-03","14":"09-03","26":"10-03","27":"10-03","23":"09-04","24":"09-04","36":"10-04","37":"10-04","19":"11-04","01":"08-05","33":"09-05","34":"09-05","29":"11-05","11":"08-06","43":"09-06","44":"09-06","39":"11-06","21":"08-07","46":"10-07","47":"10-07","49":"11-07","31":"08-08","56":"10-08","57":"10-08","59":"11-08","41":"08-09","53":"09-09","54":"09-09","66":"10-09","67":"10-09","63":"09-10","64":"09-10","76":"10-10","77":"10-10","73":"09-11","74":"09-11","86":"10-11","87":"10-11","69":"11-11","51":"08-12","83":"09-12","84":"09-12","79":"11-12","61":"08-13","93":"09-13","94":"09-13","89":"11-13","71":"08-14","96":"10-14","97":"10-14","99":"11-14","81":"08-15","08":"10-15","91":"08-16","05":"09-16","18":"10-16","15":"09-17","28":"10-17","25":"09-18","38":"10-18","00":"11-18","02":"08-19","35":"09-19","10":"11-19","12":"08-20","45":"09-20","20":"11-20","22":"08-21","48":"10-21","30":"11-21","32":"08-22","58":"10-22","40":"11-22","42":"08-23","55":"09-23","68":"10-23","65":"09-24","78":"10-24","75":"09-25","88":"10-25","50":"11-25","52":"08-26","85":"09-26","60":"11-26","62":"08-27","95":"09-27","70":"11-27","72":"08-28","98":"10-28","80":"11-28","82":"08-29","90":"11-29","92":"08-30"};
   const pr2025ByFinal={1:'08-15',2:'08-29',3:'09-10',4:'09-19',5:'09-30',6:'10-10',7:'10-20',8:'10-31',9:'11-14',0:'11-28'};
   const scByFinal2024={1:'03-31',2:'04-30',3:'05-31',4:'06-30',5:'07-31',6:'08-31',7:'09-30',8:'10-31',9:'11-30',0:'12-31'};
@@ -654,6 +693,21 @@ self.onmessage=e=>{
     }else if(uf==='ES'){
       const grp=[1,2].includes(final)?0:[3,4].includes(final)?1:[5,6].includes(final)?2:[7,8].includes(final)?3:4;
       mmdd=year===2024?['09-12','09-19','09-20','09-23','09-26'][grp]:['09-11','09-12','09-15','09-18','09-19'][grp];
+    }else if(uf==='PA'&&year===2025){
+      if(!validPlate(placa))return {incomplete:'No Pará, informe a placa completa para consultar os DOIS últimos dígitos.',calendarYear:year,...source};
+      const suffix=plateFmt(placa).slice(-2);
+      const tens=Number(suffix[0]);
+      mmdd=paHistoric2025[final]?.[tens<=3?0:tens<=6?1:2]||null;
+      source.note='Conferidos os dois últimos dígitos conforme a Portaria DETRAN/PA 5543/2024.';
+    }else if(historicExtra[year]?.[uf]||(year===2024?historicalMissing2024[uf]:historicalMissing2025[uf])){
+      mmdd=(historicExtra[year]?.[uf]||(year===2024?historicalMissing2024[uf]:historicalMissing2025[uf]))[final]||null;
+      if(uf==='RR'&&year===2025)source.note='Data para veículos sujeitos ao IPVA. Isentos/não incidência têm prazo especial de 31/03/2025. Confira o enquadramento.';
+      if(uf==='AM'&&year===2025)source.note='Calendário encontrado em compilação publicada; confirme no Detran-AM se necessário.';
+      if(uf==='MA'&&year===2025)source.note='Data da terceira parcela do IPVA; o início da fiscalização é posterior.';
+      if(uf==='PE')source.note='Este prazo é a data limite para circular com o CRLV do exercício anterior; não é o vencimento da taxa de IPVA.';
+      if(uf==='AL')source.note='Data de pagamento do licenciamento; a validade do CRLV anterior pode ser diferente.';
+      if(uf==='RN'&&year===2025)source.note='A data apresentada é de pagamento da taxa; a validade do CRLV 2024 é posterior e indicada por mês na Portaria.';
+      if(uf==='RO'&&year===2024&&!mmdd)return {notVerified:true,calendarYear:year,incomplete:'O mês é conhecido, mas o dia exato deste final em 2024 não foi validado.',...source};
     }
     if(!mmdd)return {notVerified:true,calendarYear:year,incomplete:'Não foi possível identificar um prazo histórico validado. Consulte o Detran.',...source};
     const [m,d]=mmdd.split('-').map(Number);
@@ -944,7 +998,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual '+(dl.calendarYear||exc)+': '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.17',processedAt:new Date().toISOString(),data:v,classification:cat,
+    return {version:'5.18',processedAt:new Date().toISOString(),data:v,classification:cat,
       calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain,year:exc}:null,
       summary:{title,msg},renewalYear:supportedYear?exc:null,
       disclaimer:'A cor mostra a comparação com o calendário do exercício '+shownYear+'. A data do calendário não comprova, por si só, a regularidade do veículo ou a validade individual do documento; consulte o Detran.'};
