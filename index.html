@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#ffcc00" />
 <meta name="description" content="FrotaCheck: digitalização, leitura de CRLV-e para identificar tipo do veículo e prazo estadual de licenciamento." />
-<title>FrotaCheck 5.15 | Tipologia e carroceria</title>
+<title>FrotaCheck 5.17 | Calendário Fleet 2026</title>
 <style>
 :root{--yellow:#ffcc00;--red:#d40511;--red-dark:#a9000b;--ink:#242424;--muted:#66645e;--line:#e6e3da;--bg:#f8f8f5;--white:#fff;--r:20px;color-scheme:light}
 *{box-sizing:border-box}[hidden]{display:none!important}html{font-size:16px;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -120,7 +120,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.processing-strip{margin:10px 17px 4px}}
 
-/* FrotaCheck 5.15 — validação visual de carroceria */
+/* FrotaCheck 5.17 — cabine estendida / PTC / carroceria aberta */
 .body-check{margin:14px 0 15px;border:1px solid #e4d8ad;background:linear-gradient(145deg,#fffdf3,#fff9e5);border-radius:17px;padding:18px;box-shadow:0 5px 16px #45310e0b}
 .body-check .check-overline{display:flex;align-items:center;gap:8px;color:#8d111b;font-size:11px;letter-spacing:.7px;font-weight:850;text-transform:uppercase}
 .body-check .check-icon{height:29px;width:29px;border-radius:9px;display:grid;place-items:center;background:#ffeab1;font-size:16px}
@@ -149,6 +149,22 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .uf-rescue label{display:block;font-size:13px;font-weight:850;margin:0 0 6px;color:#513b25}
 .uf-rescue p{font-size:12px;color:#765c40;margin:0 0 9px;line-height:1.4}
 .uf-rescue select{background:white;border:1px solid #d9b686;color:#312e28;font-weight:700;padding:10px 12px;width:100%;min-height:44px;border-radius:9px;font-size:16px}
+
+/* v5.17 - PTC e escolha visual compacta e responsiva */
+.ptc-alert{display:flex;flex-direction:column;gap:3px;border-left:4px solid #b90d20;background:#fff1ed;border-radius:9px;padding:10px 12px;margin:10px 0 9px;color:#92201d;font-size:12px}
+.ptc-alert strong{font-size:13px;line-height:1.4}
+.ptc-alert span{font-size:11px;color:#69534c}
+.body-check.compact-ptc{padding:13px 15px;border-radius:14px;margin:12px 0}
+.body-check.compact-ptc h3{font-size:14px;margin:8px 0 4px;line-height:1.38;letter-spacing:0}
+.body-check.compact-ptc p{font-size:11px}
+.body-check.compact-ptc .body-options{gap:8px;margin-top:9px}
+.body-check.compact-ptc .body-option{padding:8px;gap:4px;border-width:1.5px;border-radius:10px}
+.body-check.compact-ptc .body-option .draw{min-height:49px}
+.body-check.compact-ptc .body-option svg{height:51px;width:min(100%,120px)}
+.body-check.compact-ptc .body-option strong{font-size:12px}
+.body-check.compact-ptc .body-option .body-desc{font-size:10px}
+.body-check.compact-ptc .body-small{padding-top:7px;margin-top:8px;font-size:10px}
+@media(max-width:560px){.body-check.compact-ptc .body-option{display:grid;grid-template-columns:82px 1fr;align-items:center}.body-check.compact-ptc .body-option .draw{grid-row:span 2}.body-check.compact-ptc .body-option svg{height:50px}}
 </style>
 </head>
 <body>
@@ -217,7 +233,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
       <div class="field full"><label for="especie">Espécie / tipo no documento</label><input id="especie" placeholder="Ex.: CARGA CAMINHÃO" /></div>
       <div class="field full"><label for="modelo">Marca / modelo</label><input id="modelo" placeholder="Ex.: VW/24.280" /></div>
       <div class="field full"><label for="carroceria">Carroceria descrita no CRLV</label><input id="carroceria" placeholder="Ex.: ABERTA, FECHADA, BAÚ" /><p class="hint">Digite apenas o que aparece no documento. A cobertura alta será confirmada pela foto do veículo.</p></div>
-      <input id="cobertura_alta" type="hidden" value="" />
+      <input id="cobertura_alta" type="hidden" value="" /><input id="cabine_estendida" type="hidden" value="" />
       <div class="field"><label for="capacidade">Capacidade de carga (t)</label><input id="capacidade" inputmode="decimal" placeholder="Ex.: 1,46" /><p class="hint">Não confundir com o PBT ou CMT.</p></div>
       <div class="field"><label for="pbt">PBT (toneladas)</label><input id="pbt" inputmode="decimal" placeholder="Ex.: 16" /></div>
       <div class="field"><label for="comprimento">Comprimento (m)</label><input id="comprimento" inputmode="decimal" placeholder="Ex.: 7,2" /></div>
@@ -233,18 +249,19 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 <section class="panel result-panel" aria-labelledby="result-title">
   <div class="result-head"><h2 id="result-title">Resultado do CRLV-e</h2><span class="result-tag">CONSULTA DE APOIO</span></div>
   <div class="result-tile red"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7zM7.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>Tipo do veículo</div><div class="big" id="category">Aguardando dados</div><span class="type-confidence" id="confidence">—</span><p class="detail-note" id="category-note">O tipo aparecerá após a leitura ou o preenchimento.</p></div>
-  <section class="body-check" id="body-question" aria-labelledby="body-question-title" hidden>
-    <div class="check-overline"><span class="check-icon" aria-hidden="true">▣</span> Verificação visual · Carroceria aberta</div>
-    <h3 id="body-question-title">Na foto do veículo, a caçamba possui uma cobertura <u>alta e fechada</u>, estilo Fiorino?</h3>
-    <p>Considere uma capota-baú rígida e alta que forma um compartimento fechado para carga. <strong>Não</strong> conte lona nem capota marítima baixa.</p>
-    <div class="body-options" role="group" aria-label="A caçamba tem cobertura alta e fechada?">
+  <section class="body-check compact-ptc" id="body-question" aria-labelledby="body-question-title" hidden>
+    <div class="check-overline"><span class="check-icon" aria-hidden="true">▣</span> Ação necessária · Carroceria aberta</div>
+    <div class="ptc-alert" role="note"><strong>Abra um PTC solicitando foto do veículo.</strong><span>Após receber a foto, selecione abaixo o tipo de carroceria.</span></div>
+    <h3 id="body-question-title">Na foto, a carroceria é <u>fechada (tipo Fiorino)</u> ou <u>aberta</u>?</h3>
+    <p>Fechada = cobertura rígida, alta e fechada sobre a caçamba. Lona e capota marítima baixa contam como aberta.</p>
+    <div class="body-options" role="group" aria-label="A carroceria de carga é fechada ou aberta?">
       <button class="body-option" id="body-answer-yes" type="button" aria-pressed="false">
         <span class="draw"><svg viewBox="0 0 200 90" role="img" aria-label="Picape com cobertura alta tipo furgão"><rect x="12" y="25" width="130" height="44" rx="6" fill="#e2b923" stroke="#66553c" stroke-width="2"/><path d="M140 37h24l18 20v12h-42z" fill="#e2b923" stroke="#66553c" stroke-width="2"/><path d="M152 40h12l11 14h-23z" fill="#a1c8d2" stroke="#66553c" stroke-width="2"/><rect x="14" y="15" width="112" height="12" rx="4" fill="#e2b923" stroke="#66553c" stroke-width="2"/><circle cx="44" cy="70" r="13" fill="#343434"/><circle cx="44" cy="70" r="6" fill="#ddd"/><circle cx="156" cy="70" r="13" fill="#343434"/><circle cx="156" cy="70" r="6" fill="#ddd"/></svg></span>
-        <strong>✓ Sim, possui</strong><span class="body-desc">Cobertura elevada e rígida, tipo capota-baú. <b>Tipologia: Fiorino.</b></span>
+        <strong>Fechada</strong><span class="body-desc">Cobertura alta rígida, tipo Fiorino. <b>Tipologia: Fiorino.</b></span>
       </button>
       <button class="body-option" id="body-answer-no" type="button" aria-pressed="false">
         <span class="draw"><svg viewBox="0 0 200 90" role="img" aria-label="Picape com caçamba descoberta"><path d="M14 49h113V31h36l18 22v17H14z" fill="#e2b923" stroke="#66553c" stroke-width="2"/><path d="M141 34h20l14 17h-34z" fill="#a1c8d2" stroke="#66553c" stroke-width="2"/><path d="M14 44h107" stroke="#66553c" stroke-width="3"/><path d="M21 31v15M114 31v15" stroke="#66553c" stroke-width="3"/><circle cx="44" cy="70" r="13" fill="#343434"/><circle cx="44" cy="70" r="6" fill="#ddd"/><circle cx="156" cy="70" r="13" fill="#343434"/><circle cx="156" cy="70" r="6" fill="#ddd"/></svg></span>
-        <strong>✕ Não possui</strong><span class="body-desc">Caçamba aberta ou só com lona/capota baixa. <b>Tipologia: Passeio.</b></span>
+        <strong>Aberta</strong><span class="body-desc">Sem cobertura alta, ou só lona/capota baixa. <b>Tipologia: Passeio.</b></span>
       </button>
     </div>
     <p class="body-small">ℹ️ Essa é uma classificação operacional interna. A espécie e a carroceria documentadas no CRLV permanecem as mesmas.</p>
@@ -267,7 +284,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
 </section>
 </div>
-<div class="footer-note">A data exibida corresponde ao calendário do exercício do CRLV (2024, 2025 ou 2026), e não necessariamente à data de expiração do próprio CRLV. A versão inclui 2026 para as 27 UFs e tabelas históricas verificadas de 2024 e 2025 para SP, RJ, MG, PR, RS, SC, DF e ES; outras UFs históricas exigem confirmação e ficam em amarelo, sem data inventada. Vermelho significa que a data da tabela passou, não que a irregularidade esteja confirmada no Detran. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. As tipologias RBM, inclusive Passeio e Fiorino, são classificações operacionais. A cobertura alta é confirmada pela foto e não modifica o CRLV; PBT não equivale à carga útil.</div>
+<div class="footer-note">A data exibida corresponde ao calendário do exercício do CRLV (2024, 2025 ou 2026), e não necessariamente à data de expiração do próprio CRLV. A versão usa a tabela Fleet fornecida para 2026 nas 27 UFs (incluindo preenchimento oficial para AP e correções de prorrogações e divergências verificadas). Dados da tabela Fleet sem correspondência oficial conferida são apenas referência interna; o Pará continua usando dois dígitos. Mantém tabelas históricas de 2024 e 2025 para SP, RJ, MG, PR, RS, SC, DF, ES e GO, além de MS com cobertura parcial em 2024; demais UFs históricas exigem confirmação e ficam em amarelo, sem data inventada. Vermelho significa que a data da tabela passou, não que a irregularidade esteja confirmada no Detran. Datas podem indicar pagamento, licenciamento ou exigência do CRLV, conforme o estado. O vencimento exibido não confirma a regularidade do veículo. O FrotaCheck não autentica CRLV-e, não decodifica QR Seguro VIO sem integração autorizada e não consulta débitos ou restrições. As tipologias RBM, inclusive Passeio e Fiorino, são classificações operacionais. Para carroceria aberta em veículo leve, abrir PTC e solicitar foto; cabine estendida identificada no documento é Passeio automaticamente. A cobertura alta é confirmada pela foto e não modifica o CRLV; PBT não equivale à carga útil.</div>
 </main>
 <div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
   <div class="scanner-box">
@@ -531,7 +548,7 @@ self.onmessage=e=>{
   'use strict';
   const $=id=>document.getElementById(id);
   const names={placa:'Placa',uf:'UF de registro',exercicio:'Exercício do CRLV',especie:'Espécie/tipo',modelo:'Marca/modelo',capacidade:'Capacidade de carga',pbt:'PBT',eixos:'Eixos',carroceria:'Carroceria do CRLV'};
-  const fields=['placa','uf','exercicio','especie','modelo','pbt','capacidade','eixos','carroceria','cobertura_alta','comprimento','largura','override'];
+  const fields=['placa','uf','exercicio','especie','modelo','pbt','capacidade','eixos','carroceria','cobertura_alta','cabine_estendida','comprimento','largura','override'];
   const ufs=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
   for(const uf of ufs){for(const id of ['uf','uf-rescue-select']){const opt=document.createElement('option');opt.value=uf;opt.textContent=uf;$(id).append(opt);}}
   const dates={
@@ -563,6 +580,7 @@ self.onmessage=e=>{
     RR:{url:'https://www.sefaz.rr.gov.br/downloads?catid=1063&id=26354&m=0&task=download.send',note:'Portaria conjunta divulgada pela Sefaz/RR. Confirmar possíveis prorrogações.',kind:'prazo de pagamento do licenciamento'},
     TO:{url:'https://www.legisweb.com.br/legislacao/?id=490496',note:'Portaria GAB/PRES 26/2026.',kind:'prazo de pagamento do licenciamento'}
   };
+  dates.MS={...(dates.MS||{}),url:'https://www.detran.ms.gov.br/detran-ms-altera-calendario-de-licenciamento-2026-para-evitar-transtornos-aos-cidadaos/',kind:'prazo de licenciamento (calendário prorrogado em abril de 2026)'};
   // Referencias historicas verificadas, exercicios 2024 e 2025.
   // NUNCA reutilizar a tabela de 2026 para anos anteriores.
   // Sem fonte historica validada: retornar "conferencia necessaria" sem inventar uma data.
@@ -575,7 +593,9 @@ self.onmessage=e=>{
       RS:{url:'https://publicacoeslegais.detran.rs.gov.br/portaria-detran-rs-n-562-2023-65a18f5338451',kind:'validade do CRLV anterior'},
       SC:{url:'https://www.sef.sc.gov.br/saiba-mais/prazos-do-ipva',kind:'prazo de licenciamento'},
       DF:{url:'https://www.sinj.df.gov.br/sinj/Norma/3276ec29ea5848c99aa6617de2cb7632/detran_ins_543_2024.html',kind:'prazo de renovação'},
-      ES:{url:'https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/Calend%C3%A1rio%20de%20Licenciamento%202024.pdf',kind:'vencimento do licenciamento'}
+      ES:{url:'https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/Calend%C3%A1rio%20de%20Licenciamento%202024.pdf',kind:'vencimento do licenciamento'},
+      GO:{url:'https://www.informanet.com.br/Prodinfo/boletim/2023/go/portaria_detran_1095_41_2023.html',kind:'prazo de pagamento (Portaria DETRAN GO 1095/2023)'},
+      MS:{url:'https://www.detran.ms.gov.br/vence-hoje-licenciamento-veiculos-com-placas-de-final-1-e-2/',kind:'prazo de licenciamento (somente placas finais 1/2 e 0 verificados)'}
     },
     2025:{
       SP:{url:'https://servicos.sp.gov.br/fcarta/564F6C83-1A86-472E-AC79-3A7F5ABFE248',kind:'renovação / circulação'},
@@ -585,7 +605,9 @@ self.onmessage=e=>{
       RS:{url:'https://publicacoeslegais.detran.rs.gov.br/portaria-detran-rs-n-486-2024',kind:'validade do CRLV anterior'},
       SC:{url:'https://www.sef.sc.gov.br/noticias/secretaria-de-estado-da-fazenda-divulga-calendario-do-ipva-para-2025-em-santa-catarina',kind:'prazo de licenciamento'},
       DF:{url:'https://www.sinj.df.gov.br/sinj/Norma/170075e3794a44f28874f90428a2f8dd/Instru_o_1188_01_09_2025.html',kind:'prazo de renovação'},
-      ES:{url:'https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/Calendario%20de%20Licenciamento%202025.pdf',kind:'vencimento do licenciamento'}
+      ES:{url:'https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/Calendario%20de%20Licenciamento%202025.pdf',kind:'vencimento do licenciamento'},
+      GO:{url:'https://legisla.casacivil.go.gov.br/pesquisa_ato_infralegal/7234',kind:'prazo de pagamento / início da fiscalização (Portaria 77/2025)'},
+      MS:{url:'https://www.detran.ms.gov.br/detran-ms-publica-calendario-anual-de-licenciamento-para-2025/',kind:'licenciamento, último dia útil do mês; final 3 prorrogado até 30/09'}
     }
   };
   const pr2024ByTwoDigits={"06":"10-01","07":"10-01","09":"11-01","03":"09-02","04":"09-02","16":"10-02","17":"10-02","13":"09-03","14":"09-03","26":"10-03","27":"10-03","23":"09-04","24":"09-04","36":"10-04","37":"10-04","19":"11-04","01":"08-05","33":"09-05","34":"09-05","29":"11-05","11":"08-06","43":"09-06","44":"09-06","39":"11-06","21":"08-07","46":"10-07","47":"10-07","49":"11-07","31":"08-08","56":"10-08","57":"10-08","59":"11-08","41":"08-09","53":"09-09","54":"09-09","66":"10-09","67":"10-09","63":"09-10","64":"09-10","76":"10-10","77":"10-10","73":"09-11","74":"09-11","86":"10-11","87":"10-11","69":"11-11","51":"08-12","83":"09-12","84":"09-12","79":"11-12","61":"08-13","93":"09-13","94":"09-13","89":"11-13","71":"08-14","96":"10-14","97":"10-14","99":"11-14","81":"08-15","08":"10-15","91":"08-16","05":"09-16","18":"10-16","15":"09-17","28":"10-17","25":"09-18","38":"10-18","00":"11-18","02":"08-19","35":"09-19","10":"11-19","12":"08-20","45":"09-20","20":"11-20","22":"08-21","48":"10-21","30":"11-21","32":"08-22","58":"10-22","40":"11-22","42":"08-23","55":"09-23","68":"10-23","65":"09-24","78":"10-24","75":"09-25","88":"10-25","50":"11-25","52":"08-26","85":"09-26","60":"11-26","62":"08-27","95":"09-27","70":"11-27","72":"08-28","98":"10-28","80":"11-28","82":"08-29","90":"11-29","92":"08-30"};
@@ -593,7 +615,7 @@ self.onmessage=e=>{
   const scByFinal2024={1:'03-31',2:'04-30',3:'05-31',4:'06-30',5:'07-31',6:'08-31',7:'09-30',8:'10-31',9:'11-30',0:'12-31'};
   const scByFinal2025={...scByFinal2024,0:'12-30'};
   function historicCalendar(uf,final,year,type,placa){
-    const source=historicSources[year]?.[uf];
+    const source=historicSources[year]?.[uf] ? {...historicSources[year][uf]} : null;
     if(!source)return {notVerified:true,calendarYear:year,incomplete:'A data de '+year+' para '+uf+' ainda não foi validada em fonte histórica. Consulte o Detran; não foi usado o calendário de 2026.'};
     let mmdd=null;
     if(uf==='SP'){
@@ -618,6 +640,17 @@ self.onmessage=e=>{
         if(!validPlate(placa))return {incomplete:'O Paraná em 2024 exige os dois últimos números da placa. Confirme a placa completa.',calendarYear:year,...source};
         mmdd=pr2024ByTwoDigits[plateFmt(placa).slice(-2)];
       }else mmdd=pr2025ByFinal[final];
+    }else if(uf==='GO'){
+      mmdd=year===2024?({1:'09-09',2:'09-10',3:'10-07',4:'10-08',5:'10-09',6:'10-10',7:'10-11',8:'10-14',9:'10-15',0:'10-16'}[final]):([1,2,3,4,5].includes(final)?'09-15':'10-15');
+    }else if(uf==='MS'){
+      if(year===2024){
+        if([1,2].includes(final))mmdd='04-30';
+        else if(final===0){mmdd='10-31';source.url='https://www.detran.ms.gov.br/calendario-do-licenciamento-2024-termina-dia-31-de-outubro/';}
+        else return {notVerified:true,calendarYear:year,incomplete:'O Detran-MS informou o mês, mas o dia histórico desse final não foi confirmado nesta revisão.',...source};
+      }else{
+        mmdd=([1,2].includes(final)?'04-30':final===3?'09-30':[4,5].includes(final)?'06-30':final===6?'07-31':[7,8].includes(final)?'08-29':final===9?'09-30':'10-31');
+        if(final===3)source.url='https://www.detran.ms.gov.br/motoristas-com-placas-3-e-9-tem-ate-o-final-de-setembro-para-licenciar-veiculos-de-forma-100-online/';
+      }
     }else if(uf==='ES'){
       const grp=[1,2].includes(final)?0:[3,4].includes(final)?1:[5,6].includes(final)?2:[7,8].includes(final)?3:4;
       mmdd=year===2024?['09-12','09-19','09-20','09-23','09-26'][grp]:['09-11','09-12','09-15','09-18','09-19'][grp];
@@ -632,7 +665,7 @@ self.onmessage=e=>{
     PR:{1:'08-14',2:'08-28',3:'09-09',4:'09-18',5:'09-28',6:'10-09',7:'10-20',8:'10-30',9:'11-13',0:'11-27'},
     ES:{1:'09-09',2:'09-09',3:'09-10',4:'09-10',5:'09-11',6:'09-11',7:'09-14',8:'09-14',9:'09-15',0:'09-15'},
     GO:{1:'09-15',2:'09-15',3:'10-15',4:'10-15',5:'10-15',6:'10-15',7:'10-15',8:'10-15',9:'10-15',0:'10-15'},
-    MS:{1:'07-29',2:'07-29',3:'07-29',4:'07-31',5:'07-31',6:'07-31',7:'09-18',8:'09-18',9:'09-30',0:'10-30'},
+    MS:{1:'06-30',2:'06-30',3:'06-30',4:'07-31',5:'07-31',6:'07-31',7:'08-31',8:'08-31',9:'09-30',0:'10-30'},
     SC:{1:'03-31',2:'04-30',3:'05-31',4:'06-30',5:'07-31',6:'08-31',7:'09-30',8:'10-31',9:'11-30',0:'12-30'},
     SE:{1:'04-30',2:'04-30',3:'05-29',4:'05-29',5:'06-30',6:'07-31',7:'08-31',8:'09-30',9:'10-30',0:'11-30'},
     RO:{1:'03-31',2:'03-31',3:'03-31',4:'04-30',5:'05-29',6:'06-30',7:'07-31',8:'08-31',9:'09-30',0:'10-29'},
@@ -692,44 +725,66 @@ self.onmessage=e=>{
     7:['08-14','08-21','08-28'], 8:['09-04','09-11','09-18'],
     9:['09-25','10-02','10-16'], 0:['10-23','11-06','11-13']
   };
+  // Fonte interna: TABELA LICENCIAMENTO VEC FLEET 1 7(1).xlsx, aba LICENCIAMENTO.
+  // Datas de serial Excel convertidas para ISO; sem depender da planilha no navegador.
+  // Divergências conferidas: fonte oficial mais recente tem prioridade sobre planilha.
+  const fleet2026={"AC":{"1":"2026-03-31","2":"2026-03-31","3":"2026-04-28","4":"2026-04-28","5":"2026-05-31","6":"2026-06-30","7":"2026-07-31","8":"2026-08-31","9":"2026-09-29","0":"2026-10-31"},"AL":{"1":"2026-08-31","2":"2026-08-31","3":"2026-09-30","4":"2026-09-30","5":"2026-10-31","6":"2026-10-31","7":"2026-11-30","8":"2026-11-30","9":"2026-12-31","0":"2026-12-31"},"AP":{"1":null,"2":null,"3":null,"4":null,"5":null,"6":null,"7":null,"8":null,"9":null,"0":null},"AM":{"1":"2026-03-28","2":"2026-04-30","3":"2026-05-31","4":"2026-06-28","5":"2026-07-31","6":"2026-08-30","7":"2026-09-30","8":"2026-10-31","9":"2026-11-29","0":"2026-12-27"},"BA":{"1":"2026-07-30","2":"2026-07-31","3":"2026-08-28","4":"2026-08-29","5":"2026-09-29","6":"2026-09-30","7":"2026-10-30","8":"2026-10-31","9":"2026-11-27","0":"2026-11-28"},"CE":{"1":"2026-03-10","2":"2026-04-10","3":"2026-05-10","4":"2026-06-10","5":"2026-07-10","6":"2026-08-10","7":"2026-09-10","8":"2026-10-10","9":"2026-11-10","0":"2026-12-10"},"ES":{"1":"2026-12-09","2":"2026-12-09","3":"2026-09-19","4":"2026-09-19","5":"2026-09-20","6":"2026-09-20","7":"2026-09-23","8":"2026-09-23","9":"2026-09-26","0":"2026-09-26"},"GO":{"1":"2026-09-09","2":"2026-06-09","3":"2026-07-10","4":"2026-08-10","5":"2026-09-10","6":"2026-10-10","7":"2026-11-10","8":"2026-10-14","9":"2026-10-15","0":"2026-10-16"},"MA":{"1":"2026-05-05","2":"2026-05-05","3":"2026-12-05","4":"2026-12-05","5":"2026-05-19","6":"2026-05-19","7":"2026-05-26","8":"2026-05-26","9":"2026-05-31","0":"2026-05-31"},"MT":{"1":"2026-03-31","2":"2026-03-31","3":"2026-03-31","4":"2026-04-30","5":"2026-05-31","6":"2026-06-30","7":"2026-07-31","8":"2026-08-31","9":"2026-09-30","0":"2026-10-31"},"MS":{"1":"2026-04-30","2":"2026-04-30","3":"2026-05-31","4":"2026-06-30","5":"2026-06-30","6":"2026-07-31","7":"2026-08-31","8":"2026-08-31","9":"2026-09-30","0":"2026-10-31"},"MG":{"1":"2026-03-31","2":"2026-03-31","3":"2026-03-31","4":"2026-03-31","5":"2026-03-31","6":"2026-03-31","7":"2026-03-31","8":"2026-03-31","9":"2026-03-31","0":"2026-03-31"},"PA":{"1":"2026-03-20","2":"2026-04-17","3":"2026-05-15","4":"2026-06-05","5":"2026-06-26","6":"2026-07-17","7":"2026-08-07","8":"2026-08-28","9":"2026-09-18","0":"2026-10-16"},"PB":{"1":"2026-03-28","2":"2026-04-30","3":"2026-05-31","4":"2026-06-28","5":"2026-07-31","6":"2026-08-30","7":"2026-09-30","8":"2026-10-31","9":"2026-11-29","0":"2026-12-30"},"PR":{"1":"2026-08-31","2":"2026-08-31","3":"2026-09-15","4":"2026-09-15","5":"2026-09-30","6":"2026-10-15","7":"2026-10-15","8":"2026-10-31","9":"2026-11-15","0":"2026-12-31"},"PE":{"1":"2026-02-10","2":"2026-02-10","3":"2026-02-13","4":"2026-02-13","5":"2026-02-19","6":"2026-02-19","7":"2026-02-24","8":"2026-02-24","9":"2026-02-27","0":"2026-02-27"},"PI":{"1":"2026-03-29","2":"2026-04-30","3":"2026-05-31","4":"2026-06-28","5":"2026-07-31","6":"2026-08-30","7":"2026-09-30","8":"2026-10-31","9":"2026-11-29","0":"2026-12-30"},"RJ":{"1":"2026-05-31","2":"2026-05-31","3":"2026-06-30","4":"2026-06-30","5":"2026-06-30","6":"2026-07-31","7":"2026-07-31","8":"2026-07-31","9":"2026-07-31","0":"2026-05-31"},"RN":{"1":"2026-10-03","2":"2026-10-03","3":"2026-10-04","4":"2026-10-04","5":"2026-10-04","6":"2026-12-05","7":"2026-12-05","8":"2026-12-05","9":"2026-10-06","0":"2026-10-06"},"RS":{"1":"2026-07-31","2":"2026-07-31","3":"2026-07-31","4":"2026-07-31","5":"2026-07-31","6":"2026-07-31","7":"2026-07-31","8":"2026-07-31","9":"2026-07-31","0":"2026-07-31"},"RO":{"1":"2026-03-28","2":"2026-03-28","3":"2026-03-28","4":"2026-04-30","5":"2026-05-31","6":"2026-06-28","7":"2026-07-31","8":"2026-08-30","9":"2026-09-30","0":"2026-10-31"},"RR":{"1":"2026-02-28","2":"2026-03-31","3":"2026-04-28","4":"2026-05-31","5":"2026-06-30","6":"2026-07-31","7":"2026-08-31","8":"2026-09-29","9":"2026-10-31","0":"2026-11-30"},"SC":{"1":"2026-03-31","2":"2026-04-30","3":"2026-05-31","4":"2026-06-30","5":"2026-07-31","6":"2026-08-31","7":"2026-09-30","8":"2026-10-31","9":"2026-11-30","0":"2026-12-31"},"SP_CAMINHAO":{"1":"2026-09-30","2":"2026-09-30","3":"2026-10-31","4":"2026-10-31","5":"2026-10-31","6":"2026-11-30","7":"2026-11-30","8":"2026-11-30","9":"2026-12-31","0":"2026-12-31"},"SP_OUTROS":{"1":"2026-07-31","2":"2026-07-31","3":"2026-08-31","4":"2026-08-31","5":"2026-09-30","6":"2026-09-30","7":"2026-10-31","8":"2026-10-31","9":"2026-11-30","0":"2026-12-31"},"SE":{"1":"2026-04-30","2":"2026-04-30","3":"2026-05-31","4":"2026-05-31","5":"2026-06-28","6":"2026-07-31","7":"2026-08-30","8":"2026-09-30","9":"2026-10-31","0":"2026-11-29"},"TO":{"1":"2026-12-31","2":"2026-12-31","3":"2026-12-31","4":"2026-12-31","5":"2026-12-31","6":"2026-12-31","7":"2026-12-31","8":"2026-12-31","9":"2026-12-31","0":"2026-12-31"},"DF":{"1":"2026-02-23","2":"2026-02-23","3":"2026-02-24","4":"2026-02-24","5":"2026-02-25","6":"2026-02-25","7":"2026-02-26","8":"2026-02-26","9":"2026-02-27","0":"2026-02-27"}};
+  const official2026={"RJ":{"dates":{"0":"2026-07-31","1":"2026-07-31","2":"2026-07-31","3":"2026-08-31","4":"2026-08-31","5":"2026-08-31","6":"2026-09-30","7":"2026-09-30","8":"2026-09-30","9":"2026-09-30"},"url":"https://detran.rj.gov.br/veiculo/calendarios/licenciamento.html","kind":"prazo de renovação do CRLV (prorrogação oficial)"},"MG":{"dates":{"1":"2026-08-31","2":"2026-08-31","3":"2026-08-31","4":"2026-09-30","5":"2026-09-30","6":"2026-09-30","7":"2026-10-31","8":"2026-10-31","9":"2026-10-31","0":"2026-10-31"},"url":"https://www.agenciaminas.mg.gov.br/noticia/licenciamento-anual-de-veiculos-em-minas-gerais-tem-calendario-definido-para-2026","kind":"prazo de renovação / exigência do CRLV"},"DF":{"dates":{"1":"2026-09-30","2":"2026-09-30","3":"2026-10-31","4":"2026-10-31","5":"2026-10-31","6":"2026-11-30","7":"2026-11-30","8":"2026-11-30","9":"2026-12-31","0":"2026-12-31"},"url":"https://www.sinj.df.gov.br/sinj/Norma/4753424a5f4842f99f687c68149ab057/detran_ins_291_2026.html","kind":"prazo de renovação do CRLV"},"GO":{"dates":{"1":"2026-09-15","2":"2026-09-15","3":"2026-10-15","4":"2026-10-15","5":"2026-10-15","6":"2026-10-15","7":"2026-10-15","8":"2026-10-15","9":"2026-10-15","0":"2026-10-15"},"url":"https://goias.gov.br/detran/prazo-para-pagamento-do-licenciamento-anual-2026-vence-nesta-quinta-feira/","kind":"pagamento do licenciamento 2026"},"PR":{"dates":{"1":"2026-08-14","2":"2026-08-28","3":"2026-09-09","4":"2026-09-18","5":"2026-09-28","6":"2026-10-09","7":"2026-10-20","8":"2026-10-30","9":"2026-11-13","0":"2026-11-27"},"url":"https://www.detran.pr.gov.br/Noticia/Alerta-para-placas-com-final-8-9-e-0-calendario-do-licenciamento-de-2026-esta-perto-da","kind":"vencimento da taxa de licenciamento"},"ES":{"dates":{"1":"2026-09-09","2":"2026-09-09","3":"2026-09-10","4":"2026-09-10","5":"2026-09-11","6":"2026-09-11","7":"2026-09-14","8":"2026-09-14","9":"2026-09-15","0":"2026-09-15"},"url":"https://detran.es.gov.br/Media/detran/Calendarios%20de%20pagamento/2026/Calend%C3%A1rio%20de%20Licenciamento%202026.pdf","kind":"vencimento do licenciamento"},"MS":{"dates":{"1":"2026-07-29","2":"2026-07-29","3":"2026-07-29","4":"2026-07-31","5":"2026-07-31","6":"2026-07-31","7":"2026-09-18","8":"2026-09-18","9":"2026-09-30","0":"2026-10-30"},"url":"https://www.detran.ms.gov.br/informativo/calendario-de-licenciamento/","kind":"prazo do licenciamento, com prorrogações"},"PE":{"dates":{"1":"2026-09-30","2":"2026-09-30","3":"2026-10-31","4":"2026-10-31","5":"2026-10-31","6":"2026-11-30","7":"2026-11-30","8":"2026-11-30","9":"2026-12-31","0":"2026-12-31"},"url":"https://www.detran.pe.gov.br/duvidas-veiculos/documento-do-veiculo-crlv","kind":"fim do período de validade do CRLV anterior"},"TO":{"dates":{"1":"2026-09-30","2":"2026-09-30","3":"2026-10-30","4":"2026-10-30","5":"2026-10-30","6":"2026-10-30","7":"2026-10-30","8":"2026-10-30","9":"2026-10-30","0":"2026-10-30"},"url":"https://www.legisweb.com.br/legislacao/?id=490496","kind":"prazo de pagamento da taxa de licenciamento"},"AP":{"dates":{"0":"2026-09-30","1":"2026-09-30","2":"2026-09-30","3":"2026-09-30","4":"2026-09-30","5":"2026-09-30","6":"2026-09-30","7":"2026-09-30","8":"2026-09-30","9":"2026-09-30"},"url":"https://www.legisweb.com.br/legislacao/?id=492728","kind":"prazo máximo para o licenciamento 2026"}};
+  function fleetDate(iso){
+    if(typeof iso!=='string'||!/^2026-\d{2}-\d{2}$/.test(iso))return null;
+    const d=new Date(iso+'T12:00:00Z');
+    return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===iso?d:null;
+  }
   function calendar(uf,final,year,type,placa){
     if(final===null||!dates[uf])return null;
     if(year===2024||year===2025)return historicCalendar(uf,final,year,type,placa);
     if(year!==2026)return null;
-    let d=null;
-    if(uf==='SP'){
-      const n=norm(type);const truck=/\bCAMINHAO(?:\s*-\s*TRATOR)?\b/.test(n);
-      if(!n||!/(CAMINHAO|CAMINHONETE|AUTOMOVEL|CAMIONETA|ONIBUS|MICROONIBUS|SEMI.REBOQUE|REBOQUE|UTILITARIO|MOTOCICLETA|TRATOR|MOTONETA)/.test(n))return {incomplete:'Em SP, informe a espécie/tipo: caminhões têm prazos diferentes.'};
-      const m=truck?([1,2].includes(final)?9:[3,4,5].includes(final)?10:[6,7,8].includes(final)?11:12):([1,2].includes(final)?7:[3,4].includes(final)?8:[5,6].includes(final)?9:[7,8].includes(final)?10:final===9?11:12);
-      d=monthEnd(m);
-    } else if(uf==='PA'){
-      if(!validPlate(placa))return {incomplete:'No Pará, informe a placa completa para considerar os dois últimos dígitos.'};
+    const f=String(final);
+    // PA requer os DOIS últimos números da placa; não reduzir a apenas um.
+    if(uf==='PA'){
+      if(!validPlate(placa))return {incomplete:'No Pará, informe a placa completa para considerar os dois últimos dígitos.',calendarYear:2026};
       const suffix=plateFmt(placa).slice(-2);
-      const group=Math.floor(Number(suffix[0]) / 4)===0 ? 0 : Number(suffix[0])<=6?1:2;
-      const [m,day]=paCalendar[final][group].split('-').map(Number);
-      d=date(m,day);
-    } else if(uf==='MG')d=monthEnd([1,2,3].includes(final)?8:[4,5,6].includes(final)?9:10);
-    else if(uf==='RJ')d=monthEnd([0,1,2].includes(final)?7:[3,4,5].includes(final)?8:9);
-    else if(uf==='RS')d=date(7,31);
-    else if(uf==='DF')d=monthEnd([1,2].includes(final)?9:[3,4,5].includes(final)?10:[6,7,8].includes(final)?11:12);
-    else if(uf==='MT')d=monthEnd([1,2,3].includes(final)?3:final===0?10:final);
-    else if(uf==='PI'||uf==='RR')d=date(3,31);
-    else if(uf==='AP')d=date(9,30);
-    else if(table[uf]){const [m,day]=table[uf][final].split('-').map(Number);d=date(m,day);}
-    return d?{date:d,...dates[uf],uncertain:!!dates[uf].provisional||(uf==='AC'&&[7,8].includes(final)),calendarYear:2026}:null;
+      const tens=Number(suffix[0]);
+      const group=tens<=3?0:tens<=6?1:2;
+      const md=paCalendar[final]?.[group];
+      if(!md)return {notVerified:true,calendarYear:2026,incomplete:'Não foi encontrado calendário do Pará para esta placa.'};
+      const [m,day]=md.split('-').map(Number);
+      return {date:date(m,day),calendarYear:2026,kind:'pagamento do licenciamento por dois últimos dígitos',url:dates.PA.url,note:'No Pará, foram preservadas as regras completas por dois dígitos; a tabela Fleet apresenta apenas o final.',uncertain:false};
+    }
+    const isTruck=uf==='SP'&&/\bCAMINHAO(?:\s*[-/]\s*TRATOR)?\b/.test(norm(type));
+    if(uf==='SP'&&!norm(type))return {incomplete:'Para SP, confirme a espécie/tipo: caminhões têm calendário diferente.',calendarYear:2026};
+    const key=uf==='SP'?(isTruck?'SP_CAMINHAO':'SP_OUTROS'):uf;
+    const listed=fleet2026[key]?.[f]??null;
+    const correction=official2026[uf];
+    const effective=correction?.dates?.[f]||listed;
+    const chosen=fleetDate(effective);
+    if(!chosen){
+      return {notVerified:true,calendarYear:2026,incomplete:'A tabela Fleet não informa data válida para '+uf+' / final '+f+'. Consulte o Detran.'};
+    }
+    const changed=!!(correction&&listed&&listed!==effective);
+    const filled=!!(correction&&!listed);
+    const note=changed?'A planilha Fleet informa '+fmt(fleetDate(listed))+', mas a norma ou comunicado estadual mais recente indica '+fmt(chosen)+'. Foi aplicada a data oficial.':filled?'A planilha Fleet não contém esta data; preenchida a partir de fonte estadual.': 'Data importada da tabela Fleet 2026 fornecida para conferência operacional.';
+    return {date:chosen,calendarYear:2026,uncertain:false,kind:correction?.kind||'calendário Fleet 2026 (referência interna)',url:correction?.url||null,note};
   }
   // A verificação vale exclusivamente para veículo leve, NUNCA para caminhões,
   // semirreboques, cavalos mecânicos ou caminhões de carroceria aberta.
   function hasOpenBody(v){return /\bABERT[AO]\b/.test(norm(v.carroceria));}
-  function isLightOpenBody(v){
+  function isLightVehicle(v){
     const t=norm(v.especie),m=norm(v.modelo);
     if(/CAMINHAO|SEMI\s*REBOQUE|REBOQUE|CAVALO|TRATOR|ONIBUS|MICRO\s*ONIBUS/.test(t))return false;
-    return hasOpenBody(v) && (/CAMINHONETE|CAMIONETA|AUTOMOVEL|UTILITARIO|FURGAO|PASSEIO|PICAPE/.test(t)
-      || /\b(STRADA|SAVEIRO|MONTANA|OROCH|RANGER|HILUX|AMAROK|FRONTIER|TORO|S10|D20|RAMPAGE|RAM\s*1500)\b/.test(m));
+    return /CAMINHONETE|CAMIONETA|AUTOMOVEL|UTILITARIO|FURGAO|PASSEIO|PICAPE/.test(t)
+      || /\b(STRADA|SAVEIRO|MONTANA|OROCH|RANGER|HILUX|AMAROK|FRONTIER|TORO|S10|D20|RAMPAGE|RAM\s*1500)\b/.test(m);
+  }
+  function hasExtendedCab(v){
+    return isLightVehicle(v) && (v.cabine_estendida==='sim'||/\bCABINE\s+ESTENDIDA\b/.test(norm([v.carroceria,v.modelo,v.especie].join(' '))));
+  }
+  function isLightOpenBody(v){
+    return isLightVehicle(v)&&hasOpenBody(v)&&!hasExtendedCab(v);
   }
   function updateBodyQuestion(v){
     const required=isLightOpenBody(v),box=$('body-question');
     box.hidden=!required;
+    if(!required)v.cobertura_alta='';
     for(const [key,val] of [['body-answer-yes','sim'],['body-answer-no','nao']]){
       $(key).setAttribute('aria-pressed',String(required&&v.cobertura_alta===val));
     }
@@ -749,10 +804,11 @@ self.onmessage=e=>{
     if(/CAMINHAO\s*TRATOR|CAVALO\s*MECANICO/.test(type))return {name:'Cavalo',confidence:'Espécie/tipo do CRLV',note:'Caminhão-trator, com 2 ou 3 eixos. A capacidade pode estar vazia; não confundir com Carreta.'};
     if(/\bSEMI\s*REBOQUE\b/.test(type))return {name:'Carreta',confidence:'Espécie/tipo do CRLV',note:'Semirreboque com 2 ou 3 eixos. Classificação própria, mesmo quando a capacidade diverge.'};
     if(/\bREBOQUE\b/.test(type))return {name:'Outro / a confirmar',confidence:'Tipo reboque',note:'O documento indica reboque, não necessariamente semirreboque.'};
+    if(hasExtendedCab(v))return {name:'Passeio',confidence:'Cabine estendida no CRLV',note:'O documento identifica cabine estendida: classificação operacional Passeio automática, sem solicitar PTC. Não se aplica a caminhões.'};
     if(isLightOpenBody(v)){
       if(v.cobertura_alta==='sim')return {name:'Fiorino',confidence:'Verificação visual',note:'Cobertura alta rígida e fechada confirmada pela foto; classificação interna.'};
       if(v.cobertura_alta==='nao')return {name:'Passeio',confidence:'Verificação visual',note:'Caçamba aberta sem cobertura alta, ou apenas capota marítima baixa; classificação interna.'};
-      return {name:'Confirmar carroceria',confidence:'Requer resposta Sim/Não',note:'Confirme cobertura ALTA rígida e fechada estilo Fiorino na foto do veículo.'};
+      return {name:'Confirmar carroceria',confidence:'PTC • foto necessária',note:'Abra um PTC solicitando foto do veículo; após receber a foto, confirme se a carroceria é fechada (Fiorino) ou aberta (Passeio).'};
     }
     if(truck){
       // Prioridade de eixos sobre peso para diferenciar Truck e Toco.
@@ -888,7 +944,7 @@ self.onmessage=e=>{
     $('status-explanation').textContent=msg;
     $('deadline-kind').textContent=dl?.kind?'Referência estadual '+(dl.calendarYear||exc)+': '+dl.kind:'';
     showSource(v.uf,dl);
-    return {version:'5.15',processedAt:new Date().toISOString(),data:v,classification:cat,
+    return {version:'5.17',processedAt:new Date().toISOString(),data:v,classification:cat,
       calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain,year:exc}:null,
       summary:{title,msg},renewalYear:supportedYear?exc:null,
       disclaimer:'A cor mostra a comparação com o calendário do exercício '+shownYear+'. A data do calendário não comprova, por si só, a regularidade do veículo ou a validade individual do documento; consulte o Detran.'};
@@ -1141,6 +1197,8 @@ self.onmessage=e=>{
     if(!map.uf?.value)recoverUFfromText(text,map,3,'UF contextual do documento');
     fields.filter(k=>k!=='override').forEach(k=>$(k).value='');$('override').value='';
     for(const [key,val] of Object.entries(map)){if($(key))$(key).value=val.value;}
+    const bodyEvidence=[text,map.carroceria?.value,map.modelo?.value,map.especie?.value].filter(Boolean).join(' ');
+    $('cabine_estendida').value=map.cabine_estendida?.value==='sim'||/\bCABINE\s+ESTENDIDA\b/.test(norm(bodyEvidence))?'sim':'';
     extraction=map;extractionMode=mode;rawText=text;$('rawtext').textContent=text||'Não foi possível detectar texto.';
     const evidence=documentEvidence(text,map);
     if(identified===true)evidence.level='identified';
@@ -2145,12 +2203,13 @@ self.onmessage=e=>{
   }
   function mapFromGemini(data){
     const map={};
-    for(const key of ['placa','uf','exercicio','modelo','especie','pbt','capacidade','eixos','carroceria']){
+    for(const key of ['placa','uf','exercicio','modelo','especie','pbt','capacidade','eixos','carroceria','cabine_estendida']){
       const value=data.fields?.[key];
       if(value!==null&&value!==undefined&&String(value).trim()){
         let text=String(value).trim();
         if(key==='pbt'||key==='capacidade')text=tonnesFromGemini(text);
         if(key==='uf')text=explicitUF(text)||'';
+        if(key==='cabine_estendida')text=norm(text)==='SIM'?'sim':'';
         if(key==='eixos'){
           const m=text.match(/\b(?:[1-9]|1[0-2])\b/);
           text=m?m[0]:'';
@@ -2162,7 +2221,7 @@ self.onmessage=e=>{
   }
   function summaryFromGemini(map){
     const lines=['Leitura estruturada da cópia digitalizada pelo Gemini IA:'];
-    for(const key of ['placa','uf','exercicio','modelo','especie','pbt','capacidade','eixos','carroceria']){
+    for(const key of ['placa','uf','exercicio','modelo','especie','pbt','capacidade','eixos','carroceria','cabine_estendida']){
       lines.push((names[key]||key)+': '+(map[key]?.value||'não identificado'));
     }
     return lines.join('\n');
@@ -2172,7 +2231,7 @@ self.onmessage=e=>{
     if(pending){notice('Aguarde a análise atual terminar antes de enviar outro arquivo.','warning');return;}
     // OCR e tratamento de documentos feitos no próprio navegador.
     lastFile=file;
-    $('cobertura_alta').value='';
+    $('cobertura_alta').value='';$('cabine_estendida').value='';
     processedCache=null;
     resetProcessedPDF();
     resetStages();
@@ -2429,7 +2488,7 @@ self.onmessage=e=>{
     $('uf').value=$('uf-rescue-select').value;
     $('uf').dispatchEvent(new Event('change',{bubbles:true}));
   });
-  fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(['especie','modelo','carroceria'].includes(id))$('cobertura_alta').value='';if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
+  fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(['especie','modelo','carroceria'].includes(id)){$('cobertura_alta').value='';$('cabine_estendida').value='';}if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
   for(const [button,value] of [['body-answer-yes','sim'],['body-answer-no','nao']]){
     $(button).addEventListener('click',()=>{
       $('cobertura_alta').value=value;
