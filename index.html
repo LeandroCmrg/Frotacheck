@@ -120,6 +120,11 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 @media(max-width:500px){.vehicle-specs{grid-template-columns:1fr 1fr}.vehicle-specs>div:first-child{grid-column:1/-1}}
 @media(max-width:520px){.processing-strip{margin:10px 17px 4px}}
 
+/* Verificação documental do modelo antes da classificação operacional */
+.model-research{font-size:11px;line-height:1.55;color:#555c58;margin-top:7px;padding-top:9px;border-top:1px solid #e9e1d3}
+.model-research strong{font-size:11px}.model-research a{color:#99141b;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.model-research .check-state{display:inline-block;font-weight:850;color:#126d3d}
+.model-research .check-state.review{color:#956111}.model-research .google-suggestions{display:block;width:100%;max-width:100%;height:65px;margin-top:7px;border:0;background:transparent}
 /* RBM por faixas inferiores + PTC */
 .body-check{margin:14px 0 15px;border:1px solid #e4d8ad;background:linear-gradient(145deg,#fffdf3,#fff9e5);border-radius:17px;padding:18px;box-shadow:0 5px 16px #45310e0b}
 .body-check .check-overline{display:flex;align-items:center;gap:8px;color:#8d111b;font-size:11px;letter-spacing:.7px;font-weight:850;text-transform:uppercase}
@@ -272,7 +277,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
       <p>O sistema tentará ler a UF no documento. Se não conseguir, selecione o estado abaixo para calcular a data.</p>
       <select id="uf-rescue-select" aria-label="UF do CRLV"><option value="">Selecione a UF do CRLV</option></select>
     </div></div>
-  <div class="model-summary"><small>Marca / modelo identificado</small><strong id="result-model">Aguardando leitura</strong></div>
+  <div class="model-summary"><small>Marca / modelo identificado</small><strong id="result-model">Aguardando leitura</strong><div id="model-research" class="model-research" hidden role="status" aria-live="polite"></div></div>
   <div class="vehicle-specs" aria-label="Características extraídas do CRLV"><div><small>Espécie / tipo no CRLV</small><b id="result-especie">—</b></div><div><small>Carga útil</small><b id="result-capacidade">—</b></div><div><small>PBT</small><b id="result-pbt">—</b></div><div><small>Eixos</small><b id="result-eixos">—</b></div><div><small>Carroceria no CRLV</small><b id="result-carroceria">—</b></div></div>
   <div class="meta"><div class="meta-item"><small>Placa</small><b id="summary-placa">—</b></div><div class="meta-item"><small>UF</small><b id="summary-uf">—</b></div><div class="meta-item"><small>Exercício</small><b id="summary-exercicio">—</b></div></div>
   <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário correspondente ao exercício (2024–2026).</p>
@@ -284,7 +289,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
 </section>
 </div>
-<div class="footer-note">As datas exibidas são referências de calendários estaduais dos exercícios 2024, 2025 e 2026, conforme a UF e a placa. Algumas datas podem corresponder a pagamento, licenciamento ou exigência para circulação; a confirmação oficial depende do Detran. A cobertura histórica de 2024 é parcial e datas não verificadas exigem conferência. As tipologias usam a tabela RBM por faixas de carga útil, com validação de espécie/tipo e eixos. O FrotaCheck não autentica o CRLV-e nem consulta débitos ou restrições.</div>
+<div class="footer-note">As datas exibidas são referências de calendários estaduais dos exercícios 2024, 2025 e 2026, conforme a UF e a placa. Algumas datas podem corresponder a pagamento, licenciamento ou exigência para circulação; a confirmação oficial depende do Detran. A cobertura histórica de 2024 é parcial e datas não verificadas exigem conferência. As tipologias consideram modelo pesquisado, espécie/tipo, eixos e tabela RBM de carga útil; em caso de divergência pode ser necessária conferência. O FrotaCheck não autentica o CRLV-e nem consulta débitos ou restrições.</div>
 </main>
 <div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
   <div class="scanner-box">
@@ -864,6 +869,96 @@ self.onmessage=e=>{
     if(toneladas===null||!Number.isFinite(toneladas))return null;
     return RBM_FAIXAS.find(f=>toneladas>=f.min&&toneladas<f.max)||null;
   }
+  // Base local com modelos pesquisados em fontes confiaveis. Nao usa apenas o peso.
+  // So grava MODELO, sem placa, proprietario ou outros identificadores pessoais.
+  const MODEL_CATALOG=[{
+    test:/\b(?:VW|VOLKSWAGEN)\s*\/?\s*(?:DELIVERY\s+)?EXPRESS(?:\s+DRC|\s+PLUS|\s*\+|\b)/,
+    name:'VUC',brand:'Volkswagen Delivery Express',
+    note:'Modelo VW Delivery Express identificado. A Volkswagen confirma a linha de caminhões leves (PBT 3.500 kg); fonte especializada a classifica operacionalmente como VUC. A carga útil do CRLV pode cair em outra faixa RBM.',
+    sources:[
+      {title:'Volkswagen Caminhões e Ônibus',url:'https://www.vwco.com.br/caminhoes/Delivery/Deliveryexpress?id=1&productid=197'},
+      {title:'Automotive Business — Delivery Express VUC',url:'https://www.automotivebusiness.com.br/noticias/vwco-lanca-servico-de-locacao-para-caminhao-delivery-express'}
+    ]
+  }];
+  let modelVerification=null;
+  let modelLookupAttempted=false;
+  const modelResearchCache=new Map();
+  function knownModelVerification(model){
+    const m=norm(model);
+    const entry=MODEL_CATALOG.find(x=>x.test.test(m));
+    return entry?{model:m,name:entry.name,label:entry.brand,note:entry.note,sources:entry.sources,verified:true,method:'Referências conferidas'}:null;
+  }
+  function verifiedModelFor(v){
+    const known=knownModelVerification(v.modelo);
+    if(known)return known;
+    return modelVerification?.verified&&modelVerification.model===norm(v.modelo)?modelVerification:null;
+  }
+  function modelValidForCategory(v,category){
+    const t=norm(v.especie),axes=num(v.eixos);
+    if(!category||!/^(Fiorino|Van|HR|VUC|Médio|Toco|Truck)$/.test(category))return false;
+    if(/CAMINHAO\s*TRATOR|SEMI\s*R?REBOQUE|\bREBOQUE\b/.test(t)||hasExtendedCab(v)||isLightOpenBody(v))return false;
+    if(axes===null||axes>3||axes<2)return false;
+    if(axes===3)return category==='Truck'&&/CAMINHAO/.test(t);
+    if(['Toco','Truck','Médio'].includes(category))return /CAMINHAO/.test(t);
+    if(['Fiorino','Van'].includes(category))return /CAMINHONETE|UTILITARIO|FURGAO|CAMIONETA/.test(t);
+    if(['HR','VUC'].includes(category))return /CAMINHONETE|UTILITARIO|FURGAO|CAMIONETA|CAMINHAO/.test(t);
+    return false;
+  }
+  function renderModelResearch(v){
+    const el=$('model-research');el.replaceChildren();
+    const found=verifiedModelFor(v);
+    if(!v.modelo){el.hidden=true;return;}
+    el.hidden=false;
+    const status=document.createElement('span');status.className='check-state'+(found?'':' review');
+    status.textContent=found?'✓ Modelo verificado antes da tipologia':'ℹ Modelo sem validação externa conclusiva';
+    el.append(status);
+    if(found){
+      const detail=document.createElement('div');detail.textContent='Referência: '+found.label+' · '+found.method;
+      el.append(detail);
+      const links=document.createElement('div');
+      found.sources?.slice(0,3).forEach((s,i)=>{
+        try{const u=new URL(s.url);if(u.protocol!=='https:')return;
+          if(i)links.append(document.createTextNode(' · '));
+          const a=document.createElement('a');a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=s.title||'Fonte '+(i+1);links.append(a);
+        }catch(e){}
+      });
+      el.append(links);
+      if(found.googleSearchHtml){
+        // Pesquisa Google: apresentar as sugestoes fornecidas pelo provedor em sandbox.
+        const frame=document.createElement('iframe');frame.className='google-suggestions';
+        frame.title='Sugestões de pesquisa Google';frame.setAttribute('sandbox','allow-popups allow-popups-to-escape-sandbox');
+        frame.setAttribute('referrerpolicy','no-referrer');frame.srcdoc=found.googleSearchHtml;el.append(frame);
+      }
+    }else{
+      const small=document.createElement('div');small.textContent=modelLookupAttempted?'Pesquisa não confirmou o modelo. Confira a categoria antes de utilizá-la.':'Faixa RBM provisória; pesquisa do modelo ainda não realizada.';el.append(small);
+    }
+  }
+  async function researchModel(v){
+    const model=norm(v.modelo);
+    if(!model||model.length<5){modelVerification=null;modelLookupAttempted=false;return;}
+    const known=knownModelVerification(model);
+    if(known){modelVerification=known;modelLookupAttempted=true;return;}
+    if(modelResearchCache.has(model)){
+      modelVerification=modelResearchCache.get(model);modelLookupAttempted=true;return;
+    }
+    modelLookupAttempted=true;modelVerification=null;
+    // A consulta externa recebe apenas os atributos tecnicos, nunca placa ou CPF.
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),11000);
+    try{
+      const response=await fetch(GEMINI_WORKER_URL+'/verificar-modelo',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({modelo:v.modelo,especie:v.especie,eixos:v.eixos,capacidade:v.capacidade}),
+        signal:controller.signal,cache:'no-store'
+      });
+      const data=await response.json();
+      const sources=Array.isArray(data.fontes)?data.fontes.filter(s=>/^https:\/\//.test(s.url||'')).slice(0,3):[];
+      if(response.ok&&data.ok&&data.verificado===true&&sources.length&&/^(Fiorino|Van|HR|VUC|Médio|Toco|Truck)$/.test(data.tipologia)){
+        modelVerification={model,name:data.tipologia,label:String(data.modelo_confirmado||v.modelo).slice(0,90),
+          note:String(data.justificativa||'').slice(0,330),sources,verified:true,googleSearchHtml:typeof data.sugestoesGoogle==='string'?data.sugestoesGoogle:null,method:'Pesquisa Google via Gemini'};
+      }
+    }catch(err){ /* Sem alterar a classificacao com pesquisa inconclusiva. */ }
+    finally{clearTimeout(timer);modelResearchCache.set(model,modelVerification);}
+  }
   function classify(v){
     const type=norm(v.especie).replace(/\s*[-/]\s*/g,' '),model=norm(v.modelo);
     const axes=num(v.eixos),cargo=num(v.capacidade),pbt=num(v.pbt);
@@ -882,6 +977,14 @@ self.onmessage=e=>{
       if(v.cobertura_alta==='sim')return {name:'Fiorino',confidence:'Verificação visual',note:'Cobertura alta rígida fechada confirmada por foto; classificação operacional interna.'};
       if(v.cobertura_alta==='nao')return {name:'Passeio',confidence:'Verificação visual',note:'Sem cobertura alta, ou só lona/capota marítima baixa; classificação operacional interna.'};
       return {name:'Confirmar carroceria',confidence:'PTC • foto necessária',note:'Abra um PTC solicitando foto do veículo; depois confirme Fechada (Fiorino) ou Aberta (Passeio).'};
+    }
+    // Prioridade da familia/modelo quando pesquisado e compativel com a configuracao.
+    // Nao sobrepoe Cavalo, Carreta, cabine estendida, PTC ou 3 eixos de caminhão.
+    const verified=verifiedModelFor(v);
+    if(verified&&modelValidForCategory(v,verified.name)){
+      const diff=row&&row.name!==verified.name;
+      return {name:verified.name,confidence:'Modelo pesquisado + CRLV',
+        note:verified.note+(diff?' Atenção: capacidade de '+(cargo??'—')+' t corresponde à faixa RBM '+row.name+', mas o modelo identificado é '+verified.name+'. Conferir divergência com o cadastro operacional.':'')};
     }
     if(truck){
       if(axes>3)return {name:'Outro / a confirmar',confidence:'Configuração de eixos especial',note:'Mais de 3 eixos: conferir a composição antes de classificar.'};
@@ -914,6 +1017,7 @@ self.onmessage=e=>{
         if(row.name==='Carreta')return {name:'A confirmar',confidence:'Espécie incompatível',note:'Carreta exige semirreboque; não classificar apenas por capacidade.'};
         if(['Médio','Toco','Truck'].includes(row.name))return {name:'A confirmar',confidence:'Espécie/carga divergentes',note:'Capacidade sugere '+row.name+' ('+row.range+'), mas o CRLV indica veículo leve. Confira espécie e carga.'};
         const modelNote=modelIsHr&&row.name!=='HR'?' Modelo parece HR/Bongo; confira a capacidade.':vanPattern.test(model)&&row.name!=='Van'?' Modelo de van, mas faixa operacional de carga diferente; confira.':'';
+        if(modelLookupAttempted&&!verifiedModelFor(v)&&row.name==='Fiorino')return {name:'A confirmar',confidence:'Modelo sem confirmação',note:'A carga útil sugere Fiorino, mas a pesquisa não confirmou o modelo. Não classificar um caminhão leve como Fiorino só pela capacidade.'};
         return {name:row.name,confidence:'Carga útil RBM + espécie',note:'Faixa RBM '+(row.name==='Fiorino'?'Utilitário/Fiorino':row.name)+': '+row.range+'. O limite superior pertence à próxima faixa.'+modelNote};
       }
       if(modelIsHr)return {name:'HR',confidence:'Modelo / RBM (provisório)',note:'Modelo HR/Bongo; confirmar carga útil de 1.800 a menos de 2.200 kg.'};
@@ -960,6 +1064,7 @@ self.onmessage=e=>{
     const cat=classify(v);
     $('category').textContent=cat.name;
     $('result-model').textContent=v.modelo||'Não identificado — conferir o CRLV';
+    renderModelResearch(v);
     $('result-especie').textContent=v.especie||'Não identificado';
     $('result-pbt').textContent=v.pbt?v.pbt+' t':'—';
     $('result-capacidade').textContent=v.capacidade?v.capacidade+' t':'—';
@@ -2313,6 +2418,7 @@ self.onmessage=e=>{
     if(pending){notice('Aguarde a análise atual terminar antes de enviar outro arquivo.','warning');return;}
     // OCR e tratamento de documentos feitos no próprio navegador.
     lastFile=file;
+    modelVerification=null;modelLookupAttempted=false;
     $('cobertura_alta').value='';$('cabine_estendida').value='';
     processedCache=null;
     resetProcessedPDF();
@@ -2430,6 +2536,11 @@ self.onmessage=e=>{
       notice('Etapa 3/4 • Identificando o veículo...');
       await yieldScreen();
       const text=parts.join('\n').trim();
+      const modelTechnical={modelo:map.modelo?.value||'',especie:map.especie?.value||'',
+        eixos:map.eixos?.value||'',capacidade:map.capacidade?.value||''};
+      setStage(2,'running','Pesquisando referência do modelo antes de classificar...');
+      await researchModel(modelTechnical);
+      if(taskId!==activeProcessId||file!==lastFile)return;
       setExtracted(map,native?.native?(aiUsed?'PDF digital → Gemini + texto nativo':'PDF digital → texto nativo'):(aiUsed?'Scanner 5.2 → Gemini IA':'Scanner 5.2 → OCR local (IA indisponível)'),text,aiUsed?aiCrlv:null);
       if(!aiUsed)displayExerciseDiagnostic();
       const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));
@@ -2570,7 +2681,8 @@ self.onmessage=e=>{
     $('uf').value=$('uf-rescue-select').value;
     $('uf').dispatchEvent(new Event('change',{bubbles:true}));
   });
-  fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(['especie','modelo','carroceria'].includes(id)){$('cobertura_alta').value='';}if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
+  fields.forEach(id=>$(id).addEventListener(['uf','override'].includes(id)?'change':'input',()=>{if(id==='modelo'){modelVerification=null;modelLookupAttempted=false;}if(['especie','modelo','carroceria'].includes(id)){$('cobertura_alta').value='';}if(extraction[id]&&id!=='ano-calendario')extraction[id]={...extraction[id],origin:'Revisado manualmente',score:3,value:$(id).value};renderExtraction();analyze();}));
+  $('modelo').addEventListener('blur',async()=>{const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));if(v.modelo){await researchModel(v);if(norm($('modelo').value)===norm(v.modelo))analyze();}});
   for(const [button,value] of [['body-answer-yes','sim'],['body-answer-no','nao']]){
     $(button).addEventListener('click',()=>{
       $('cobertura_alta').value=value;
@@ -2822,7 +2934,7 @@ self.onmessage=e=>{
   });
   renderExtraction();analyze();resetStages();
   // Funções de diagnóstico local, sem envio de documentos.
-  window.__FrotaCheckTest={isLightOpenBody,hasOpenBody,updateBodyQuestion,yearFromFocusedOCR,calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,prepareUprightCrlv,scanWith52,canvasFromScanResult,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
+  window.__FrotaCheckTest={knownModelVerification,verifiedModelFor,modelValidForCategory,researchModel,isLightOpenBody,hasOpenBody,updateBodyQuestion,yearFromFocusedOCR,calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,prepareUprightCrlv,scanWith52,canvasFromScanResult,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
 })();
 
 </script>
