@@ -170,6 +170,8 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
 .body-check.compact-ptc .body-option .body-desc{font-size:10px}
 .body-check.compact-ptc .body-small{padding-top:7px;margin-top:8px;font-size:10px}
 @media(max-width:560px){.body-check.compact-ptc .body-option{display:grid;grid-template-columns:82px 1fr;align-items:center}.body-check.compact-ptc .body-option .draw{grid-row:span 2}.body-check.compact-ptc .body-option svg{height:50px}}
+
+/* Opções discretas: a digitalização permanece automática e sem telas extras. */
 </style>
 </head>
 <body>
@@ -191,11 +193,11 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     <button id="ai-test-button" class="button ghost" type="button">Verificar conexão com Gemini</button>
     <span id="ai-test-result" role="status" aria-live="polite"></span>
   </div>
-  <p class="file-hint">Até 15 MB. Fotos e scans são melhorados no navegador; PDFs digitais passam direto para leitura; após sua autorização, a imagem é enviada ao Gemini para leitura. Uma cópia PDF é gerada localmente apenas quando há melhoria visual.</p>
+  <p class="file-hint">Até 15 MB. PDFs digitais passam direto para leitura; imagens recebem tratamento adaptativo. Quando necessário, a leitura complementar com IA solicita autorização antes de enviar o documento.</p>
   </div>
   <div class="processing-strip" id="processing-strip" role="status" aria-live="polite" hidden>
     <span class="processing-spinner" aria-hidden="true"></span>
-    <span><strong>Processando documento…</strong><small>Melhorando a imagem e identificando os dados. Aguarde a conclusão.</small></span>
+    <span><strong>Processando…</strong></span>
   </div>
   <details id="exercise-diag" class="exercise-diag" hidden>
     <summary>Diagnóstico do exercício não reconhecido</summary>
@@ -2125,6 +2127,52 @@ self.onmessage=e=>{
       [src,gray,balanced,blurred,output,clahe].forEach(x=>{try{x?.delete?.();}catch(e){}});
     }
   }
+  // Diagnóstico rápido em miniatura: cada foto recebe tratamento proporcional.
+  // A imagem aprovada pelo Scanner 5.2 NÃO é sobrescrita; o original é preservado.
+  function diagnoseScanQuality(source){
+    const maxSide=350,scale=Math.min(1,maxSide/Math.max(source.width,source.height));
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(source.width*scale));
+    c.height=Math.max(1,Math.round(source.height*scale));
+    const ctx=c.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(source,0,0,c.width,c.height);
+    const rgba=ctx.getImageData(0,0,c.width,c.height).data;
+    const hist=new Uint32Array(256);let sum=0,dark=0,bright=0,rgbDelta=0;
+    const total=rgba.length/4;
+    for(let i=0;i<rgba.length;i+=4){
+      const r=rgba[i],g=rgba[i+1],b=rgba[i+2];
+      const v=Math.round(.299*r+.587*g+.114*b);
+      hist[v]++;sum+=v;
+      if(v<70)dark++;if(v>238)bright++;
+      rgbDelta+=(b-r);
+    }
+    const nth=q=>{let count=0,target=Math.max(1,Math.floor(total*q));for(let i=0;i<256;i++){count+=hist[i];if(count>=target)return i;}return 255;};
+    const mean=sum/total,spread=nth(.90)-nth(.10),cast=Math.abs(rgbDelta/total);
+    const needs=mean<180||mean>245||spread<100||dark/total>.24||cast>16;
+    return {needs,mean:Math.round(mean),spread,darkRatio:dark/total,brightRatio:bright/total,colorCast:Math.round(cast)};
+  }
+  async function adaptiveScanForRecognition(source){
+    const diagnosis=diagnoseScanQuality(source);
+    if(!diagnosis.needs)return {canvas:source,engine:'Scanner 5.2 · imagem já legível',diagnosis};
+    // O OpenCV pode levar alguns segundos para iniciar. Limitar espera mantém o app utilizável.
+    let cvReady=false;
+    try{
+      cvReady=await Promise.race([
+        opencvLib().then(()=>true).catch(()=>false),
+        new Promise(resolve=>setTimeout(()=>resolve(false),4800))
+      ]);
+    }catch(_){cvReady=false;}
+    let improved=source;
+    if(cvReady){
+      try{improved=await enhanceCanvasSmart(source,'color');}
+      catch(_){improved=enhanceCanvas(source,'color');}
+    }else{
+      improved=enhanceCanvas(source,'color');
+    }
+    // Não aplicar filtros fortes a documentos que já possuem bom contraste:
+    // preservar QR e traços finos tem prioridade sobre branquear o fundo.
+    return {canvas:improved,engine:cvReady?'OpenCV.js adaptativo':'Ajuste adaptativo local (reserva)',diagnosis};
+  }
   /* Melhoria local de reserva: normalização de contraste, escala de cinza
      e limiar adaptativo para variações de iluminação. Não é autenticação. */
   const clamp8=x=>x<0?0:x>255?255:Math.round(x);
@@ -2506,26 +2554,76 @@ self.onmessage=e=>{
             await yieldScreen();
           }
           if(!improvements)throw Error('Não foi possível melhorar a imagem.');
+          // O arquivo e o PDF melhorado continuam a usar o Scanner 5.2.
+          // Uma segunda cópia temporária é preparada só para reconhecimento.
           batch={file,originals,scanned,improvements};processedCache=batch;
         }
         if(!pdfReady){pdfButton('↓ Baixar PDF melhorado',false);pdfMessage('Leitura pronta. A cópia em PDF será gerada apenas ao baixar.','ok');}
-        setStage(0,'done','Imagem adaptada para leitura.');
-        currentStage=1;setStage(1,'running','Gemini lendo imagem...');
-        try{
-          aiData=await geminiRead(batch.scanned[0],batch.originals[0]);
-          if(taskId!==activeProcessId||file!==lastFile)return;
-          aiUsed=true;aiCrlv=aiData.is_crlv===true;
-          Object.assign(map,mapFromGemini(aiData));parts.push(summaryFromGemini(map));
-        }catch(err){
-          aiError=String(err?.message||err);
+        setStage(0,'done','Digitalização concluída.');
+        // Reutilização sem novos downloads ou recompressões do PDF original.
+        if(!batch.recognitionCanvases){
+          batch.recognitionCanvases=[];batch.quality=[];
           for(let i=0;i<Math.min(2,batch.scanned.length);i++){
-            await readDocumentImage(batch.scanned[i],map,parts,'OCR LOCAL DE RESERVA · PÁGINA '+(i+1),true,batch.originals[i]);
+            const normalized=await adaptiveScanForRecognition(batch.scanned[i]);
+            if(taskId!==activeProcessId||file!==lastFile)return;
+            batch.recognitionCanvases.push(normalized.canvas);
+            batch.quality.push({engine:normalized.engine,...normalized.diagnosis});
+          }
+        }
+        let localAttempted=false,localSufficient=false;
+        const localRead=async()=>{
+          localAttempted=true;
+          // Uma leitura geral, limitada a 2 páginas; leituras de zonas apenas em caso de falha.
+          for(let i=0;i<Math.min(2,batch.recognitionCanvases.length);i++){
+            const candidate=batch.recognitionCanvases[i]||batch.scanned[i];
+            const readText=await ocr(candidate,11);
+            if(taskId!==activeProcessId||file!==lastFile)return;
+            parts.push('--- OPENCV / TESSERACT · PÁGINA '+(i+1)+' ---\n'+readText);
+            parseText(readText,map,2,'OCR local Tesseract');
+            if(nativeFieldsSufficient(map)&&map.carroceria?.value&&
+               documentEvidence(parts.join('\n'),map).level==='identified')break;
+          }
+          localSufficient=nativeFieldsSufficient(map)&&!!map.carroceria?.value&&
+            documentEvidence(parts.join('\n'),map).level==='identified';
+        };
+        currentStage=1;
+        {
+          setStage(1,'running','Lendo caracteres localmente com Tesseract...');
+          try{await localRead();}
+          catch(err){parts.push('OCR local indisponível: '+String(err?.message||err).slice(0,110));}
+        }
+        if(!localSufficient){
+          setStage(1,'running','Conferindo os campos por IA...');
+          try{
+            aiData=await geminiRead(batch.recognitionCanvases[0]||batch.scanned[0],batch.originals[0]);
+            if(taskId!==activeProcessId||file!==lastFile)return;
+            aiUsed=true;aiCrlv=aiData.is_crlv===true;
+            const aiMap=mapFromGemini(aiData);
+            for(const [key,value] of Object.entries(aiMap)){
+              if(map[key]?.value && map[key].value!==value.value)
+                conflicts.push(`${names[key]||key}: OCR ${map[key].value} × Gemini ${value.value}`);
+              // Gemini revisa texto incerto; dados nativos de PDF têm lógica separada.
+              map[key]=value;
+            }
+            parts.push(summaryFromGemini(aiMap));
+          }catch(err){aiError=String(err?.message||err);}
+        }
+        if(!aiUsed && !localSufficient){
+          for(let i=0;i<Math.min(2,batch.scanned.length);i++){
+            // Evita repetir a leitura geral de OCR caso o modo local já a tenha feito.
+            if(localAttempted && !missingImportant(map) && map.modelo?.value && map.eixos?.value)break;
+            await readDocumentImage(batch.recognitionCanvases[i]||batch.scanned[i],map,parts,
+              'OCR DE APOIO · PÁGINA '+(i+1),true,batch.originals[i]);
+            if(taskId!==activeProcessId||file!==lastFile)return;
             await yieldScreen();
           }
           if(isPDF&&missingImportant(map)){
             try{const textInfo=await nativePdfText(file);for(const rows of textInfo.rows)parseCoordinates(rows,map);parseText(textInfo.text,map,2,'Texto PDF de apoio');}catch(e){}
           }
         }
+        extractionMode=aiUsed
+          ? (localAttempted?'Scanner 5.2 + OpenCV + Tesseract → Gemini':'Scanner 5.2 + OpenCV → Gemini')
+          : 'OpenCV.js + Tesseract.js · leitura local';
       }
       if(!map.uf?.value){
         recoverUFfromText(parts.join('\n'),map,3,'UF contextual do documento');
@@ -2538,7 +2636,7 @@ self.onmessage=e=>{
       const text=parts.join('\n').trim();
       const modelTechnical={modelo:map.modelo?.value||'',especie:map.especie?.value||'',
         eixos:map.eixos?.value||'',capacidade:map.capacidade?.value||''};
-      setStage(2,'running','Pesquisando referência do modelo antes de classificar...');
+      setStage(2,'running','Conferindo a referência técnica do modelo...');
       await researchModel(modelTechnical);
       if(taskId!==activeProcessId||file!==lastFile)return;
       setExtracted(map,native?.native?(aiUsed?'PDF digital → Gemini + texto nativo':'PDF digital → texto nativo'):(aiUsed?'Scanner 5.2 → Gemini IA':'Scanner 5.2 → OCR local (IA indisponível)'),text,aiUsed?aiCrlv:null);
@@ -2567,7 +2665,7 @@ self.onmessage=e=>{
       }else if(ev.level!=='identified'){
         notice('Leitura parcial concluída. Tipo e prazo são sugestões baseadas nos campos encontrados; confira no documento original.','warning');
       }else{
-        notice(native?.native?'CRLV digital lido sem alterações no PDF original. Confira os campos extraídos.':aiUsed?'CRLV interpretado pelo Gemini IA a partir da imagem melhorada. Confira os campos.':'CRLV lido pelo OCR local de reserva. Confira os dados.','success');
+        notice(native?.native?'CRLV digital lido sem alterações no PDF original. Confira os campos extraídos.':aiUsed?'CRLV interpretado pelo Gemini após tratamento local. Confira os campos.':'CRLV lido pelo OpenCV/Tesseract no navegador. Confira os dados.','success');
       }
       if(aiError){
         notice('Gemini não concluiu a leitura ('+aiError+'). '+(native?.native?'O texto nativo do PDF foi utilizado.':'O OCR local foi usado como alternativa.')+' Confira os dados.','warning');
@@ -2934,7 +3032,7 @@ self.onmessage=e=>{
   });
   renderExtraction();analyze();resetStages();
   // Funções de diagnóstico local, sem envio de documentos.
-  window.__FrotaCheckTest={knownModelVerification,verifiedModelFor,modelValidForCategory,researchModel,isLightOpenBody,hasOpenBody,updateBodyQuestion,yearFromFocusedOCR,calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,prepareUprightCrlv,scanWith52,canvasFromScanResult,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
+  window.__FrotaCheckTest={knownModelVerification,verifiedModelFor,modelValidForCategory,researchModel,isLightOpenBody,hasOpenBody,updateBodyQuestion,yearFromFocusedOCR,calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,diagnoseScanQuality,adaptiveScanForRecognition,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,prepareUprightCrlv,scanWith52,canvasFromScanResult,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
 })();
 
 </script>
