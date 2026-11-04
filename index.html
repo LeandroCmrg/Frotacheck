@@ -235,7 +235,8 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     <div class="fields">
       <div class="field"><label for="placa">Placa</label><input id="placa" placeholder="ABC1D23" maxlength="7" autocomplete="off" /></div>
       <div class="field"><label for="uf">UF</label><select id="uf"><option value="">Selecione</option></select></div>
-      <div class="field"><label for="exercicio">Exercício do CRLV</label><input id="exercicio" inputmode="numeric" maxlength="4" placeholder="2025" /></div>
+      <div class="field"><label for="exercicio">Exercício do CRLV</label><input id="exercicio" inputmode="numeric" maxlength="4" placeholder="2026" /></div>
+      <div class="field"><label for="emissao">Data de emissão (LOCAL / DATA)</label><input id="emissao" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" /><p class="hint">Data no documento, não o vencimento. Não presume renovação.</p></div>
       <div class="field"><label for="eixos">Eixos</label><input id="eixos" type="number" min="1" max="12" placeholder="Ex.: 2" /></div>
       <div class="field full"><label for="especie">Espécie / tipo no documento</label><input id="especie" placeholder="Ex.: CARGA CAMINHÃO" /></div>
       <div class="field full"><label for="modelo">Marca / modelo</label><input id="modelo" placeholder="Ex.: VW/24.280" /></div>
@@ -274,7 +275,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
     <p class="body-small">ℹ️ Essa é uma classificação operacional interna. A espécie e a carroceria documentadas no CRLV permanecem as mesmas.</p>
     <div id="body-check-result" class="body-check-result" role="status" aria-live="polite" hidden></div>
   </section>
-  <div class="result-tile yellow" id="license-tile"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>Licenciamento • calendário 2024–2026</div><div class="big deadline-date" id="deadline">—</div><div class="year" id="renewal-year">Calendário de 2024–2026</div><span class="status neutral" id="status">Aguardando documento</span><p class="detail-note" id="deadline-kind"></p>
+  <div class="result-tile yellow" id="license-tile"><div class="tile-head"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></svg>Licenciamento • renovação anual</div><div class="big deadline-date" id="deadline">—</div><div class="year" id="renewal-year">Próxima renovação</div><span class="status neutral" id="status">Aguardando documento</span><p class="detail-note" id="deadline-kind"></p><p class="detail-note" id="issue-date-note" hidden></p>
     <div id="uf-rescue" class="uf-rescue" hidden><label for="uf-rescue-select">UF não reconhecida: confirme o estado que aparece no CRLV</label>
       <p>O sistema tentará ler a UF no documento. Se não conseguir, selecione o estado abaixo para calcular a data.</p>
       <select id="uf-rescue-select" aria-label="UF do CRLV"><option value="">Selecione a UF do CRLV</option></select>
@@ -282,7 +283,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="model-summary"><small>Marca / modelo identificado</small><strong id="result-model">Aguardando leitura</strong><div id="model-research" class="model-research" hidden role="status" aria-live="polite"></div></div>
   <div class="vehicle-specs" aria-label="Características extraídas do CRLV"><div><small>Espécie / tipo no CRLV</small><b id="result-especie">—</b></div><div><small>Carga útil</small><b id="result-capacidade">—</b></div><div><small>PBT</small><b id="result-pbt">—</b></div><div><small>Eixos</small><b id="result-eixos">—</b></div><div><small>Carroceria no CRLV</small><b id="result-carroceria">—</b></div></div>
   <div class="meta"><div class="meta-item"><small>Placa</small><b id="summary-placa">—</b></div><div class="meta-item"><small>UF</small><b id="summary-uf">—</b></div><div class="meta-item"><small>Exercício</small><b id="summary-exercicio">—</b></div></div>
-  <p class="explanation" id="status-explanation">Envie o documento para consultar o calendário correspondente ao exercício (2024–2026).</p>
+  <p class="explanation" id="status-explanation">Envie o documento para identificar o exercício e consultar a próxima renovação anual.</p>
   <details class="rbm-reference"><summary>▤ Consultar referência de tipologias RBM</summary>
     <table><thead><tr><th>Tipologia</th><th>Carga de referência</th><th>Volume</th></tr></thead>
       <tbody><tr><td>Utilitário / Fiorino</td><td>500 até &lt; 1.500 kg</td><td>2 m³</td></tr><tr><td>Van</td><td>1.500 até &lt; 1.800 kg</td><td>6 ou 8 m³</td></tr><tr><td>HR</td><td>1.800 até &lt; 2.200 kg</td><td>12 m³</td></tr><tr><td>VUC</td><td>2.200 até &lt; 3.500 kg</td><td>16 m³</td></tr><tr><td>Médio</td><td>3.500 até &lt; 6.000 kg</td><td>25 m³</td></tr><tr><td>Toco</td><td>6.000 até &lt; 12.000 kg</td><td>40 m³</td></tr><tr><td>Truck</td><td>12.000 até &lt; 24.000 kg</td><td>50 m³</td></tr><tr><td>Carreta</td><td>A partir de 24.000 kg*</td><td>90 m³</td></tr></tbody>
@@ -291,7 +292,7 @@ main{max-width:1204px;padding:32px 22px 38px;margin:auto}.intro{margin-bottom:25
   <div class="result-footer"><a id="source-link" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Ver fonte oficial ↗</a><button class="button" type="button" id="copy-summary">⧉ Copiar resultado</button></div>
 </section>
 </div>
-<div class="footer-note">As datas exibidas são referências de calendários estaduais dos exercícios 2024, 2025 e 2026, conforme a UF e a placa. Algumas datas podem corresponder a pagamento, licenciamento ou exigência para circulação; a confirmação oficial depende do Detran. A cobertura histórica de 2024 é parcial e datas não verificadas exigem conferência. As tipologias consideram modelo pesquisado, espécie/tipo, eixos e tabela RBM de carga útil; em caso de divergência pode ser necessária conferência. O FrotaCheck não autentica o CRLV-e nem consulta débitos ou restrições.</div>
+<div class="footer-note">As datas de próxima renovação usam os calendários estaduais verificados de 2025 e 2026; para 2027, sem calendário oficial confirmado, informa-se apenas o ano. Algumas datas podem corresponder a pagamento, licenciamento ou exigência para circulação; a confirmação oficial depende do Detran. Algumas datas históricas são incompletas e exigem conferência. As tipologias consideram modelo pesquisado, espécie/tipo, eixos e tabela RBM de carga útil; em caso de divergência pode ser necessária conferência. O FrotaCheck não autentica o CRLV-e nem consulta débitos ou restrições.</div>
 </main>
 <div id="qr-modal" class="scanner-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
   <div class="scanner-box">
@@ -554,8 +555,8 @@ self.onmessage=e=>{
 (() => {
   'use strict';
   const $=id=>document.getElementById(id);
-  const names={placa:'Placa',uf:'UF de registro',exercicio:'Exercício do CRLV',especie:'Espécie/tipo',modelo:'Marca/modelo',capacidade:'Capacidade de carga',pbt:'PBT',eixos:'Eixos',carroceria:'Carroceria do CRLV'};
-  const fields=['placa','uf','exercicio','especie','modelo','pbt','capacidade','eixos','carroceria','cobertura_alta','cabine_estendida','comprimento','largura','override'];
+  const names={placa:'Placa',uf:'UF de registro',exercicio:'Exercício do CRLV',emissao:'Emissão do CRLV',especie:'Espécie/tipo',modelo:'Marca/modelo',capacidade:'Capacidade de carga',pbt:'PBT',eixos:'Eixos',carroceria:'Carroceria do CRLV'};
+  const fields=['placa','uf','exercicio','emissao','especie','modelo','pbt','capacidade','eixos','carroceria','cobertura_alta','cabine_estendida','comprimento','largura','override'];
   const ufs=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
   for(const uf of ufs){for(const id of ['uf','uf-rescue-select']){const opt=document.createElement('option');opt.value=uf;opt.textContent=uf;$(id).append(opt);}}
   const dates={
@@ -754,6 +755,20 @@ self.onmessage=e=>{
   const plateFmt=s=>norm(s).replace(/[^A-Z0-9]/g,'');
   const validPlate=s=>/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(plateFmt(s));
   const plateFinal=s=>validPlate(s)?Number(plateFmt(s).slice(-1)):null;
+  // LOCAL/DATA é a emissão do documento. Não equivale à renovação nem ao vencimento.
+  function parseIssueDate(value){
+    const m=String(value||'').match(/(?:^|[^\d])(\d{2})[\/.\-](\d{2})[\/.\-](20\d{2})(?!\d)/);
+    if(!m)return null;
+    const day=+m[1],month=+m[2],year=+m[3];
+    if(year<2000||year>2099)return null;
+    const d=new Date(Date.UTC(year,month-1,day));
+    if(d.getUTCDate()!==day||d.getUTCMonth()!==month-1||d.getUTCFullYear()!==year)return null;
+    // Datas futuras não devem ser apresentadas como emissão confirmada.
+    if(d.getTime()>Date.now()+86400000)return null;
+    return `${m[1]}/${m[2]}/${m[3]}`;
+  }
+  const todayBrazilYear=()=>+new Intl.DateTimeFormat('en-US',{timeZone:'America/Sao_Paulo',year:'numeric'}).format(new Date());
+
   const fmt=d=>d.toLocaleDateString('pt-BR',{timeZone:'UTC'});
   let lastFile=null,rawText='',extraction={}, conflicts=[],extractionMode='manual',pending=false;
   let processedCache=null;
@@ -1057,11 +1072,15 @@ self.onmessage=e=>{
     a.textContent='Ver referência do calendário de '+uf+' ↗';
     a.hidden=false;
   }
-  // A tabela aplicavel é SEMPRE a do exercicio lido. Nunca projetar data de outro ano.
+  // Exercício do CRLV indica o último ANO licenciado; o calendário do ano
+  // SEGUINTE estabelece quando precisa renovar. Não é data da impressão.
   function analyze(){
     const v=Object.fromEntries(fields.map(k=>[k,$(k).value.trim()]));
     const final=plateFinal(v.placa),exc=Number(v.exercicio),validYear=/^20\d{2}$/.test(v.exercicio);
-    const supportedYear=validYear&&[2024,2025,2026].includes(exc);
+    const validExercise=validYear&&exc>=2000&&exc<=2035;
+    const renewalYear=validExercise?exc+1:null;
+    const todayYear=todayBrazilYear();
+    const issued=parseIssueDate(v.emissao);
     updateBodyQuestion(v);
     const cat=classify(v);
     $('category').textContent=cat.name;
@@ -1081,24 +1100,43 @@ self.onmessage=e=>{
     $('summary-exercicio').textContent=v.exercicio||'—';
     $('deadline').textContent='—';
     $('deadline').className='big deadline-date';
-    const shownYear=supportedYear?exc:'2024–2026';
-    $('renewal-year').textContent='Calendário estadual do exercício '+shownYear;
-    $('license-tile').querySelector('.tile-head').lastChild.textContent='Licenciamento • calendário '+shownYear;
+    $('renewal-year').textContent=renewalYear?'Próxima renovação • exercício '+renewalYear:'Exercício do CRLV a confirmar';
+    $('license-tile').querySelector('.tile-head').lastChild.textContent='Licenciamento • próxima renovação';
+    $('issue-date-note').hidden=!issued;
+    $('issue-date-note').textContent=issued?'Emissão do CRLV (LOCAL / DATA): '+issued+' — não é o vencimento.':'';
     let title='Aguardando dados',msg='Informe placa, UF e exercício do CRLV.';
     let css='neutral',dl=null;
     const licenseTile=$('license-tile');
     licenseTile.classList.remove('license-ok','license-bad','license-pending','yellow');
-    if(!supportedYear){
-      title='Confirme o exercício';
-      msg='Este módulo possui calendário de 2024, 2025 e 2026. Confira o exercício informado no CRLV.';
-    }else if(final===null){
-      title='Informe a placa';msg='A placa válida é necessária para localizar o prazo do exercício '+exc+'.';
+    const issueYear=issued?Number(issued.slice(-4)):null;
+    if(!validExercise){
+      title='Confirme o exercício';css='warn';
+      msg='Confira o exercício exibido no CRLV. A emissão (LOCAL / DATA) não substitui o exercício.';
+    }else if(issueYear&&issueYear<exc){
+      title='Data de emissão a conferir';css='warn';
+      msg='A data LOCAL / DATA lida ('+issued+') é anterior ao exercício '+exc+'. Confira a leitura do documento.';
     }else if(!v.uf||!dates[v.uf]){
-      title='UF não identificada';css='warn';msg='A leitura não conseguiu extrair a UF do CRLV. Confirme o estado no seletor abaixo para exibir a data correta, sem presumir a localização do veículo.';
-    }else{
-      dl=calendar(v.uf,final,exc,v.especie,v.placa);
+      title='UF não identificada';css='warn';
+      msg='Confirme a UF de registro para localizar a próxima renovação. A data de emissão não identifica a UF.';
+    }else if(final===null){
+      title='Informe a placa';css='warn';
+      msg='A placa válida é necessária para identificar o prazo de renovação '+renewalYear+'.';
+    }else if(renewalYear>todayYear+1){
+      $('deadline').textContent=String(renewalYear);
+      title='Exercício futuro — conferir';css='warn';
+      msg='O CRLV apresenta exercício futuro. Confirme os dados no Detran.';
+    }else if(renewalYear===2027){
+      $('deadline').textContent='2027';
+      title=todayYear<=2026?'No prazo — exercício 2026':'Data de 2027 a confirmar';
+      css=todayYear<=2026?'ok':'warn';
+      msg='O CRLV informado é do exercício 2026. O próximo ciclo de licenciamento é 2027. Não há data específica de 2027 verificada na base para esta UF/placa; consulte o Detran quando publicar o calendário.';
+      if(issued)msg+=' Emissão do CRLV registrada no documento: '+issued+'.';
+      msg+=' Não é uma consulta de débitos ou regularidade do RENAVAM.';
+    }else if(renewalYear>=2025&&renewalYear<=2026){
+      dl=calendar(v.uf,final,renewalYear,v.especie,v.placa);
       if(dl?.notVerified){
-        title='Data histórica a conferir';css='warn';msg=dl.incomplete;
+        title='Data a conferir';css='warn';
+        msg=dl.incomplete||'Calendário histórico não confirmado. Consulte o Detran.';
       }else if(dl?.incomplete){
         title='Dados para conferir';css='warn';msg=dl.incomplete;
       }else if(dl?.date){
@@ -1106,37 +1144,42 @@ self.onmessage=e=>{
         const deadlineDay=Date.UTC(dl.date.getUTCFullYear(),dl.date.getUTCMonth(),dl.date.getUTCDate())/86400000;
         const delta=deadlineDay-brazilDate();
         const kind=norm(dl.kind||'');
-        const isPaymentOnly=/PAGAMENTO|IPVA|TAXA|EMISSAO/.test(kind)&&!/CIRCULACAO|VALIDADE|EXIGENCIA|FISCALIZACAO/.test(kind);
+        const paymentOnly=/PAGAMENTO|IPVA|TAXA|EMISSAO/.test(kind)&&!/CIRCULACAO|VALIDADE|EXIGENCIA|FISCALIZACAO|RENOVACAO/.test(kind);
         const extra=dl.note?' '+dl.note:'';
-        if(dl.uncertain){
-          title='Conferência necessária';css='warn';
-          msg='A data de referência não está confirmada para este estado. Confira no Detran.'+extra;
+        if(dl.uncertain||paymentOnly){
+          title='Data a conferir';css='warn';
+          msg='Referência de '+renewalYear+': '+fmt(dl.date)+'. '+(paymentOnly?'Esta fonte trata de pagamento/taxa e não comprova isoladamente o limite de circulação. ':'')+extra;
         }else if(delta<0){
-          title='Vencido';css='bad';$('deadline').classList.add('overdue');
-          msg='O prazo do calendário de '+exc+' terminou em '+fmt(dl.date)+'. Data anterior à de hoje: vencido pela regra operacional do FrotaCheck.'+extra;
-          if(isPaymentOnly)msg+=' O prazo indicado é de pagamento e não confirma, isoladamente, irregularidade para circulação.';
+          title='Prazo de renovação ultrapassado';css='bad';$('deadline').classList.add('overdue');
+          msg='Para o CRLV do exercício '+exc+', o prazo de renovação '+renewalYear+' terminou em '+fmt(dl.date)+'. A situação oficial do veículo precisa ser confirmada no Detran.'+extra;
         }else{
-          title=delta===0?'No prazo — vence hoje':'No prazo';css='ok';$('deadline').classList.add('on-time');
-          msg=delta===0?'O prazo do calendário de '+exc+' termina hoje.':'O prazo estadual de '+exc+' ainda não terminou ('+delta+' dia'+(delta===1?'':'s')+' restante'+(delta===1?'':'s')+').';
-          if(isPaymentOnly)msg+=' Este prazo refere-se ao pagamento, que pode diferir da exigência do CRLV para circulação.';
-          msg+=extra;
+          title=delta===0?'Vence hoje':'No prazo';css='ok';$('deadline').classList.add('on-time');
+          msg='O CRLV de exercício '+exc+' encontra-se dentro do prazo de renovação '+renewalYear+' indicado para esta UF e placa, até '+fmt(dl.date)+'.'+extra;
         }
-        msg+=' Situação baseada na data da tabela do exercício, não é consulta à situação oficial do veículo no Detran.';
       }else{
         title='Prazo não encontrado';css='warn';
-        msg='Não foi possível localizar uma data confiável para '+v.uf+' no exercício '+exc+'. Consulte o Detran.';
+        msg='Não foi possível localizar data confiável de renovação '+renewalYear+' para '+v.uf+'. Consulte o Detran.';
       }
+    }else if(renewalYear>2027){
+      $('deadline').textContent=String(renewalYear);
+      title='Data a confirmar';css='warn';
+      msg='O ciclo de renovação '+renewalYear+' não possui calendário estadual verificado.';
+    }else{
+      title='Exercício antigo';css='bad';
+      msg='O exercício '+exc+' está antigo. Para avaliar a situação atual, consulte o Detran.';
     }
     licenseTile.classList.add(css==='ok'?'license-ok':css==='bad'?'license-bad':css==='warn'?'license-pending':'yellow');
     $('status').textContent=title;
     $('status').className='status '+css;
     $('status-explanation').textContent=msg;
-    $('deadline-kind').textContent=dl?.kind?'Referência estadual '+(dl.calendarYear||exc)+': '+dl.kind:'';
+    $('deadline-kind').textContent=dl?.kind?'Referência estadual '+(dl.calendarYear||renewalYear)+': '+dl.kind:
+      renewalYear===2027?'Calendário de renovação 2027: dia e mês ainda não confirmados.':'';
     showSource(v.uf,dl);
     return {processedAt:new Date().toISOString(),data:v,classification:cat,
-      calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain,year:exc}:null,
-      summary:{title,msg},renewalYear:supportedYear?exc:null,
-      disclaimer:'A cor mostra a comparação com o calendário do exercício '+shownYear+'. A data do calendário não comprova, por si só, a regularidade do veículo ou a validade individual do documento; consulte o Detran.'};
+      calendar:dl?.date?{deadline:fmt(dl.date),kind:dl.kind,source:dl.url,needsConfirmation:!!dl.uncertain,year:renewalYear}:
+        renewalYear===2027?{deadline:'2027 — data exata a confirmar',kind:'próxima renovação',source:null,needsConfirmation:true,year:renewalYear}:null,
+      summary:{title,msg},renewalYear,
+      disclaimer:'O CRLV mostra um EXERCÍCIO, não uma data impressa de vencimento. A data LOCAL/DATA é de emissão. O prazo de renovação depende de UF, placa e publicação do Detran; a consulta não comprova a regularidade do veículo.'};
   }
   const aliases={
     placa:[/^PLACA(?: ATUAL)?$/],
@@ -1260,6 +1303,7 @@ self.onmessage=e=>{
   function parseValue(key,value,contextual=false){let s=norm(value).replace(/^[:#-]\s*/,'').trim();if(!s)return null;
     if(key==='placa'){const m=s.match(/[A-Z0-9]{3}[0-9OQILSB][A-Z0-9][0-9OQILSB]{2}/);const v=m&&(contextual?repairPlate(m[0]):validPlate(m[0])?m[0]:null);return v||null;}
     if(key==='exercicio'){const m=s.match(/\b20\d{2}\b/);return m?m[0]:null;}
+    if(key==='emissao')return parseIssueDate(s);
     if(key==='uf'){const m=s.match(/\b(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);return m?m[0]:null;}
     if(key==='especie'){const m=s.match(species);return m?m[0].replace(/\s+/g,' '):null;}
     if(key==='modelo') {const cropped=s.split(/\b(?:CHASSI|COR PREDOMINANTE|COMBUSTIVEL|PLACA|ESPECIE|CATEGORIA|EXERCICIO)\b/)[0].trim();return cropped.length>=4&&cropped.length<=85&&!isLabel(cropped)?cropped:null;}
@@ -1279,6 +1323,34 @@ self.onmessage=e=>{
     const rows=[];
     for(const it of items||[]){if(!it.str?.trim()||!it.transform)continue;const y=it.transform[5];let row=rows.find(r=>Math.abs(r.y-y)<=3);if(!row){row={y,parts:[]};rows.push(row);}row.parts.push({x:it.transform[4],y,text:it.str.trim()});}
     rows.sort((a,b)=>b.y-a.y);rows.forEach(r=>r.parts.sort((a,b)=>a.x-b.x));return rows;
+  }
+  function issueDateFromRows(rows,map){
+    for(let i=0;i<rows.length;i++){
+      const row=rows[i];
+      const label=row.parts.find(p=>/^DATA$/.test(norm(p.text))&&p.x>330);
+      const local=row.parts.find(p=>/^LOCAL$/.test(norm(p.text)));
+      if(!label||!local||label.x<local.x+70)continue;
+      for(let j=i+1;j<Math.min(rows.length,i+4);j++){
+        const below=rows[j];if(row.y-below.y>55)break;
+        for(const val of below.parts){
+          if(Math.abs(val.x-label.x)>58)continue;
+          const stamp=parseIssueDate(val.text);
+          if(stamp){register(map,'emissao',stamp,4,'LOCAL / DATA · PDF digital');return stamp;}
+        }
+      }
+    }
+    return null;
+  }
+  function issueDateFromText(raw,map,score=2){
+    const t=String(raw||'').replace(/\r/g,'');
+    // Não usar a data do rodapé (documento emitido) nem uma data de pagamento.
+    const patterns=[
+      /\bLOCAL\s*\/\s*DATA\s*[:\-]?\s*[^\n]{0,70}?(\d{2}[\/.\-]\d{2}[\/.\-]20\d{2})/i,
+      /\bLOCAL\b[^\n]{0,45}\bDATA\b[^\n]*\n[^\n]{0,85}?(\d{2}[\/.\-]\d{2}[\/.\-]20\d{2})/i,
+      /\bLOCAL\s*[:\-]?\s*[A-ZÀ-Ú\s]{3,50}\s+\b(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\s+(\d{2}[\/.\-]\d{2}[\/.\-]20\d{2})/i
+    ];
+    for(const re of patterns){const m=t.match(re);if(m){const stamp=parseIssueDate(m[1]);if(stamp){register(map,'emissao',stamp,score,'LOCAL / DATA · OCR');return stamp;}}}
+    return null;
   }
   function parseCoordinates(rows,map){
     for(let index=0;index<rows.length;index++){
@@ -1336,6 +1408,7 @@ self.onmessage=e=>{
     const detran=txt.match(/\bDETRAN\s*[-/]\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
     if(detran)register(map,'uf',detran[1],score,'Órgão emissor');
     recoverUFfromText(raw,map,score,'UF em LOCAL/DETRAN no texto');
+    issueDateFromText(raw,map,score);
     const loc=txt.match(/\bUF DE REGISTRO\s*[:\-]?\s*(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\b/);
     if(loc)register(map,'uf',loc[1],score,'UF registrada');
     // Busca isolada de placa somente se não existe âncora mais confiável.
@@ -1453,7 +1526,8 @@ self.onmessage=e=>{
     {key:'modelo',   box:[.087,.342,.260,.018], psm:7, label:'Marca/modelo'},
     {key:'especie',  box:[.088,.378,.240,.019], psm:7, label:'Espécie/tipo'},
     {key:'pbt',      box:[.823,.169,.055,.014], psm:7, label:'Peso bruto total'},
-    {key:'eixos',    box:[.812,.192,.032,.015], psm:7, label:'Eixos'}
+    {key:'eixos',    box:[.812,.192,.032,.015], psm:7, label:'Eixos'},
+    {key:'emissao',  box:[.84,.292,.135,.035], psm:7, label:'Data LOCAL/DATA'}
   ];
   // Uma região de conferência ajuda a recuperar campos quando o PDF está com
   // margens diferentes. Só usa valores explícitos e nunca inventa a UF.
@@ -1463,7 +1537,8 @@ self.onmessage=e=>{
     {key:'modelo',box:[.076,.331,.320,.031],psm:6,label:'Modelo amplo'},
     {key:'especie',box:[.076,.370,.320,.028],psm:6,label:'Espécie ampla'},
     {key:'pbt',box:[.808,.161,.095,.032],psm:6,label:'PBT amplo'},
-    {key:'eixos',box:[.795,.184,.060,.028],psm:6,label:'Eixos amplo'}
+    {key:'eixos',box:[.795,.184,.060,.028],psm:6,label:'Eixos amplo'},
+    {key:'emissao',box:[.805,.285,.165,.05],psm:7,label:'Data de emissão ampla'}
   ];
   function fieldZoneValue(key,raw){
     const n=norm(String(raw||'')).replace(/[|]/g,' ').trim();
@@ -1507,6 +1582,7 @@ self.onmessage=e=>{
       const m=n.replace(/O/g,'0').match(/(?:^|\s)(\d{1,3}[.,]\d{1,2})(?=\s|$)/);
       return m?parseValue('pbt',m[1],true):null;
     }
+    if(key==='emissao')return parseIssueDate(n);
     if(key==='eixos'){
       const cleaned=n.replace(/(?:E[I1]X[O0]S|N[UO]MERO\s+DE\s+E[I1]X[O0]S)/g,' ').trim();
       const matches=[...new Set(cleaned.match(/\b(?:[1-9]|1[0-2])\b/g)||[])];
@@ -2309,6 +2385,33 @@ self.onmessage=e=>{
       improveMessage('Prévia pronta com '+lastEnhancementEngine+'. Confira a legibilidade e baixe o PDF.','success');
     }catch(e){if(token===previewToken)improveMessage('Não foi possível mostrar a prévia: '+(e.message||String(e)),'error');}
   }
+  // Acabamento visual para o PDF exportado: fundo de papel próximo do branco,
+  // mantendo contraste do texto fino, cabeçalho e QR. Não recria o conteúdo.
+  function polishScannedForPdf(source){
+    const c=document.createElement('canvas');c.width=source.width;c.height=source.height;
+    const cx=c.getContext('2d',{willReadFrequently:true});cx.drawImage(source,0,0);
+    const img=cx.getImageData(0,0,c.width,c.height),a=img.data;
+    for(let i=0;i<a.length;i+=4){
+      const r=a[i],g=a[i+1],b=a[i+2];
+      const y=.299*r+.587*g+.114*b;
+      let target=y;
+      if(y>=214)target=Math.min(255,249+(y-214)*.17);
+      else if(y>=174)target=y+(y-174)*.12;
+      else if(y<92)target=Math.max(0,y*.91);
+      const shift=target-y;
+      // Contraste adaptativo suave: não executar limiar duro nos QR Codes.
+      if(Math.abs(r-g)<14&&Math.abs(g-b)<14){
+        const tone=Math.max(0,Math.min(255,Math.round(target)));
+        a[i]=a[i+1]=a[i+2]=tone;
+      }else{
+        a[i]=Math.max(0,Math.min(255,r+shift));
+        a[i+1]=Math.max(0,Math.min(255,g+shift));
+        a[i+2]=Math.max(0,Math.min(255,b+shift));
+      }
+    }
+    cx.putImageData(img,0,0);
+    return c;
+  }
   // PDF mínimo em imagem, feito localmente: exportação sem contratar API e sem
   // depender de biblioteca extra além das necessárias para ler PDFs de entrada.
   function makeEnhancedPdf(canvases){
@@ -2438,12 +2541,13 @@ self.onmessage=e=>{
   }
   function mapFromGemini(data){
     const map={};
-    for(const key of ['placa','uf','exercicio','modelo','especie','pbt','capacidade','eixos','carroceria','cabine_estendida']){
+    for(const key of ['placa','uf','exercicio','emissao','modelo','especie','pbt','capacidade','eixos','carroceria','cabine_estendida']){
       const value=data.fields?.[key];
       if(value!==null&&value!==undefined&&String(value).trim()){
         let text=String(value).trim();
         if(key==='pbt'||key==='capacidade')text=tonnesFromGemini(text);
         if(key==='uf')text=explicitUF(text)||'';
+        if(key==='emissao')text=parseIssueDate(text)||'';
         if(key==='cabine_estendida')text=norm(text)==='SIM'?'sim':'';
         if(key==='eixos'){
           const m=text.match(/\b(?:[1-9]|1[0-2])\b/);
@@ -2456,7 +2560,7 @@ self.onmessage=e=>{
   }
   function summaryFromGemini(map){
     const lines=['Leitura estruturada da cópia digitalizada pelo Gemini IA:'];
-    for(const key of ['placa','uf','exercicio','modelo','especie','pbt','capacidade','eixos','carroceria','cabine_estendida']){
+    for(const key of ['placa','uf','exercicio','emissao','modelo','especie','pbt','capacidade','eixos','carroceria','cabine_estendida']){
       lines.push((names[key]||key)+': '+(map[key]?.value||'não identificado'));
     }
     return lines.join('\n');
@@ -2521,7 +2625,7 @@ self.onmessage=e=>{
         pdfButton('↓ Baixar PDF original',false);
         pdfMessage('PDF digital reconhecido: original preservado, leitura direta sem melhoria.','ok');
         setStage(0,'done','PDF digital original: melhoria ignorada.');
-        for(const rows of native.rows){parseCoordinates(rows,map);recoverUFfromRows(rows,map);}
+        for(const rows of native.rows){parseCoordinates(rows,map);recoverUFfromRows(rows,map);issueDateFromRows(rows,map);}
         parseText(native.text,map,3,'Texto nativo do PDF');
         parts.push('--- TEXTO ORIGINAL DO PDF ---\n'+native.text);
         currentStage=1;setStage(1,'running','Leitura direta do PDF digital...');
@@ -2582,6 +2686,15 @@ self.onmessage=e=>{
             parseText(readText,map,2,'OCR local Tesseract');
             if(nativeFieldsSufficient(map)&&map.carroceria?.value&&
                documentEvidence(parts.join('\n'),map).level==='identified')break;
+          }
+          if(!map.emissao?.value&&batch.scanned[0]){
+            try{
+              const c=batch.scanned[0];
+              if(c.height>c.width*1.12){
+                const value=fieldZoneValue('emissao',await ocr(fieldCrop(c,[.83,.29,.145,.043]),7));
+                if(value)register(map,'emissao',value,3,'LOCAL / DATA · OCR localizado');
+              }
+            }catch(_){}
           }
           localSufficient=nativeFieldsSufficient(map)&&!!map.carroceria?.value&&
             documentEvidence(parts.join('\n'),map).level==='identified';
@@ -2870,7 +2983,7 @@ self.onmessage=e=>{
   function savePdf(blob,file){
     const title=(file.name.replace(/\.[^.]+$/,'').replace(/[^a-z0-9áàâãéêíóôõúç_-]/gi,'_').slice(0,65)||'CRLV');
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=(blob===lastFile&&/\.pdf$/i.test(file.name))?file.name:title+'-melhorado-2026.pdf';document.body.append(a);a.click();a.remove();
+    const a=document.createElement('a');a.href=url;a.download=(blob===lastFile&&/\.pdf$/i.test(file.name))?file.name:title+'-melhorado.pdf';document.body.append(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),60000);
   }
   function initScannerWorker(){
@@ -3008,7 +3121,7 @@ self.onmessage=e=>{
         }
       }
       if(!count)throw Error('O scanner não conseguiu melhorar nenhuma página. Nenhum PDF foi alterado.');
-      const pdf=makeEnhancedPdf(processed);
+      const pdf=makeEnhancedPdf(processed.map(polishScannedForPdf));
       if(version===pdfGeneration&&file===lastFile){
         pdfReady=pdf;
         pdfMessage(count===processed.length?'PDF melhorado pronto. Confira a cópia antes de utilizar.':'PDF parcialmente tratado: algumas páginas foram preservadas sem alterações.','ok');
@@ -3026,13 +3139,13 @@ self.onmessage=e=>{
   $('clear').addEventListener('click',()=>{void qrClose();lastFile=null;exerciseAttempts=[];$('exercise-diag').hidden=true;$('processing-strip').hidden=true;$('ai-diagnostic').hidden=true;processedCache=null;activeProcessId++;resetProcessedPDF();resetStages();previewToken++;scanOriginal=null;autoCorners=null;manualCorners=null;cropDrag=-1;$('scan-crop').hidden=true;$('crop-mode').value='auto';$('enhance-previews').hidden=true;$('enhance-preview-button').disabled=true;$('download-pdf').disabled=true;$('retry-enhanced-ocr').disabled=true;$('retry-reading').disabled=true;improveMessage('Envie uma foto ou PDF para habilitar a melhoria.');conflicts=[];extraction={};rawText='';extractionMode='manual';fields.forEach(k=>$(k).value='');$('edit-fields').open=false;$('file').value='';$('rawtext').textContent='Nenhum arquivo analisado.';renderExtraction();notice('Campos limpos. Pronto para novo documento.');analyze();});
   $('copy-summary').addEventListener('click',async()=>{
     const r=analyze();
-    const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nCapacidade: ${r.data.capacidade||'-'} t\nCarroceria no CRLV: ${r.data.carroceria||'-'}\nCobertura alta (foto): ${r.data.cobertura_alta==='sim'?'Sim':r.data.cobertura_alta==='nao'?'Não':'Não confirmada'}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nCalendário consultado: ${r.renewalYear||"não identificado"}\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
+    const s=`FrotaCheck | CRLV-e\nPlaca: ${r.data.placa||'-'}\nTipo do veículo: ${r.classification.name}\nCapacidade: ${r.data.capacidade||'-'} t\nCarroceria no CRLV: ${r.data.carroceria||'-'}\nCobertura alta (foto): ${r.data.cobertura_alta==='sim'?'Sim':r.data.cobertura_alta==='nao'?'Não':'Não confirmada'}\nUF: ${r.data.uf||'-'}\nExercício: ${r.data.exercicio||'-'}\nData de emissão: ${r.data.emissao||'não identificada'}\nPróxima renovação: ${r.renewalYear||"não identificada"}\nPrazo: ${r.calendar?.deadline||'não disponível'}\nSituação do prazo: ${r.summary.title}\nFonte: ${r.calendar?.source||'não disponível'}\nObservação: ${r.summary.msg}\n${r.disclaimer}`;
     try{await navigator.clipboard.writeText(s);notice('Resultado copiado.','success');}
     catch(e){notice('Não foi possível copiar automaticamente.','warning');}
   });
   renderExtraction();analyze();resetStages();
   // Funções de diagnóstico local, sem envio de documentos.
-  window.__FrotaCheckTest={knownModelVerification,verifiedModelFor,modelValidForCategory,researchModel,isLightOpenBody,hasOpenBody,updateBodyQuestion,yearFromFocusedOCR,calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,diagnoseScanQuality,adaptiveScanForRecognition,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,prepareUprightCrlv,scanWith52,canvasFromScanResult,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
+  window.__FrotaCheckTest={parseIssueDate,issueDateFromRows,issueDateFromText,polishScannedForPdf,knownModelVerification,verifiedModelFor,modelValidForCategory,researchModel,isLightOpenBody,hasOpenBody,updateBodyQuestion,yearFromFocusedOCR,calendar,analyze,parseText,parseCoordinates,makeRows,validPlate,classify,docCheck,documentEvidence,enhanceCanvas,enhanceCanvasSmart,diagnoseScanQuality,adaptiveScanForRecognition,detectDocumentCorners,detectDocumentCornersLocal,warpDocument,warpDocumentFallback,scanCanvas,prepareUprightCrlv,scanWith52,canvasFromScanResult,makeEnhancedPdf,setExtracted,fieldZoneValue,readCrlvFieldZones};
 })();
 
 </script>
